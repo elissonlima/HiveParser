@@ -1,0 +1,18 @@
+from distutils.core import setup, Extension
+
+
+setup(name='hiveparser',
+    version='1.0',
+    ext_modules=[
+    Extension('hiveparser', 
+        ['${CMAKE_CURRENT_SOURCE_DIR}/module.cpp', 
+            '${CMAKE_CURRENT_SOURCE_DIR}/HiveParserModule.cpp',
+            '${ANTLR_HiveParser_OUTPUT_DIR}/HiveParser.cpp','${ANTLR_HiveParser_OUTPUT_DIR}/HiveLexer.cpp',
+            '${CMAKE_CURRENT_SOURCE_DIR}/HqlFunction.cpp'],
+        include_dirs = ['${CMAKE_CURRENT_SOURCE_DIR}', '${ANTLR4_INCLUDE_DIRS}', '${ANTLR_HiveParser_OUTPUT_DIR}'],
+        extra_compile_args=['-DANTLR4CPP_STATIC'],
+        library_dirs = ['${ANTLR4_LIB_DIR}', '${ANTLR4_INCLUDE_DIRS}', '${ANTLR_HiveParser_OUTPUT_DIR}'],
+        libraries = ['antlr4-runtime-static']
+        )
+    ]
+)
