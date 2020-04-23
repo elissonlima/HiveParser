@@ -107,6 +107,57 @@ expr returns [json res]
     | math_func { $res = $math_func.res; }
     | string_func { $res = $string_func.res; }
     | date_func { $res = $date_func.res; }
+    | cond_func { $res = $cond_func.res; }
+    ;
+
+cond_func returns [json res]
+    : T_IF T_OPEN_P test_cond=expr ',' valueTrue=expr ',' valueFalse=expr T_CLOSE_P { $res = hql_three_param_func("IF", "test_cond", $test_cond.res, "value_true", $valueTrue.res, "value_false", $valueFalse.res); }
+    | T_ISNULL T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("ISNULL", "expr", $expr.res); }
+    | T_ISNOTNULL T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("ISNOTNULL", "expr", $expr.res); }
+    | T_NVL T_OPEN_P expr_val=expr ',' default_val=expr T_CLOSE_P { $res = hql_double_param_func("NVL", "expr_val", $expr_val.res, "default_val", $default_val.res); }
+    | { vector<ExprContext*> exprs; } T_COALESCE T_OPEN_P (exprs+=expr) (',' exprs+=expr) (',' exprs+=expr)* T_CLOSE_P { 
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_list_param_func("COALESCE","expr_list",expr_list_json);
+    }
+    | { vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; } T_CASE case_expr=expr (T_WHEN when_exprs+=expr T_THEN then_exprs+=expr)+ T_END { 
+        vector<json> when_expr_list_json; vector<json> then_expr_list_json;
+        for(int i = 0 ; i < $when_exprs.size() ; i++)
+        {
+            when_expr_list_json.push_back($when_exprs[i]->res);
+            then_expr_list_json.push_back($then_exprs[i]->res);
+        }
+        $res = hql_case_func($case_expr.res, when_expr_list_json, then_expr_list_json, NULL);
+     }
+    | { vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; } T_CASE case_expr=expr (T_WHEN when_exprs+=expr T_THEN then_exprs+=expr)+ T_ELSE els_expr=expr T_END{ 
+        vector<json> when_expr_list_json; vector<json> then_expr_list_json;
+        for(int i = 0 ; i < $when_exprs.size() ; i++)
+        {
+            when_expr_list_json.push_back($when_exprs[i]->res);
+            then_expr_list_json.push_back($then_exprs[i]->res);
+        }
+        $res = hql_case_func($case_expr.res, when_expr_list_json, then_expr_list_json, $els_expr.res);
+     }
+    | { vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; } T_CASE (T_WHEN when_exprs+=expr T_THEN then_exprs+=expr)+ T_END { 
+        vector<json> when_expr_list_json; vector<json> then_expr_list_json;
+        for(int i = 0 ; i < $when_exprs.size() ; i++)
+        {
+            when_expr_list_json.push_back($when_exprs[i]->res);
+            then_expr_list_json.push_back($then_exprs[i]->res);
+        }
+        $res = hql_case_func(NULL, when_expr_list_json, then_expr_list_json, NULL);
+     }
+    | { vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; } T_CASE (T_WHEN when_exprs+=expr T_THEN then_exprs+=expr)+ T_ELSE els_expr=expr T_END{ 
+        vector<json> when_expr_list_json; vector<json> then_expr_list_json;
+        for(int i = 0 ; i < $when_exprs.size() ; i++)
+        {
+            when_expr_list_json.push_back($when_exprs[i]->res);
+            then_expr_list_json.push_back($then_exprs[i]->res);
+        }
+        $res = hql_case_func(NULL, when_expr_list_json, then_expr_list_json, $els_expr.res);
+     }
+    | T_NULLIF T_OPEN_P a_expr=expr ',' b_expr=expr T_CLOSE_P { $res = hql_double_param_func("NULLIF", "a_expr", $a_expr.res, "b_expr", $b_expr.res); }
+    | T_ASSERT_TRUE T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("ASSERT_TRUE", "expr", $expr.res); }
     ;
 
 date_func returns [json res]
@@ -248,6 +299,7 @@ T_AND             : A N D ;
 T_AS              : A S ;
 T_ASC             : A S C ;
 T_ASIN            : A S I N ;
+T_ASSERT_TRUE     : A S S E R T '_' T R U E ;
 T_AT              : A T ;
 T_ATAN            : A T A N ;
 T_AUTO_INCREMENT  : A U T O '_' I N C R E M E N T ;
@@ -275,7 +327,8 @@ T_CHARSET         : C H A R S E T ;
 T_CLIENT          : C L I E N T ;
 T_CLOSE           : C L O S E ;
 T_CLUSTERED       : C L U S T E R E D;
-T_CMP             : C M P ; 
+T_CMP             : C M P ;
+T_COALESCE        : C O A L E S C E ; 
 T_COLLECT         : C O L L E C T ; 
 T_COLLECTION      : C O L L E C T I O N ; 
 T_COLUMN          : C O L U M N ;
@@ -398,6 +451,9 @@ T_INTERVAL        : I N T E R V A L ;
 T_INTO            : I N T O ;
 T_INVOKER         : I N V O K E R ;
 T_IS              : I S ;
+T_ISNOTNULL       : I S N O T N U L L ;
+T_ISNULL          : I S N U L L ;
+T_NVL             : N V L ;
 T_ISOPEN          : I S O P E N ;
 T_ITEMS           : I T E M S ; 
 T_JOIN            : J O I N ;
@@ -450,6 +506,7 @@ T_NONE            : N O N E ;
 T_NOT             : N O T ;
 T_NOTFOUND        : N O T F O U N D ; 
 T_NULL            : N U L L ;
+T_NULLIF          : N U L L I F ;
 T_NUMERIC         : N U M E R I C ; 
 T_NUMBER          : N U M B E R ;
 T_OBJECT          : O B J E C T ; 

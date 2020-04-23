@@ -65,3 +65,33 @@ json hql_three_param_func(string func_name, string fst_param_name, json fst_expr
 	j[thrd_param_name] = thrd_expr;
 	return j;
 }
+
+json hql_list_param_func(string func_name, string list_name, vector<json> expr_list)
+{
+	json j;
+	j["type"] = "FUNCTION";
+	j["name"] = func_name;
+	j["list_name"] = expr_list;
+	return j;
+}
+
+json hql_case_func(json case_expr, vector<json> when_expr_list, vector<json> then_expr_list, json else_expr)
+{
+	json j;
+	j["type"] = "FUNCTION";
+	j["name"] = "CASE";
+	vector<json> when_then_expr_list;
+	for (int i = 0; i < when_expr_list.size(); i++)
+	{
+		json when_then_expr;
+		when_then_expr["when"] = when_expr_list[i];
+		when_then_expr["then"] = then_expr_list[i];
+		when_then_expr_list.push_back(when_then_expr);
+	}
+	if (case_expr != NULL)
+		j["case_expr"] = case_expr;
+	if (else_expr != NULL)
+		j["else_expr"] = else_expr;
+	j["when_then_expr_list"] = when_then_expr_list;
+	return j;
+}
