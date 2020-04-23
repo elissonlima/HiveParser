@@ -25,6 +25,8 @@ include_directories(${ANTLR4_INCLUDE_DIRS})
 set(ANTLR_EXECUTABLE C:/antlr/antlr-4.8-complete.jar)
 find_package(ANTLR REQUIRED)
 
+add_subdirectory("third_part")
+
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
 
@@ -46,11 +48,11 @@ include_directories(${ANTLR4_RUNTIME_LIBRARIES})
 message("Lexer out dir ${ANTLR_HiveLexer_OUTPUT_DIR}")
 message("Parser out dir ${ANTLR_HiveParser_OUTPUT_DIR}")
 
-add_executable(hiveparser Main.cpp HqlFunction.cpp
+add_executable(hiveparser main.cpp hql_types.cpp hql_exprs.cpp hql_stmts.cpp hql_functions.cpp
 #               ${ANTLR_HiveLexer_CXX_OUTPUTS}
                ${ANTLR_HiveParser_CXX_OUTPUTS})
 
-target_link_libraries(hiveparser antlr4_static)
+target_link_libraries(hiveparser PRIVATE antlr4_static PRIVATE nlohmann_json::nlohmann_json)
 # target_link_libraries(hiveparser antlr4_shared)
 #add_custom_command(TARGET hiveparser
 #                   POST_BUILD

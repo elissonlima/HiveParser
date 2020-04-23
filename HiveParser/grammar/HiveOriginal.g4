@@ -1073,7 +1073,7 @@ expr_cursor_attribute :
      
 expr_agg_window_func :
        T_AVG T_OPEN_P expr_func_all_distinct? expr T_CLOSE_P expr_func_over_clause?
-     | T_COUNT T_OPEN_P ((expr_func_all_distinct? expr) | '*') T_CLOSE_P expr_func_over_clause?
+     | T_COUNT T_OPEN_P (r=(expr_func_all_distinct? expr) | '*') T_CLOSE_P expr_func_over_clause?
      | T_COUNT_BIG T_OPEN_P ((expr_func_all_distinct? expr) | '*') T_CLOSE_P expr_func_over_clause?
      | T_CUME_DIST T_OPEN_P T_CLOSE_P expr_func_over_clause
      | T_DENSE_RANK T_OPEN_P T_CLOSE_P expr_func_over_clause
