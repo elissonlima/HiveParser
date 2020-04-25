@@ -71,7 +71,18 @@ json hql_list_param_func(string func_name, string list_name, vector<json> expr_l
 	json j;
 	j["type"] = "FUNCTION";
 	j["name"] = func_name;
-	j["list_name"] = expr_list;
+	j[list_name] = expr_list;
+	return j;
+}
+
+json hql_single_param_list_func(string func_name, string fst_param_name, json fst_param,
+	string list_name, vector<json> expr_list)
+{
+	json j;
+	j["type"] = "FUNCTION";
+	j["name"] = func_name;
+	j[fst_param_name] = fst_param;
+	j[list_name] = expr_list;
 	return j;
 }
 

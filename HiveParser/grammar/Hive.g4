@@ -102,12 +102,64 @@ expr returns [json res]
     | l_expr=expr set_operators r_expr=expr { $res = hql_generic_operator($set_operators.text, $l_expr.res, $r_expr.res); }
     | l_expr=expr op=T_AND r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
     | l_expr=expr op=T_OR r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
-    | '(' expr ')' { $res = $expr.res; }
+    | '(' expr ')' { $res = $expr.res; }  
     | spec_func { $res = $spec_func.res; }
     | math_func { $res = $math_func.res; }
     | string_func { $res = $string_func.res; }
     | date_func { $res = $date_func.res; }
     | cond_func { $res = $cond_func.res; }
+    | str_func { $res = $str_func.res; }
+    | expr_concat { $res = $expr_concat.res; } //LEMBRAR DE ADICIONAR TODA EXPRESSÃO DE FUNÇÃO NESSE NÃO-TERMINAL
+    ;
+
+str_func returns [json res]
+    : T_ASCII T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("ASCII", "expr", $expr.res); }
+    | T_BASE64 T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("BASE64", "expr", $expr.res); }
+    | T_CHARACTER_LENGTH T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("CHARACTER_LENGTH", "expr", $expr.res); }
+    | T_CHR T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("CHR", "expr", $expr.res); }
+    | { vector<ExprContext*> exprs; } T_CONCAT T_OPEN_P exprs+=expr ( ',' exprs+=expr )+ T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_list_param_func("CONCAT","expr_list",expr_list_json);
+    }
+    | { vector<ExprContext*> exprs; } T_CONCAT_WS T_OPEN_P sep=expr ',' exprs+=expr ( ',' exprs+=expr )+ T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_single_param_list_func("CONCAT","separator", $sep.res, "expr_list",expr_list_json);
+    }
+    | T_DECODE T_OPEN_P expr_bin=expr ',' expr_charset=expr T_CLOSE_P { $res = hql_double_param_func("DECODE", "binary_value", $expr_bin.res, "charset", $expr_charset.res); }
+    | { vector<ExprContext*> exprs; } T_ELT T_OPEN_P index_num=expr ',' exprs+=expr ( ',' exprs+=expr )* T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_single_param_list_func("ELT","index_num", $index_num.res, "expr_list",expr_list_json);
+    }
+    | T_ENCODE T_OPEN_P expr_str=expr ',' expr_charset=expr T_CLOSE_P { $res = hql_double_param_func("ENCODE", "str_value", $expr_str.res, "charset", $expr_charset.res); }
+    | { vector<ExprContext*> exprs; } T_FIELD T_OPEN_P expr_val=expr ',' exprs+=expr ( ',' exprs+=expr )* T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_single_param_list_func("FIELD","expr_val", $expr_val.res, "expr_list",expr_list_json);
+    }
+    | T_FIELD_IN_SET T_OPEN_P expr_str=expr ',' expr_str_list=expr T_CLOSE_P { $res = hql_double_param_func("FIELD_IN_SET", "str_value", $expr_str.res, "str_list", $expr_str_list.res); }
+    ;
+
+expr_concat returns [json res]
+    : { vector<Expr_concat_itemContext*> exprs; } expr_concat_items+=expr_concat_item ( '||' expr_concat_items+=expr_concat_item )+ {
+        vector<json> expr_list_json;
+        for (Expr_concat_itemContext* exp_contxt : $expr_concat_items){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_list_param_func("CONCAT","expr_list",expr_list_json);
+    }
+    ;
+
+expr_concat_item returns [json res]
+    : literal_values { $res = $literal_values.res; }    
+    | ident { $res =  $ident.res; }
+    | T_OPEN_P expr T_CLOSE_P { $res = $expr.res; }  
+    | spec_func { $res = $spec_func.res; }
+    | math_func { $res = $math_func.res; }
+    | string_func { $res = $string_func.res; }
+    | date_func { $res = $date_func.res; }
+    | cond_func { $res = $cond_func.res; }
+    | str_func { $res = $str_func.res; }
     ;
 
 cond_func returns [json res]
@@ -298,12 +350,14 @@ T_ALTER           : A L T E R ;
 T_AND             : A N D ;
 T_AS              : A S ;
 T_ASC             : A S C ;
+T_ASCII           : A S C I I ;
 T_ASIN            : A S I N ;
 T_ASSERT_TRUE     : A S S E R T '_' T R U E ;
 T_AT              : A T ;
 T_ATAN            : A T A N ;
 T_AUTO_INCREMENT  : A U T O '_' I N C R E M E N T ;
 T_AVG             : A V G ; 
+T_BASE64          : B A S E '6' '4' ;
 T_BEGIN           : B E G I N ;
 T_BETWEEN         : B E T W E E N ; 
 T_BIGINT          : B I G I N T ;
@@ -323,7 +377,9 @@ T_CEIL            : C E I L ;
 T_CEILING         : C E I L I N G ;
 T_CHAR            : C H A R ;
 T_CHARACTER       : C H A R A C T E R ;
+T_CHARACTER_LENGTH: C H A R A C T E R '_' L E N G T H ;
 T_CHARSET         : C H A R S E T ;
+T_CHR             : C H R ;
 T_CLIENT          : C L I E N T ;
 T_CLOSE           : C L O S E ;
 T_CLUSTERED       : C L U S T E R E D;
@@ -336,7 +392,8 @@ T_COMMENT         : C O M M E N T;
 T_CONSTANT        : C O N S T A N T ;
 T_COMMIT          : C O M M I T ; 
 T_COMPRESS        : C O M P R E S S ;
-T_CONCAT          : C O N C A T;
+T_CONCAT          : C O N C A T ;
+T_CONCAT_WS       : C O N C A T '_' W S ;
 T_CONDITION       : C O N D I T I O N ;
 T_CONSTRAINT      : C O N S T R A I N T ; 
 T_CONTINUE        : C O N T I N U E ;
@@ -364,6 +421,7 @@ T_DAY             : D A Y ;
 T_DAYS            : D A Y S ;
 T_DEC             : D E C ;
 T_DECIMAL         : D E C I M A L ;
+T_DECODE          : D E C O D E ;
 T_DECLARE         : D E C L A R E ;
 T_DEFAULT         : D E F A U L T ;
 T_DEFERRED        : D E F E R R E D ; 
@@ -388,7 +446,9 @@ T_DYNAMIC         : D Y N A M I C ;
 T_ELSE            : E L S E ;
 T_ELSEIF          : E L S E I F ;
 T_ELSIF           : E L S I F ;
+T_ELT             : E L T ;
 T_ENABLE          : E N A B L E ;
+T_ENCODE          : E N C O D E ;
 T_END             : E N D ;
 T_ENGINE          : E N G I N E ;
 T_ESCAPED         : E S C A P E D ; 
@@ -404,7 +464,9 @@ T_FACTORIAL       : F A C T O R I A L ;
 T_FALLBACK        : F A L L B A C K ;
 T_FALSE           : F A L S E ;
 T_FETCH           : F E T C H ;
+T_FIELD           : F I E L D  ; 
 T_FIELDS          : F I E L D S ; 
+T_FIELD_IN_SET    : F I E L D '_' I N '_' S E T ;
 T_FILE            : F I L E ;
 T_FILES           : F I L E S ; 
 T_FLOAT           : F L O A T ;
