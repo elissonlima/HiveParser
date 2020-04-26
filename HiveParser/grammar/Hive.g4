@@ -171,6 +171,19 @@ str_func returns [json res]
     | T_SENTENCES T_OPEN_P str_expr=expr ',' lang_expr=expr ',' locale_expr=expr T_CLOSE_P { $res = hql_three_param_func("SENTENCES", "string", $str_expr.res, "lang", $lang_expr.res, "locale", $locale_expr.res); }
     | T_SPACE T_OPEN_P size_expr=expr T_CLOSE_P { $res = hql_single_param_func("SPACE", "size", $size_expr.res); }
     | T_SPLIT T_OPEN_P str_expr=expr ',' pattern=expr T_CLOSE_P { $res = hql_double_param_func("SPLIT", "string", $str_expr.res, "pattern", $pattern.res); }
+    | T_STR_TO_MAP T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_three_param_func("STR_TO_MAP", "string", $str_expr.res, "delimiter1", hql_string_type(";"), "delimiter2", hql_string_type(":")); }
+    | T_STR_TO_MAP T_OPEN_P str_expr=expr ',' delimiter1=expr T_CLOSE_P { $res = hql_three_param_func("STR_TO_MAP", "string", $str_expr.res, "delimiter1", $delimiter1.res, "delimiter2", hql_string_type(":")); }
+    | T_STR_TO_MAP T_OPEN_P str_expr=expr ',' delimiter1=expr ',' delimiter2=expr T_CLOSE_P { $res = hql_three_param_func("STR_TO_MAP", "string", $str_expr.res, "delimiter1", $delimiter1.res, "delimiter2",$delimiter2.res); }
+    | ( T_SUBSTR | T_SUBSTRING ) T_OPEN_P str_expr=expr ',' start_indx=expr T_CLOSE_P { $res = hql_double_param_func("SUBSTRING", "string", $str_expr.res, "start", $start_indx.res); }
+    | ( T_SUBSTR | T_SUBSTRING ) T_OPEN_P str_expr=expr ',' start_indx=expr ',' lenght_expr=expr T_CLOSE_P { $res = hql_three_param_func("SUBSTRING", "string", $str_expr.res, "start", $start_indx.res, "length", $lenght_expr.res); }
+    | T_SUBSTRING_INDEX T_OPEN_P str_expr=expr ',' delimiter=expr ',' count=expr T_CLOSE_P { $res = hql_three_param_func("SUBSTRING_INDEX", "string", $str_expr.res, "delimiter", $delimiter.res, "count", $count.res); }
+    | T_TRANSLATE T_OPEN_P input_expr=expr ',' from_expr=expr ',' to_expr=expr T_CLOSE_P { $res = hql_three_param_func("TRANSLATE", "input", $input_expr.res, "from", $from_expr.res, "to", $to_expr.res); }
+    | T_TRIM T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("TRIM", "string", $str_expr.res); }
+    | T_UNBASE64 T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("UNBASE64", "string", $str_expr.res); }
+    | ( T_UCASE | T_UPPER ) T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("UPPERCASE", "string", $str_expr.res); }
+    | T_INITCAP T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("INITCAP", "string", $str_expr.res); }
+    | T_LEVENSHTEIN T_OPEN_P strA_expr=expr ',' strB_expr=expr T_CLOSE_P { $res = hql_double_param_func("LEVENSHTEIN", "string_A", $strA_expr.res, "string_B", $strB_expr.res); }
+    | T_SOUNDEX T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("SOUNDEX", "string", $str_expr.res); }
     ;
 
 expr_concat returns [json res]
@@ -533,11 +546,12 @@ T_IN              : I N ;
 T_INCLUDE         : I N C L U D E ;
 T_INDEX           : I N D E X ;
 T_IN_FILE         : I N '_' F I L E ;
+T_INITCAP         : I N I T C A P ;
 T_INITRANS        : I N I T R A N S ;
 T_INNER           : I N N E R ; 
 T_INOUT           : I N O U T;
 T_INSERT          : I N S E R T ;
-T_IN_STR          : I N     S T R ;
+T_IN_STR          : I N S T R ;
 T_INT             : I N T ;
 T_INT2            : I N T '2';
 T_INT4            : I N T '4';
@@ -563,6 +577,7 @@ T_LCASE           : L C A S E ;
 T_LEAVE           : L E A V E ;
 T_LEFT            : L E F T ;
 T_LENGTH          : L E N G T H ;
+T_LEVENSHTEIN     : L E V E N S H T E I N ;
 T_LIKE            : L I K E ; 
 T_LIMIT           : L I M I T ;
 T_LINES           : L I N E S ; 
@@ -694,6 +709,7 @@ T_SIMPLE_FLOAT    : S I M P L E '_' F L O A T ;
 T_SIMPLE_INTEGER  : S I M P L E '_' I N T E G E R ;
 T_SMALLDATETIME   : S M A L L D A T E T I M E ;
 T_SMALLINT        : S M A L L I N T ;
+T_SOUNDEX         : S O U N D E X ;
 T_SPACE           : S P A C E ;
 T_SPLIT           : S P L I T ;
 T_SQL             : S Q L ; 
@@ -708,9 +724,11 @@ T_STEP            : S T E P ;
 T_STORAGE         : S T O R A G E ; 
 T_STORED          : S T O R E D ;
 T_STRING          : S T R I N G ;
+T_STR_TO_MAP      : S T R '_' T O '_' M A P ;
 T_SUBDIR          : S U B D I R ; 
 T_SUBSTR          : S U B S T R ; 
 T_SUBSTRING       : S U B S T R I N G ; 
+T_SUBSTRING_INDEX : S U B S T R I N G '_' I N D E X ;
 T_SUM             : S U M ;
 T_SUMMARY         : S U M M A R Y ;
 T_SYS_REFCURSOR   : S Y S '_' R E F C U R S O R ; 
@@ -728,10 +746,13 @@ T_TO              : T O ;
 T_TOP             : T O P ;
 T_TOUTCTIMESTAMP  : T O '_' U T C '_' T I M E S T A M P ;
 T_TRANSACTION     : T R A N S A C T I O N ;
+T_TRANSLATE       : T R A N S L A T E ;
 T_TRUE            : T R U E ;
 T_TRUNCATE        : T R U N C A T E;
 T_TRUNC            : T R U N C ;
 T_TYPE            : T Y P E ; 
+T_UCASE           : U C A S E ;
+T_UNBASE64        : U N B A S E '6' '4' ;
 T_UNHEX           : U N H E X ;
 T_UNION           : U N I O N ;
 T_UNIQUE          : U N I Q U E ;
