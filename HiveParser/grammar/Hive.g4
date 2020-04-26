@@ -127,6 +127,7 @@ str_func returns [json res]
         for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
         $res = hql_single_param_list_func("CONCAT","separator", $sep.res, "expr_list",expr_list_json);
     }
+    //context_ngrams(array<array<string>>, array<string>, int K, int pf)
     | T_DECODE T_OPEN_P expr_bin=expr ',' expr_charset=expr T_CLOSE_P { $res = hql_double_param_func("DECODE", "binary_value", $expr_bin.res, "charset", $expr_charset.res); }
     | { vector<ExprContext*> exprs; } T_ELT T_OPEN_P index_num=expr ',' exprs+=expr ( ',' exprs+=expr )* T_CLOSE_P {
         vector<json> expr_list_json;
@@ -140,6 +141,36 @@ str_func returns [json res]
         $res = hql_single_param_list_func("FIELD","expr_val", $expr_val.res, "expr_list",expr_list_json);
     }
     | T_FIELD_IN_SET T_OPEN_P expr_str=expr ',' expr_str_list=expr T_CLOSE_P { $res = hql_double_param_func("FIELD_IN_SET", "str_value", $expr_str.res, "str_list", $expr_str_list.res); }
+    | T_FORMAT_NUMBER T_OPEN_P number_expr=expr ',' int_expr=expr T_CLOSE_P { $res = hql_double_param_func("FORMAT_NUMBER", "number", $number_expr.res, "decimal_places", $int_expr.res); }
+    | T_GET_JSON_OBJECTS T_OPEN_P json_string=expr ',' path_expr=expr T_CLOSE_P { $res = hql_double_param_func("GET_JSON_OBJECTS", "json_string", $json_string.res, "path", $path_expr.res); }
+    | T_IN_FILE T_OPEN_P str_expr=expr ',' filename=expr T_CLOSE_P { $res = hql_double_param_func("IN_FILE", "string", $str_expr.res, "filename", $filename.res); }
+    | T_IN_STR T_OPEN_P str_expr=expr ',' substr_expr=expr T_CLOSE_P { $res = hql_double_param_func("IN_STR", "string", $str_expr.res, "substring", $substr_expr.res); }
+    | T_LENGTH T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("LENGTH", "string", $str_expr.res); }
+    | T_LOCATE T_OPEN_P substr_expr=expr ',' str_expr=expr T_CLOSE_P { $res = hql_double_param_func("LOCATE", "substring", $substr_expr.res, "string", $str_expr.res); }
+    | T_LOCATE T_OPEN_P substr_expr=expr ',' str_expr=expr ',' pos=expr T_CLOSE_P { $res = hql_three_param_func("LOCATE", "substring", $substr_expr.res, "string", $str_expr.res,"position", $pos.res); }
+    | ( T_LOWER | T_LCASE ) T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("LOWER_CASE", "string", $str_expr.res); }
+    | T_LPAD T_OPEN_P str_expr=expr ',' len=expr ',' pad=expr T_CLOSE_P { $res = hql_three_param_func("LPAD", "string", $str_expr.res, "length", $len.res,"pad", $pad.res); }
+    | T_LTRIM T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("LTRIM", "string", $str_expr.res); }
+    //ngrams(array<array<string>>, int N, int K, int pf)
+    | T_OCTET_LENGTH T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("OCTET_LENGTH", "string", $str_expr.res); }
+    | T_PARSE_URL T_OPEN_P url_str=expr ',' part_to_extract=expr T_CLOSE_P { $res = hql_double_param_func("PARSE_URL", "url_str", $url_str.res, "part_to_extract", $part_to_extract.res); }
+    | T_PARSE_URL T_OPEN_P url_str=expr ',' part_to_extract=expr ',' key_to_extract=expr T_CLOSE_P { $res = hql_three_param_func("PARSE_URL", "url_str", $url_str.res, "part_to_extract", $part_to_extract.res, "key_to_extract", $key_to_extract.res); }
+    | { vector<ExprContext*> exprs; } T_PRINTF T_OPEN_P str_expr=expr ',' exprs+=expr ( ',' exprs+=expr )+ T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_single_param_list_func("PRINTF","string", $str_expr.res, "object_list",expr_list_json);
+    }
+    | T_QUOTE T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("QUOTE", "string", $str_expr.res); }
+    | T_REGEXP_EXTRACT T_OPEN_P subject=expr ',' pattern=expr ',' index=expr T_CLOSE_P { $res = hql_three_param_func("REGEXP_EXTRACT", "subject", $subject.res, "pattern", $pattern.res,"index", $index.res); }
+    | T_REGEXP_REPLACE T_OPEN_P initial_string=expr ',' pattern=expr ',' replacement=expr T_CLOSE_P { $res = hql_three_param_func("REGEXP_REPLACE", "initial_string", $initial_string.res, "pattern", $pattern.res,"replacement", $replacement.res); }
+    | T_REPEAT T_OPEN_P str_expr=expr ',' n_times_expr=expr T_CLOSE_P { $res = hql_double_param_func("REPEAT", "string", $str_expr.res, "n", $n_times_expr.res); }
+    | T_REPLACE T_OPEN_P str_expr=expr ',' old=expr ',' new_expr=expr T_CLOSE_P { $res = hql_three_param_func("REPLACE", "string", $str_expr.res, "old", $old.res,"new", $new_expr.res); }
+    | T_REVERSE T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("REVERSE", "string", $str_expr.res); }
+    | T_RPAD T_OPEN_P str_expr=expr ',' len=expr ',' pad=expr T_CLOSE_P { $res = hql_three_param_func("RPAD", "string", $str_expr.res, "length", $len.res,"pad", $pad.res); }
+    | T_RTRIM T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("RTRIM", "string", $str_expr.res); }
+    | T_SENTENCES T_OPEN_P str_expr=expr ',' lang_expr=expr ',' locale_expr=expr T_CLOSE_P { $res = hql_three_param_func("SENTENCES", "string", $str_expr.res, "lang", $lang_expr.res, "locale", $locale_expr.res); }
+    | T_SPACE T_OPEN_P size_expr=expr T_CLOSE_P { $res = hql_single_param_func("SPACE", "size", $size_expr.res); }
+    | T_SPLIT T_OPEN_P str_expr=expr ',' pattern=expr T_CLOSE_P { $res = hql_double_param_func("SPLIT", "string", $str_expr.res, "pattern", $pattern.res); }
     ;
 
 expr_concat returns [json res]
@@ -474,12 +505,14 @@ T_FLOOR           : F L O O R;
 T_FOR             : F O R ;
 T_FOREIGN         : F O R E I G N ; 
 T_FORMAT          : F O R M A T ;
+T_FORMAT_NUMBER   : F O R M A T '_' N U M B E R ;
 T_FOUND           : F O U N D ;
 T_FROM            : F R O M ; 
 T_FROMUTCTIMESTAMP  : F R O M '_' U T C '_' T I M E S T A M P ;
 T_FULL            : F U L L ;
 T_FUNCTION        : F U N C T I O N ;
 T_GET             : G E T ;
+T_GET_JSON_OBJECTS : G E T '_' J S O N '_' P A T H ;
 T_GLOBAL          : G L O B A L ; 
 T_GO              : G O ;
 T_GRANT           : G R A N T ; 
@@ -499,10 +532,12 @@ T_IMMEDIATE       : I M M E D I A T E ;
 T_IN              : I N ;
 T_INCLUDE         : I N C L U D E ;
 T_INDEX           : I N D E X ;
+T_IN_FILE         : I N '_' F I L E ;
 T_INITRANS        : I N I T R A N S ;
 T_INNER           : I N N E R ; 
 T_INOUT           : I N O U T;
 T_INSERT          : I N S E R T ;
+T_IN_STR          : I N     S T R ;
 T_INT             : I N T ;
 T_INT2            : I N T '2';
 T_INT4            : I N T '4';
@@ -524,12 +559,15 @@ T_KEY             : K E Y ;
 T_KEYS            : K E Y S ;
 T_LANGUAGE        : L A N G U A G E ;
 T_LASTDAY         : L A S T '_' D A Y ;
+T_LCASE           : L C A S E ;
 T_LEAVE           : L E A V E ;
 T_LEFT            : L E F T ;
+T_LENGTH          : L E N G T H ;
 T_LIKE            : L I K E ; 
 T_LIMIT           : L I M I T ;
 T_LINES           : L I N E S ; 
 T_LOCAL           : L O C A L ;
+T_LOCATE          : L O C A T E ;
 T_LOCATION        : L O C A T I O N ;
 T_LOCATOR         : L O C A T O R ; 
 T_LOCATORS        : L O C A T O R S ; 
@@ -540,8 +578,10 @@ T_LOG2            : L O G '2';
 T_LOGGED          : L O G G E D ; 
 T_LOGGING         : L O G G I N G ; 
 T_LOOP            : L O O P ;
-T_LOWER           : L O W E R;
+T_LOWER           : L O W E R ;
+T_LPAD            : L P A D ;
 T_LN              : L N ;
+T_LTRIM           : L T R I M ;
 T_MAP             : M A P ; 
 T_MATCHED         : M A T C H E D ; 
 T_MAX             : M A X ;
@@ -572,6 +612,7 @@ T_NULLIF          : N U L L I F ;
 T_NUMERIC         : N U M E R I C ; 
 T_NUMBER          : N U M B E R ;
 T_OBJECT          : O B J E C T ; 
+T_OCTET_LENGTH    : O C T E T '_' L E N G T H ;
 T_OFF             : O F F ;
 T_ON              : O N ;
 T_ONLY            : O N L Y ;
@@ -584,6 +625,7 @@ T_OVER            : O V E R ;
 T_OVERWRITE       : O V E R W R I T E ; 
 T_OWNER           : O W N E R ; 
 T_PACKAGE         : P A C K A G E ; 
+T_PARSE_URL       : P A R S E '_' U R L ;
 T_PARTITION       : P A R T I T I O N ; 
 T_PCTFREE         : P C T F R E E ; 
 T_PCTUSED         : P C T U S E D ;
@@ -595,20 +637,23 @@ T_POWER           : P O W E R;
 T_PRECISION       : P R E C I S I O N ; 
 T_PRESERVE        : P R E S E R V E ; 
 T_PRIMARY         : P R I M A R Y ;
-T_PRINT           : P R I N T ; 
+T_PRINTF           : P R I N T F ; 
 T_PROC            : P R O C ;
 T_PROCEDURE       : P R O C E D U R E ;
 T_QUALIFY         : Q U A L I F Y ;
 T_QUARTER         : Q U A R T E R ;
 T_QUERY_BAND      : Q U E R Y '_' B A N D ; 
 T_QUIT            : Q U I T ; 
-T_QUOTED_IDENTIFIER : Q U O T E D '_' I D E N T I F I E R ;
+T_QUOTE           : Q U O T E;
 T_RADIANS         : R A D I A N S ;
 T_RAISE           : R A I S E ;
 T_RAND            : R A N D ;
 T_REAL            : R E A L ; 
 T_REFERENCES      : R E F E R E N C E S ; 
 T_REGEXP          : R E G E X P ;
+T_REGEXP_EXTRACT  : R E G E X P '_' E X T R A C T ;
+T_REGEXP_REPLACE  : R E G E X P '_' R E P L A C E ;
+T_REPEAT          : R E P E A T ;
 T_REPLACE         : R E P L A C E ; 
 T_RESIGNAL        : R E S I G N A L ;
 T_RESTRICT        : R E S T R I C T ; 
@@ -626,8 +671,10 @@ T_ROW             : R O W ;
 T_ROWS            : R O W S ; 
 T_ROWTYPE         : R O W T Y P E ; 
 T_ROW_COUNT       : R O W '_' C O U N T ;
+T_RPAD            : R P A D ;
 T_RR              : R R;
 T_RS              : R S ;
+T_RTRIM           : R T R I M ;
 T_PWD             : P W D ; 
 T_TRIM            : T R I M ;
 T_SCHEMA          : S C H E M A ;
@@ -637,15 +684,18 @@ T_SECURITY        : S E C U R I T Y ;
 T_SEGMENT         : S E G M E N T ; 
 T_SEL             : S E L ;
 T_SELECT          : S E L E C T ; 
+T_SENTENCES       : S E N T E N C E S ;
 T_SET             : S E T ;
 T_SETS            : S E T S;
-T_SIGN          : S I G N ;
+T_SIGN            : S I G N ;
 T_SIN             : S I N ; 
 T_SIMPLE_DOUBLE   : S I M P L E '_' D O U B L E ;
 T_SIMPLE_FLOAT    : S I M P L E '_' F L O A T ;
 T_SIMPLE_INTEGER  : S I M P L E '_' I N T E G E R ;
 T_SMALLDATETIME   : S M A L L D A T E T I M E ;
 T_SMALLINT        : S M A L L I N T ;
+T_SPACE           : S P A C E ;
+T_SPLIT           : S P L I T ;
 T_SQL             : S Q L ; 
 T_SQLEXCEPTION    : S Q L E X C E P T I O N ;
 T_SQLINSERT       : S Q L I N S E R T ;
