@@ -105,7 +105,6 @@ expr returns [json res]
     | '(' expr ')' { $res = $expr.res; }  
     | spec_func { $res = $spec_func.res; }
     | math_func { $res = $math_func.res; }
-    | string_func { $res = $string_func.res; }
     | date_func { $res = $date_func.res; }
     | cond_func { $res = $cond_func.res; }
     | str_func { $res = $str_func.res; }
@@ -200,7 +199,6 @@ expr_concat_item returns [json res]
     | T_OPEN_P expr T_CLOSE_P { $res = $expr.res; }  
     | spec_func { $res = $spec_func.res; }
     | math_func { $res = $math_func.res; }
-    | string_func { $res = $string_func.res; }
     | date_func { $res = $date_func.res; }
     | cond_func { $res = $cond_func.res; }
     | str_func { $res = $str_func.res; }
@@ -334,12 +332,6 @@ math_func returns [json res]
     ;
 
 // https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
-
-string_func returns [json res]
-    : T_TRIM T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("TRIM", "expr", $expr.res); }
-    | T_UPPER T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("UPPER", "expr", $expr.res); }
-    | T_LOWER T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("LOWER", "expr", $expr.res); }
-    ;
 
 literal_values returns [json res]
     : STRING_LITERAL { $res = hql_string_type($STRING_LITERAL.text); }
