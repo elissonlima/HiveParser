@@ -222,7 +222,8 @@ misc_func returns [json res]
     | T_SHA2 T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("SHA2", "string", $str_expr.res, "hash_size", $n_expr.res); }
     | T_AES_ENCRYPT T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("SHA2", "input", $str_expr.res, "key", $n_expr.res); }
     | T_AES_DECRYPT T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("SHA2", "input", $str_expr.res, "key", $n_expr.res); }
-    | T_VERSION T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("VERSION"); }
+    | T_VERSION T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("VERSION"); } 
+    | f_name=(T_XPATH | T_XPATH_BOOLEAN | T_XPATH_DOUBLE | T_XPATH_FLOAT | T_XPATH_INT | T_XPATH_LONG | T_XPATH_NUMBER | T_XPATH_SHORT | T_XPATH_STRING ) T_OPEN_P xml_str_expr=expr ',' xpath_expr_str=expr T_CLOSE_P { $res = hql_double_param_func($f_name.text, "xml_string", $xml_str_expr.res, "xpath_expression_string", $xpath_expr_str.res); }
     //surrogate_key([write_id_bits, task_id_bits]) -> Automatically generate numerical Ids for rows as you enter data into a table. Can only be used as default value for acid or insert-only tables.
     ;
 
@@ -858,6 +859,16 @@ T_STDEV                : S T D E V ;
 T_SYSDATE              : S Y S D A T E ;
 T_VARIANCE             : V A R I A N C E ; 
 T_USER                 : U S E R; 
+T_XPATH                : X P A T H ;
+T_XPATH_BOOLEAN        : X P A T H '_' B O O L E A N ;
+T_XPATH_DOUBLE         : X P A T H '_' D O U B L E ;
+T_XPATH_FLOAT          : X P A T H '_' F L O A T ;
+T_XPATH_INT            : X P A T H '_' I N T ;
+T_XPATH_LONG           : X P A T H '_' L O N G ;
+T_XPATH_NUMBER         : X P A T H '_' N U M B E R ;
+T_XPATH_SHORT          : X P A T H '_' S H O R T ;
+T_XPATH_STRING         : X P A T H '_' S T R I N G ;
+
 
 T_ADD          : '+' ;
 T_COLON        : ':' ;
