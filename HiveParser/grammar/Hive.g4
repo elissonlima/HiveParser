@@ -103,12 +103,13 @@ expr returns [json res]
     | l_expr=expr op=T_AND r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
     | l_expr=expr op=T_OR r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
     | '(' expr ')' { $res = $expr.res; }  
-    | spec_func { $res = $spec_func.res; }
+    | dat_convrt_func { $res = $dat_convrt_func.res; }
     | math_func { $res = $math_func.res; }
     | date_func { $res = $date_func.res; }
     | cond_func { $res = $cond_func.res; }
     | str_func { $res = $str_func.res; }
     | expr_concat { $res = $expr_concat.res; } //LEMBRAR DE ADICIONAR TODA EXPRESSÃO DE FUNÇÃO NESSE NÃO-TERMINAL
+    | misc_func { $res = $misc_func.res; }
     ;
 
 str_func returns [json res]
@@ -198,6 +199,33 @@ str_func returns [json res]
     | T_MASK_HASH T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("MASK_HASH", "string", $str_expr.res); }
     ;
 
+misc_func returns [json res]
+    : { vector<ExprContext*> exprs; } T_JAVA_METHOD T_OPEN_P class_name_expr=expr ',' method_name_expr=expr ( ',' exprs+=expr )* T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_double_param_list_func("JAVA_METHOD","class", $class_name_expr.res, "method", $method_name_expr.res, "arg_list",expr_list_json);
+    }
+    | { vector<ExprContext*> exprs; } T_REFLECT T_OPEN_P class_name_expr=expr ',' method_name_expr=expr ( ',' exprs+=expr )* T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_double_param_list_func("JAVA_METHOD","class", $class_name_expr.res, "method", $method_name_expr.res, "arg_list",expr_list_json);
+    }
+    | { vector<ExprContext*> exprs; } T_HASH T_OPEN_P exprs+=expr ( ',' exprs+=expr )* T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_list_param_func("JAVA_METHOD", "expr_list", expr_list_json);
+    }
+    | T_CURRENT_USER T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("CURRENT_USER"); }
+    | T_LOGGED_IN_USER T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("LOGGED_IN_USER"); }
+    | T_CURRENT_DATABASE T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("CURRENT_USER"); }
+    | f_name=( T_MD5 | T_SHA | T_SHA1 | T_CRC32 ) T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func($f_name.text, "string", $str_expr.res); }    
+    | T_SHA2 T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("SHA2", "string", $str_expr.res, "hash_size", $n_expr.res); }
+    | T_AES_ENCRYPT T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("SHA2", "input", $str_expr.res, "key", $n_expr.res); }
+    | T_AES_DECRYPT T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("SHA2", "input", $str_expr.res, "key", $n_expr.res); }
+    | T_VERSION T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("VERSION"); }
+    //surrogate_key([write_id_bits, task_id_bits]) -> Automatically generate numerical Ids for rows as you enter data into a table. Can only be used as default value for acid or insert-only tables.
+    ;
+
 expr_concat returns [json res]
     : { vector<Expr_concat_itemContext*> exprs; } expr_concat_items+=expr_concat_item ( '||' expr_concat_items+=expr_concat_item )+ {
         vector<json> expr_list_json;
@@ -210,11 +238,12 @@ expr_concat_item returns [json res]
     : literal_values { $res = $literal_values.res; }    
     | ident { $res =  $ident.res; }
     | T_OPEN_P expr T_CLOSE_P { $res = $expr.res; }  
-    | spec_func { $res = $spec_func.res; }
+    | dat_convrt_func { $res = $dat_convrt_func.res; }
     | math_func { $res = $math_func.res; }
     | date_func { $res = $date_func.res; }
     | cond_func { $res = $cond_func.res; }
     | str_func { $res = $str_func.res; }
+    | misc_func { $res = $misc_func.res; }
     ;
 
 cond_func returns [json res]
@@ -293,18 +322,17 @@ date_func returns [json res]
     | T_TRUNC T_OPEN_P date_expr=expr ',' format=expr T_CLOSE_P { $res = hql_double_param_func("TRUNC", "date", $date_expr.res, "format", $format.res); }
     | T_MONTHS_BETWEEN T_OPEN_P date1=expr ',' date2=expr T_CLOSE_P { $res = hql_double_param_func("MONTHS_BETWEEN", "date1", $date1.res, "date2", $date2.res); }
     | T_DATE_FORMAT T_OPEN_P date_expr=expr ',' format=expr T_CLOSE_P { $res = hql_double_param_func("DATE_FORMAT", "date", $date_expr.res, "format", $format.res); }
+    | T_SYSDATE { $res = hql_fixed_func($T_SYSDATE.text); }
     ;
 
-spec_func returns [json res]
+dat_convrt_func returns [json res]
     : T_CAST T_OPEN_P expr T_AS dtype dtype_len? T_CLOSE_P { $res = hql_cast_func($expr.res, $dtype.res); }
-    | T_COUNT T_OPEN_P r=expr T_CLOSE_P { $res = hql_count_func($r.res); }
+    | T_BINARY T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("BINARY", "expr", $expr.res); }
+    ;
+
+aggr_func returns [json res]
+    : T_COUNT T_OPEN_P r=expr T_CLOSE_P { $res = hql_count_func($r.res); }
     | T_COUNT T_OPEN_P '*' T_CLOSE_P { $res = hql_count_all_func(); }
-    | T_CURRENT_DATE { $res = hql_fixed_func($T_CURRENT_DATE.text); }
-    | T_CURRENT_DATE '(' ')' { $res = hql_fixed_func($T_CURRENT_DATE.text); }
-    | T_CURRENT_TIMESTAMP { $res = hql_fixed_func($T_CURRENT_TIMESTAMP.text); }
-    | T_CURRENT_TIMESTAMP '(' ')' { $res = hql_fixed_func($T_CURRENT_TIMESTAMP.text); }
-    | T_SYSDATE { $res = hql_fixed_func($T_SYSDATE.text); }
-    | T_USER { $res = hql_fixed_func($T_USER.text); }
     ;
     
 math_func returns [json res]
@@ -394,6 +422,8 @@ BOOL_LITERAL
 T_ABS             : A B S ;
 T_ACOS            : A C O S ;
 T_ADD_MONTHS      : A D D '_' M O N T H S ;
+T_AES_ENCRYPT     : A E S '_' E N C R Y P T ;
+T_AES_DECRYPT     : A E S '_' D E C R Y P T ;
 T_ALL             : A L L ;
 T_ALTER           : A L T E R ;
 T_AND             : A N D ;
@@ -411,6 +441,7 @@ T_BEGIN           : B E G I N ;
 T_BETWEEN         : B E T W E E N ; 
 T_BIGINT          : B I G I N T ;
 T_BIN             : B I N ;
+T_BINARY          : B I N A R Y ;
 T_BIT             : B I T ;
 T_BODY            : B O D Y ; 
 T_BREAK           : B R E A K ;
@@ -451,12 +482,14 @@ T_COPY            : C O P Y ;
 T_COS             : C O S ;
 T_COUNT           : C O U N T ;
 T_COUNT_BIG       : C O U N T '_' B I G;
+T_CRC32           : C R C '3' '2' ;
 T_CREATE          : C R E A T E ;
 T_CREATION        : C R E A T I O N ; 
 T_CREATOR         : C R E A T O R ;
 T_CS              : C S;
 T_CURRENT         : C U R R E N T ;
 T_CURRENT_SCHEMA  : C U R R E N T '_' S C H E M A ;
+T_CURRENT_DATABASE : C U R R E N T '_' D A T A B A S E ;
 T_CURSOR          : C U R S O R ;
 T_DATABASE        : D A T A B A S E ;
 T_DATA            : D A T A ;
@@ -572,6 +605,7 @@ T_ISNULL          : I S N U L L ;
 T_NVL             : N V L ;
 T_ISOPEN          : I S O P E N ;
 T_ITEMS           : I T E M S ; 
+T_JAVA_METHOD     : J A V A '_' M E T H O D ;
 T_JOIN            : J O I N ;
 T_KEEP            : K E E P; 
 T_KEY             : K E Y ;
@@ -596,6 +630,7 @@ T_LOG             : L O G ;
 T_LOG10           : L O G '1' '0'; 
 T_LOG2            : L O G '2'; 
 T_LOGGED          : L O G G E D ; 
+T_LOGGED_IN_USER  : L O G G E D '_' I N '_' U S E R ; 
 T_LOGGING         : L O G G I N G ; 
 T_LOOP            : L O O P ;
 T_LOWER           : L O W E R ;
@@ -612,6 +647,7 @@ T_MASK_SHOW_LAST_N : M A S K '_' S H O W '_' L A S T '_' N ;
 T_MATCHED         : M A T C H E D ; 
 T_MAX             : M A X ;
 T_MAXTRANS        : M A X T R A N S ; 
+T_MD5             : M D '5' ;
 T_MERGE           : M E R G E ; 
 T_MESSAGE_TEXT    : M E S S A G E '_' T E X T ;
 T_MICROSECOND     : M I C R O S E C O N D ;
@@ -676,6 +712,7 @@ T_RAISE           : R A I S E ;
 T_RAND            : R A N D ;
 T_REAL            : R E A L ; 
 T_REFERENCES      : R E F E R E N C E S ; 
+T_REFLECT         : R E F L E C T ;
 T_REGEXP          : R E G E X P ;
 T_REGEXP_EXTRACT  : R E G E X P '_' E X T R A C T ;
 T_REGEXP_REPLACE  : R E G E X P '_' R E P L A C E ;
@@ -713,6 +750,9 @@ T_SELECT          : S E L E C T ;
 T_SENTENCES       : S E N T E N C E S ;
 T_SET             : S E T ;
 T_SETS            : S E T S;
+T_SHA             : S H A ;
+T_SHA1             : S H A '1' ;
+T_SHA2             : S H A '2' ;
 T_SIGN            : S I G N ;
 T_SIN             : S I N ; 
 T_SIMPLE_DOUBLE   : S I M P L E '_' D O U B L E ;
@@ -779,6 +819,7 @@ T_VAR             : V A R ;
 T_VARCHAR         : V A R C H A R ;
 T_VARCHAR2        : V A R C H A R '2' ;
 T_VARYING         : V A R Y I N G ;
+T_VERSION         : V E R S I O N;
 T_VOLATILE        : V O L A T I L E ;
 T_WEEKOFYEAR      : W E E K O F Y E A R ;
 T_WHEN            : W H E N ;

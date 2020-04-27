@@ -120,3 +120,17 @@ json hql_case_func(json case_expr, vector<json> when_expr_list, vector<json> the
 	j["when_then_expr_list"] = when_then_expr_list;
 	return j;
 }
+
+json hql_double_param_list_func(string func_name,
+	string fst_param_name, json fst_param,
+	string snd_param_name, json snd_param,
+	string list_name, vector<json> expr_list)
+{
+	json j;
+	j["type"] = "FUNCTION";
+	j["name"] = func_name;
+	j[fst_param_name] = fst_param;
+	j[snd_param_name] = snd_param;
+	j[list_name] = expr_list;
+	return j;
+}

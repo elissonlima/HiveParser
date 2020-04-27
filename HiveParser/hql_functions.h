@@ -20,3 +20,7 @@ json hql_list_param_func(string func_name, string list_name, vector<json> expr_l
 json hql_case_func(json case_expr, vector<json> when_expr_list, vector<json> then_expr_list, json else_expr);
 json hql_single_param_list_func(string func_name, string fst_param_name, json fst_param,
 	string list_name, vector<json> expr_list);
+json hql_double_param_list_func(string func_name, 
+	string fst_param_name, json fst_param,
+	string snd_param_name, json snd_param,
+	string list_name, vector<json> expr_list);
