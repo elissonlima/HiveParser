@@ -15,7 +15,7 @@ include(ExternalProject)
 ##
 ## OPTIONS
 ##
-option(JSON_BuildTests "Build the unit tests when BUILD_TESTING is enabled." ON)
+option(JSON_BuildTests "Build the unit tests when BUILD_TESTING is enabled." OFF)
 option(JSON_Install "Install CMake targets during install step." ON)
 option(JSON_MultipleHeaders "Use non-amalgamated version of the library." OFF)
 
@@ -77,12 +77,12 @@ endif()
 ## TESTS
 ## create and configure the unit test target
 ##
-include(CTest) #adds option BUILD_TESTING (default ON)
+#include(CTest) #adds option BUILD_TESTING (default ON)
 
-if(BUILD_TESTING AND JSON_BuildTests)
-    enable_testing()
-    add_subdirectory(test)
-endif()
+#if(BUILD_TESTING AND JSON_BuildTests)
+#    enable_testing()
+#    add_subdirectory(test)
+#endif()
 
 ##
 ## INSTALL

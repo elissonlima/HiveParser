@@ -55,7 +55,8 @@ json hql_double_param_func(string func_name, string fst_param_name, json fst_exp
 	return j;
 }
 
-json hql_three_param_func(string func_name, string fst_param_name, json fst_expr, string snd_param_name, json snd_expr, string thrd_param_name, json thrd_expr)
+json hql_three_param_func(string func_name, string fst_param_name, json fst_expr, string snd_param_name, json snd_expr,
+	string thrd_param_name, json thrd_expr)
 {
 	json j;
 	j["type"] = "FUNCTION";
@@ -63,6 +64,19 @@ json hql_three_param_func(string func_name, string fst_param_name, json fst_expr
 	j[fst_param_name] = fst_expr;
 	j[snd_param_name] = snd_expr;
 	j[thrd_param_name] = thrd_expr;
+	return j;
+}
+
+json hql_four_param_func(string func_name, string fst_param_name, json fst_expr, string snd_param_name, json snd_expr, 
+	string thrd_param_name, json thrd_expr, string fourth_param_name, json fourth_expr)
+{
+	json j;
+	j["type"] = "FUNCTION";
+	j["name"] = func_name;
+	j[fst_param_name] = fst_expr;
+	j[snd_param_name] = snd_expr;
+	j[thrd_param_name] = thrd_expr;
+	j[fourth_param_name] = fourth_expr;
 	return j;
 }
 

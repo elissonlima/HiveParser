@@ -183,6 +183,19 @@ str_func returns [json res]
     | T_INITCAP T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("INITCAP", "string", $str_expr.res); }
     | T_LEVENSHTEIN T_OPEN_P strA_expr=expr ',' strB_expr=expr T_CLOSE_P { $res = hql_double_param_func("LEVENSHTEIN", "string_A", $strA_expr.res, "string_B", $strB_expr.res); }
     | T_SOUNDEX T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("SOUNDEX", "string", $str_expr.res); }
+    | T_MASK T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("MASK", "string", $str_expr.res); }
+    | T_MASK T_OPEN_P str_expr=expr ',' str_upper_expr=expr T_CLOSE_P { $res = hql_double_param_func("MASK", "string", $str_expr.res, "upper", $str_upper_expr.res); }
+    | T_MASK T_OPEN_P str_expr=expr ',' str_upper_expr=expr ',' str_lower_expr=expr T_CLOSE_P { $res = hql_three_param_func("MASK", "string", $str_expr.res, "upper", $str_upper_expr.res, "lower", $str_lower_expr.res); }
+    | T_MASK T_OPEN_P str_expr=expr ',' str_upper_expr=expr ',' str_lower_expr=expr ',' str_number_expr=expr T_CLOSE_P { $res = hql_four_param_func("MASK", "string", $str_expr.res, "upper", $str_upper_expr.res, "lower", $str_lower_expr.res, "number", $str_number_expr.res); }
+    | T_MASK_FIRST_N T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("MASK_FIRST_N", "string", $str_expr.res); }
+    | T_MASK_FIRST_N T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("MASK_FIRST_N", "string", $str_expr.res, "n", $n_expr.res); }
+    | T_MASK_LAST_N T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("MASK_LAST_N", "string", $str_expr.res); }
+    | T_MASK_LAST_N T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("MASK_LAST_N", "string", $str_expr.res, "n", $n_expr.res); }
+    | T_MASK_SHOW_FIRST_N T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("MASK_SHOW_FIRST_N", "string", $str_expr.res); }
+    | T_MASK_SHOW_FIRST_N T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("MASK_SHOW_FIRST_N", "string", $str_expr.res, "n", $n_expr.res); }
+    | T_MASK_SHOW_LAST_N T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("MASK_SHOW_LAST_N", "string", $str_expr.res); }
+    | T_MASK_SHOW_LAST_N T_OPEN_P str_expr=expr ',' n_expr=expr T_CLOSE_P { $res = hql_double_param_func("MASK_SHOW_LAST_N", "string", $str_expr.res, "n", $n_expr.res); }
+    | T_MASK_HASH T_OPEN_P str_expr=expr T_CLOSE_P { $res = hql_single_param_func("MASK_HASH", "string", $str_expr.res); }
     ;
 
 expr_concat returns [json res]
@@ -590,6 +603,12 @@ T_LPAD            : L P A D ;
 T_LN              : L N ;
 T_LTRIM           : L T R I M ;
 T_MAP             : M A P ; 
+T_MASK            : M A S K ;
+T_MASK_FIRST_N    : M A S K '_' F I R S T '_' N ;
+T_MASK_HASH       : M A S K '_' H A S H ;
+T_MASK_LAST_N    : M A S K '_' L A S T '_' N ;
+T_MASK_SHOW_FIRST_N : M A S K '_' S H O W '_' F I R S T '_' N ;
+T_MASK_SHOW_LAST_N : M A S K '_' S H O W '_' L A S T '_' N ;
 T_MATCHED         : M A T C H E D ; 
 T_MAX             : M A X ;
 T_MAXTRANS        : M A X T R A N S ; 
