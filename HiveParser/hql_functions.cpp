@@ -15,6 +15,7 @@ json hql_count_func(json expr)
 	json j;
 	j["type"] = "FUNCTION";
 	j["name"] = "COUNT";
+	j["flag_distinct"] = false;
 	j["expr"] = expr;
 	return j;
 }
@@ -24,6 +25,7 @@ json hql_count_all_func()
 	json j;
 	j["type"] = "FUNCTION";
 	j["name"] = "COUNT";
+	j["flag_distinct"] = false;	
 	j["expr"] = "ALL";
 	return j;
 }
@@ -46,6 +48,16 @@ json hql_single_param_func(string func_name, string param_name, json expr)
 }
 
 json hql_double_param_func(string func_name, string fst_param_name, json fst_expr, string snd_param_name, json snd_expr)
+{
+	json j;
+	j["type"] = "FUNCTION";
+	j["name"] = func_name;
+	j[fst_param_name] = fst_expr;
+	j[snd_param_name] = snd_expr;
+	return j;
+}
+
+json hql_double_param_func(string func_name, string fst_param_name, bool fst_expr, string snd_param_name, json snd_expr)
 {
 	json j;
 	j["type"] = "FUNCTION";
@@ -90,6 +102,17 @@ json hql_list_param_func(string func_name, string list_name, vector<json> expr_l
 }
 
 json hql_single_param_list_func(string func_name, string fst_param_name, json fst_param,
+	string list_name, vector<json> expr_list)
+{
+	json j;
+	j["type"] = "FUNCTION";
+	j["name"] = func_name;
+	j[fst_param_name] = fst_param;
+	j[list_name] = expr_list;
+	return j;
+}
+
+json hql_single_param_list_func(string func_name, string fst_param_name, bool fst_param,
 	string list_name, vector<json> expr_list)
 {
 	json j;

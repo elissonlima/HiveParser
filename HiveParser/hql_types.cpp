@@ -100,3 +100,27 @@ json hql_type_identifier(string database, string table, string ident)
 
 	return j;
 }
+
+json hql_complx_typ_array(vector<json> arr_values)
+{
+	json j;
+	j["type"] = "ARRAY";
+	j["values"] = arr_values;
+	return j;
+}
+
+json hql_complx_typ_map(vector<json> keys, vector<json> values)
+{
+	json j;
+	j["type"] = "MAP";
+	vector<json> map_values;
+	for (int i = 0; i < keys.size(); i++)
+	{
+		json mvalue;
+		mvalue["key_map"] = keys[i];
+		mvalue["value_map"] = values[i];
+		map_values.push_back(mvalue);
+	}
+	j["values"] = map_values;
+	return j;
+}

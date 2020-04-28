@@ -83,18 +83,21 @@ query_stmt returns [json res]
     ;
 
 select_stmt returns [json res] // SELECT statement
-    : { vector<ExprContext*> exprs; } T_SELECT exprs+=expr (',' exprs+=expr)* { 
+    : { vector<Select_exprContext*> exprs; } T_SELECT exprs+=select_expr (',' exprs+=select_expr)* { 
         vector<json> expr_list;
-        for(ExprContext* expr : $exprs) {expr_list.push_back(expr->res);}
+        for(Select_exprContext* expr : $exprs) {expr_list.push_back(expr->res);}
         $res = hql_select_stmt(expr_list); 
         }
+    | T_SELECT tab_generate_func { $res = hql_select_stmt($tab_generate_func.res); }
     ;
 
-expr returns [json res]
-    : literal_values { $res = $literal_values.res; }    
-    | ident { $res =  $ident.res; }
-    | unary_operator expr { $res = hql_unary_operator($unary_operator.text, $expr.res); }
-    | l_expr=expr op=( '*' | '/' | '%' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
+select_expr returns [json res]
+    : expr { $res = $expr.res;}
+    | bool_expr { $res = $bool_expr.res;}
+    ;
+
+bool_expr returns [json res]
+    : l_expr=expr op=( '*' | '/' | '%' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
     | l_expr=expr op=( '+' | '-' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
     | l_expr=expr op=( '<<' | '>>' | '&' | '|' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); } 
     | l_expr=expr op=( '<' | '<=' | '>' | '>=' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); } 
@@ -102,6 +105,14 @@ expr returns [json res]
     | l_expr=expr set_operators r_expr=expr { $res = hql_generic_operator($set_operators.text, $l_expr.res, $r_expr.res); }
     | l_expr=expr op=T_AND r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
     | l_expr=expr op=T_OR r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
+    | expr T_IS T_NULL { $res = hql_generic_operator("IS", $expr.res, hql_null_constant()); }
+    | expr T_IS T_NOT T_NULL { $res = hql_generic_operator("IS_NOT", $expr.res, hql_null_constant()); }
+    ;
+
+expr returns [json res]
+    : literal_values { $res = $literal_values.res; }    
+    | ident { $res =  $ident.res; }
+    | unary_operator expr { $res = hql_unary_operator($unary_operator.text, $expr.res); }
     | '(' expr ')' { $res = $expr.res; }  
     | dat_convrt_func { $res = $dat_convrt_func.res; }
     | math_func { $res = $math_func.res; }
@@ -110,6 +121,26 @@ expr returns [json res]
     | str_func { $res = $str_func.res; }
     | expr_concat { $res = $expr_concat.res; } //LEMBRAR DE ADICIONAR TODA EXPRESSÃO DE FUNÇÃO NESSE NÃO-TERMINAL
     | misc_func { $res = $misc_func.res; }
+    | aggr_func { $res = $aggr_func.res; }
+    | complex_types { $res = $complex_types.res; }
+    ;
+
+
+complex_types returns [json res]
+    : { vector<ExprContext*> exprs; } T_ARRAY T_OPEN_P exprs+=expr ( ',' exprs+=expr)* T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_complx_typ_array(expr_list_json);
+    }
+    | { vector<ExprContext*> key_exprs; vector<ExprContext*> val_exprs; } T_MAP T_OPEN_P key_exprs+=expr ',' val_exprs+=expr ( ',' key_exprs+=expr ',' val_exprs+=expr )* T_CLOSE_P {
+        vector<json> key_exprs_json; vector<json> val_exprs_json;
+        for(int i = 0 ; i < $key_exprs.size() ; i++)
+        {
+            key_exprs_json.push_back($key_exprs[i]->res);
+            val_exprs_json.push_back($val_exprs[i]->res);
+        }
+        $res = hql_complx_typ_map(key_exprs_json, val_exprs_json);
+    }
     ;
 
 str_func returns [json res]
@@ -208,12 +239,12 @@ misc_func returns [json res]
     | { vector<ExprContext*> exprs; } T_REFLECT T_OPEN_P class_name_expr=expr ',' method_name_expr=expr ( ',' exprs+=expr )* T_CLOSE_P {
         vector<json> expr_list_json;
         for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
-        $res = hql_double_param_list_func("JAVA_METHOD","class", $class_name_expr.res, "method", $method_name_expr.res, "arg_list",expr_list_json);
+        $res = hql_double_param_list_func("REFLECT","class", $class_name_expr.res, "method", $method_name_expr.res, "arg_list",expr_list_json);
     }
     | { vector<ExprContext*> exprs; } T_HASH T_OPEN_P exprs+=expr ( ',' exprs+=expr )* T_CLOSE_P {
         vector<json> expr_list_json;
         for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
-        $res = hql_list_param_func("JAVA_METHOD", "expr_list", expr_list_json);
+        $res = hql_list_param_func("HASH", "expr_list", expr_list_json);
     }
     | T_CURRENT_USER T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("CURRENT_USER"); }
     | T_LOGGED_IN_USER T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("LOGGED_IN_USER"); }
@@ -245,6 +276,7 @@ expr_concat_item returns [json res]
     | cond_func { $res = $cond_func.res; }
     | str_func { $res = $str_func.res; }
     | misc_func { $res = $misc_func.res; }
+    | aggr_func { $res = $aggr_func.res; }
     ;
 
 cond_func returns [json res]
@@ -333,7 +365,31 @@ dat_convrt_func returns [json res]
 
 aggr_func returns [json res]
     : T_COUNT T_OPEN_P r=expr T_CLOSE_P { $res = hql_count_func($r.res); }
+    | { vector<ExprContext*> exprs; } T_COUNT T_OPEN_P T_DISTINCT exprs+=expr ( ',' exprs+=expr )* T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = hql_single_param_list_func("COUNT", "flag_distinct", true, "expr_list", expr_list_json);
+    }
     | T_COUNT T_OPEN_P '*' T_CLOSE_P { $res = hql_count_all_func(); }
+    | T_SUM T_OPEN_P expr T_CLOSE_P { $res = hql_double_param_func("SUM", "flag_distinct", false, "col", $expr.res); }
+    | T_SUM T_OPEN_P T_DISTINCT expr T_CLOSE_P { $res = hql_double_param_func("SUM", "flag_distinct", true, "col", $expr.res); }
+    | T_AVG T_OPEN_P expr T_CLOSE_P { $res = hql_double_param_func("AVG", "flag_distinct", false, "col", $expr.res); }
+    | T_AVG T_OPEN_P T_DISTINCT expr T_CLOSE_P { $res = hql_double_param_func("AVG", "flag_distinct", true, "col", $expr.res); }
+    | fun_name=(T_MIN | T_MAX | T_VARIANCE | T_VAR_POP | T_VAR_SAMP | T_STDDEV_POP | T_STDDEV_SAMP) T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func($fun_name.text, "col", $expr.res); }
+    | fun_name=( T_COVAR_POP | T_COVAR_SAMP | T_CORR ) T_OPEN_P col1=expr ',' col2=expr T_CLOSE_P { $res = hql_double_param_func($fun_name.text, "col1", $col1.res, "col2", $col2.res); }
+    | T_PERCENTILE T_OPEN_P col=expr ',' p_expr=expr T_CLOSE_P { $res = hql_double_param_func("PERCENTILE", "col", $col.res, "percentile", $p_expr.res); }
+    | T_PERCENTILE_APPROX T_OPEN_P col=expr ',' p_expr=expr T_CLOSE_P { $res = hql_double_param_func("PERCENTILE_APPROX", "col", $col.res, "percentile", $p_expr.res); }
+    | T_PERCENTILE_APPROX T_OPEN_P col=expr ',' p_expr=expr ',' b_expr=expr T_CLOSE_P { $res = hql_three_param_func("PERCENTILE_APPROX", "col", $col.res, "percentile", $p_expr.res, "b", $b_expr.res); }
+    | func_name=( T_REGR_AVGX | T_REGR_AVGY | T_REGR_COUNT | T_REGR_INTERCEPT | T_REGR_R2 | T_REGR_SLOPE | T_REGR_SXX | T_REGR_SXY | T_REGR_SYY ) T_OPEN_P indep=expr ',' dep=expr T_CLOSE_P { $res = hql_double_param_func($func_name.text, "independent", $indep.res, "dependent", $dep.res); }
+    | T_HISTOGRAM_NUMERIC T_OPEN_P col=expr ',' b_expr=expr T_CLOSE_P { $res = hql_double_param_func("HISTOGRAM_NUMERIC", "col", $col.res, "b", $b_expr.res); }
+    | func_name=( T_COLLECT_SET | T_COLLECT_LIST ) T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func($func_name.text, "col", $expr.res); }
+    | T_NTILE T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("NTILE", "x", $expr.res); }
+    ;
+
+tab_generate_func returns [json res]
+    : T_EXPLODE T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("EXPLODE", "expr", $expr.res); }
+    | T_POSEXPLODE T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("POSEXPLODE", "expr", $expr.res); }
+    | T_INLINE T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("INLINE", "expr", $expr.res); }
     ;
     
 math_func returns [json res]
@@ -374,6 +430,7 @@ math_func returns [json res]
     ;
 
 // https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
+// https://cwiki.apache.org/confluence/display/Hive/LanguageManual
 
 literal_values returns [json res]
     : STRING_LITERAL { $res = hql_string_type($STRING_LITERAL.text); }
@@ -428,6 +485,7 @@ T_AES_DECRYPT     : A E S '_' D E C R Y P T ;
 T_ALL             : A L L ;
 T_ALTER           : A L T E R ;
 T_AND             : A N D ;
+T_ARRAY           : A R R A Y ;
 T_AS              : A S ;
 T_ASC             : A S C ;
 T_ASCII           : A S C I I ;
@@ -467,6 +525,8 @@ T_CLUSTERED       : C L U S T E R E D;
 T_CMP             : C M P ;
 T_COALESCE        : C O A L E S C E ; 
 T_COLLECT         : C O L L E C T ; 
+T_COLLECT_SET     : C O L L E C T '_' S E T ;
+T_COLLECT_LIST    : C O L L E C T '_' L I S T ;
 T_COLLECTION      : C O L L E C T I O N ; 
 T_COLUMN          : C O L U M N ;
 T_COMMENT         : C O M M E N T;
@@ -480,9 +540,12 @@ T_CONSTRAINT      : C O N S T R A I N T ;
 T_CONTINUE        : C O N T I N U E ;
 T_CONV            : C O N V ;
 T_COPY            : C O P Y ;
+T_CORR            : C O R R ;
 T_COS             : C O S ;
 T_COUNT           : C O U N T ;
 T_COUNT_BIG       : C O U N T '_' B I G;
+T_COVAR_POP       : C O V A R '_' P O P ;
+T_COVAR_SAMP      : C O V A R '_' S A M P ;
 T_CRC32           : C R C '3' '2' ;
 T_CREATE          : C R E A T E ;
 T_CREATION        : C R E A T I O N ; 
@@ -543,6 +606,7 @@ T_EXCLUSIVE       : E X C L U S I V E ;
 T_EXISTS          : E X I S T S ; 
 T_EXIT            : E X I T ;
 T_EXP             : E X P;
+T_EXPLODE         : E X P L O D E ;
 T_FACTORIAL       : F A C T O R I A L ;
 T_FALLBACK        : F A L L B A C K ;
 T_FALSE           : F A L S E ;
@@ -574,6 +638,7 @@ T_HASH            : H A S H ;
 T_HAVING          : H A V I N G ;
 T_HDFS            : H D F S ; 
 T_HEX             : H E X ;
+T_HISTOGRAM_NUMERIC : H I S T O G R A M '_' N U M E R I C ;
 T_HIVE            : H I V E ;
 T_HOST            : H O S T ;
 T_HOUR            : H O U R ;
@@ -587,6 +652,7 @@ T_INDEX           : I N D E X ;
 T_IN_FILE         : I N '_' F I L E ;
 T_INITCAP         : I N I T C A P ;
 T_INITRANS        : I N I T R A N S ;
+T_INLINE          : I N L I N E ;
 T_INNER           : I N N E R ; 
 T_INOUT           : I N O U T;
 T_INSERT          : I N S E R T ;
@@ -670,6 +736,7 @@ T_NOLOGGING       : N O L O G G I N G ;
 T_NONE            : N O N E ;
 T_NOT             : N O T ;
 T_NOTFOUND        : N O T F O U N D ; 
+T_NTILE           : N T I L E ;
 T_NULL            : N U L L ;
 T_NULLIF          : N U L L I F ;
 T_NUMERIC         : N U M E R I C ; 
@@ -692,9 +759,12 @@ T_PARSE_URL       : P A R S E '_' U R L ;
 T_PARTITION       : P A R T I T I O N ; 
 T_PCTFREE         : P C T F R E E ; 
 T_PCTUSED         : P C T U S E D ;
+T_PERCENTILE      : P E R C E N T I L E ;
+T_PERCENTILE_APPROX : P E R C E N T I L E '_' A P P R O X ;
 T_PLS_INTEGER     : P L S '_' I N T E G E R ;
 T_PMOD            : P M O D ;
 T_POSITIVE        : P O S I T I V E ;
+T_POSEXPLODE      : P O S E X P L O D E ;
 T_POW             : P O W;
 T_POWER           : P O W E R;
 T_PRECISION       : P R E C I S I O N ; 
@@ -717,6 +787,15 @@ T_REFLECT         : R E F L E C T ;
 T_REGEXP          : R E G E X P ;
 T_REGEXP_EXTRACT  : R E G E X P '_' E X T R A C T ;
 T_REGEXP_REPLACE  : R E G E X P '_' R E P L A C E ;
+T_REGR_AVGX       : R E G R '_' A V G X ;
+T_REGR_AVGY       : R E G R '_' A V G Y ;
+T_REGR_COUNT      : R E G R '_' C O U N T ;
+T_REGR_INTERCEPT  : R E G R '_' I N T E R C E P T ;
+T_REGR_R2         : R E G R '_'R '2' ;
+T_REGR_SLOPE      : R E G R '_' S L O P E ;
+T_REGR_SXX        : R E G R '_' S X X ;
+T_REGR_SXY        : R E G R '_' S X Y ;
+T_REGR_SYY        : R E G R '_' S Y Y ;
 T_REPEAT          : R E P E A T ;
 T_REPLACE         : R E P L A C E ; 
 T_RESIGNAL        : R E S I G N A L ;
@@ -772,6 +851,8 @@ T_SQLWARNING      : S Q L W A R N I N G ;
 T_SQRT            : S Q R T ;
 T_STATS           : S T A T S ; 
 T_STATISTICS      : S T A T I S T I C S ;
+T_STDDEV_POP      : S T D D E V '_' P O P ;
+T_STDDEV_SAMP     : S T D D E V '_' S A M P ;
 T_STEP            : S T E P ; 
 T_STORAGE         : S T O R A G E ; 
 T_STORED          : S T O R E D ;
@@ -831,6 +912,15 @@ T_WITHOUT         : W I T H O U T ;
 T_WORK            : W O R K ;
 T_XACT_ABORT      : X A C T '_' A B O R T ;
 T_XML             : X M L ;
+T_XPATH                : X P A T H ;
+T_XPATH_BOOLEAN        : X P A T H '_' B O O L E A N ;
+T_XPATH_DOUBLE         : X P A T H '_' D O U B L E ;
+T_XPATH_FLOAT          : X P A T H '_' F L O A T ;
+T_XPATH_INT            : X P A T H '_' I N T ;
+T_XPATH_LONG           : X P A T H '_' L O N G ;
+T_XPATH_NUMBER         : X P A T H '_' N U M B E R ;
+T_XPATH_SHORT          : X P A T H '_' S H O R T ;
+T_XPATH_STRING         : X P A T H '_' S T R I N G ;
 T_YEAR            : Y E A R ;
 T_YES             : Y E S ; 
 
@@ -858,16 +948,9 @@ T_ROW_NUMBER           : R O W '_' N U M B E R;
 T_STDEV                : S T D E V ;
 T_SYSDATE              : S Y S D A T E ;
 T_VARIANCE             : V A R I A N C E ; 
-T_USER                 : U S E R; 
-T_XPATH                : X P A T H ;
-T_XPATH_BOOLEAN        : X P A T H '_' B O O L E A N ;
-T_XPATH_DOUBLE         : X P A T H '_' D O U B L E ;
-T_XPATH_FLOAT          : X P A T H '_' F L O A T ;
-T_XPATH_INT            : X P A T H '_' I N T ;
-T_XPATH_LONG           : X P A T H '_' L O N G ;
-T_XPATH_NUMBER         : X P A T H '_' N U M B E R ;
-T_XPATH_SHORT          : X P A T H '_' S H O R T ;
-T_XPATH_STRING         : X P A T H '_' S T R I N G ;
+T_VAR_POP              : V A R '_' P O P ;
+T_VAR_SAMP             : V A R '_' S A M P ;
+T_USER                 : U S E R ; 
 
 
 T_ADD          : '+' ;
