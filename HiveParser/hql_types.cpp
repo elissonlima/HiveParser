@@ -101,6 +101,22 @@ json hql_type_identifier(string database, string table, string ident)
 	return j;
 }
 
+json hql_type_table_identifier(string database, string ident)
+{
+	json j;
+	j["type"] = "NAME";
+	ident.erase(std::remove(ident.begin(), ident.end(), '`'), ident.end());
+	j["value"] = ident;
+	j["database"] = "DEFAULT";
+
+	if (!database.empty())
+	{
+		database.erase(std::remove(database.begin(), database.end(), '`'), database.end());
+		j["database"] = database;
+	}
+	return j;
+}
+
 json hql_complx_typ_array(vector<json> arr_values)
 {
 	json j;
@@ -122,5 +138,30 @@ json hql_complx_typ_map(vector<json> keys, vector<json> values)
 		map_values.push_back(mvalue);
 	}
 	j["values"] = map_values;
+	return j;
+}
+
+json hql_complx_typ_struct(vector<json> cols, vector<json> values)
+{
+	json j;
+	j["type"] = "STRUCT";
+	vector<json> map_values;
+	for (int i = 0; i < cols.size(); i++)
+	{
+		json mvalue;
+		mvalue["col"] = cols[i];
+		mvalue["val"] = values[i];
+		map_values.push_back(mvalue);
+	}
+	j["values"] = map_values;
+	return j;
+}
+
+json hql_complex_type_access(json struct_def, json access_expr)
+{
+	json j;
+	j["type"] = "COMPLEX_TYPE_ACCESS";
+	j["complex_type_def"] = struct_def;
+	j["access_expr"] = access_expr;
 	return j;
 }

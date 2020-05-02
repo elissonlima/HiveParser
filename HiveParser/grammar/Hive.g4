@@ -83,34 +83,108 @@ query_stmt returns [json res]
     ;
 
 select_stmt returns [json res] // SELECT statement
-    : { vector<Select_exprContext*> exprs; } T_SELECT exprs+=select_expr (',' exprs+=select_expr)* { 
+    : T_SELECT select_all_distinct select_expr_list { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res); }
+    | T_SELECT select_all_distinct select_expr_list T_FROM table_reference { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res, $table_reference.res); }
+    | T_SELECT select_all_distinct tab_generate_func { $res = hql_select_stmt($select_all_distinct.res, $tab_generate_func.res); }
+    ;
+
+table_reference returns [json res]
+    : table_factor { $res = $table_factor.res; }
+    | {vector<Table_factorContext*> table_factor_list; } table_factor_list+=table_factor (',' table_factor_list+=table_factor)+
+    {
+        vector<json> table_factor_list_json;
+        json result;
+        for(Table_factorContext* tab_fact : $table_factor_list)
+        {
+            table_factor_list_json.push_back(tab_fact->res);
+        }
+        result["type"]="TABLE_REFERENCE_LIST";
+        result["table_reference_list"] = table_factor_list_json;
+        $res = result;
+    }
+    | {vector<Join_tableContext*> join_table_list; } table_factor join_table_list+=join_table+ {
+        $join_table_list[0]->res["left_table"] = $table_factor.res;
+        for(int i = 1; i < $join_table_list.size() ; i++)
+        {
+            $join_table_list[i]->res["left_table"] =  $join_table_list[i - 1]->res;
+        }
+        $res = $join_table_list[$join_table_list.size() - 1]->res;
+    }
+    ;
+
+join_table returns [json res]
+    : T_INNER? T_JOIN table_factor { $res = hql_stmt_join_table("INNER", $table_factor.res); }
+    | T_INNER? T_JOIN table_factor join_condition { $res = hql_stmt_join_table("INNER", $table_factor.res, $join_condition.res); }
+    | j_type=( T_LEFT | T_RIGHT | T_FULL) T_OUTER? T_JOIN table_factor join_condition { $res = hql_stmt_join_table($j_type.text, $table_factor.res, $join_condition.res); }
+    | T_CROSS T_JOIN table_factor { $res = hql_stmt_join_table("CROSS", $table_factor.res); }
+    | T_CROSS T_JOIN table_factor join_condition { $res = hql_stmt_join_table("CROSS", $table_factor.res, $join_condition.res); }
+    ;
+//     table_reference [INNER] JOIN table_factor [join_condition]
+//   | table_reference {LEFT|RIGHT|FULL} [OUTER] JOIN table_reference join_condition
+//   | table_reference LEFT SEMI JOIN table_reference join_condition
+//   | table_reference CROSS JOIN table_reference [join_condition] (as of Hive 0.10)
+
+join_condition returns [json res]
+    : T_ON bool_expr { $res = $bool_expr.res; }
+    ;
+
+table_factor returns [json res]
+   : tab_ident { $res =hql_stmt_table_ref($tab_ident.res, "DEFAULT"); } 
+   | tab_ident T_AS? IDENTIFIER { $res =hql_stmt_table_ref($tab_ident.res, $IDENTIFIER.text); } 
+   | '(' select_stmt ')' T_AS? IDENTIFIER { $res =hql_stmt_table_ref($select_stmt.res, $IDENTIFIER.text); }
+   ;
+
+select_all_distinct returns [string res]
+    : { $res = "ALL"; }
+    | T_ALL { $res = "ALL"; }
+    | T_DISTINCT { $res = "DISTINCT"; }
+    ;
+
+select_expr_list returns [vector<json> res]
+    : { vector<Select_exprContext*> exprs; } exprs+=select_expr (',' exprs+=select_expr)*  { 
         vector<json> expr_list;
         for(Select_exprContext* expr : $exprs) {expr_list.push_back(expr->res);}
-        $res = hql_select_stmt(expr_list); 
+        $res = expr_list; 
         }
-    | T_SELECT tab_generate_func { $res = hql_select_stmt($tab_generate_func.res); }
     ;
 
 select_expr returns [json res]
-    : expr { $res = $expr.res;}
-    | bool_expr { $res = $bool_expr.res;}
+    : expr T_AS? IDENTIFIER { $res = hql_select_expr($expr.res, $IDENTIFIER.text); }
+    | expr { $res = hql_select_expr($expr.res); }
+    | bool_expr T_AS? IDENTIFIER { $res = hql_select_expr($bool_expr.res, $IDENTIFIER.text); }
+    | bool_expr { $res = hql_select_expr($bool_expr.res); }
+    | '*' { $res = hql_select_all_expr(); } 
+    | IDENTIFIER '.' '*' { $res = hql_select_all_expr($IDENTIFIER.text); }
     ;
 
 bool_expr returns [json res]
-    : l_expr=expr op=( '*' | '/' | '%' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
-    | l_expr=expr op=( '+' | '-' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
-    | l_expr=expr op=( '<<' | '>>' | '&' | '|' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); } 
+    : l_expr=expr op=( '<<' | '>>' | '&' | '|' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); } 
     | l_expr=expr op=( '<' | '<=' | '>' | '>=' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); } 
-    | l_expr=expr op=( '=' | '==' | '!=' | '<>' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
-    | l_expr=expr set_operators r_expr=expr { $res = hql_generic_operator($set_operators.text, $l_expr.res, $r_expr.res); }
+    | l_expr=expr op=( '=' | '==' | '!=' | '<>' | '<=>' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
     | l_expr=expr op=T_AND r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
     | l_expr=expr op=T_OR r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
-    | expr T_IS T_NULL { $res = hql_generic_operator("IS", $expr.res, hql_null_constant()); }
-    | expr T_IS T_NOT T_NULL { $res = hql_generic_operator("IS_NOT", $expr.res, hql_null_constant()); }
+    | l_expr=expr set_operators_is BOOL_LITERAL { $res = hql_generic_operator($set_operators_is.res, $l_expr.res, hql_boolean_type($BOOL_LITERAL.text)); }
+    | l_expr=expr set_operators_is NULL_CONST { $res = hql_generic_operator($set_operators_is.res, $l_expr.res, hql_null_constant()); }
+    | eval_expr=expr T_BETWEEN start_interval=expr T_AND end_interval=expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, false); }
+    | eval_expr=expr T_NOT T_BETWEEN start_interval=expr T_AND end_interval=expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, true); }
+    | eval_expr=expr set_operators_in expr_list { $res = hql_set_operators_in($set_operators_in.res, $expr.res, $expr_list.res);  }
+    | eval_expr=expr set_operators_in T_OPEN_P select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_in.res, $expr.res, $select_stmt.res); }
+    | eval_expr=expr set_operators_exists T_OPEN_P select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_exists.res, $expr.res, $select_stmt.res); }
+    | eval_expr=expr set_operators_like r_expr=expr { $res = hql_generic_operator($set_operators_like.res, $eval_expr.res, $r_expr.res); }
+    ;
+
+expr_list returns [vector<json> res]
+    : { vector<ExprContext*> exprs; } T_OPEN_P exprs+=expr (',' exprs+=expr)* T_CLOSE_P {
+        vector<json> expr_list_json;
+        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        $res = expr_list_json;
+    }
     ;
 
 expr returns [json res]
-    : literal_values { $res = $literal_values.res; }    
+    : l_expr=expr op=( '*' | '/' | '%' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
+    | l_expr=expr op=( '+' | '-' ) r_expr=expr { $res = hql_generic_operator($op.text, $l_expr.res, $r_expr.res); }
+    | literal_values { $res = $literal_values.res; }    
     | ident { $res =  $ident.res; }
     | unary_operator expr { $res = hql_unary_operator($unary_operator.text, $expr.res); }
     | '(' expr ')' { $res = $expr.res; }  
@@ -126,13 +200,29 @@ expr returns [json res]
     ;
 
 
+
 complex_types returns [json res]
+    : array_def { $res = $array_def.res; }
+    | map_def { $res = $map_def.res; }
+    | struct_def { $res = $struct_def.res; }
+    | named_struct_def  { $res = $named_struct_def.res; }
+    | ident '[' expr ']' { $res = hql_complex_type_access($ident.res, $expr.res); }
+    | array_def '[' expr ']' { $res = hql_complex_type_access($array_def.res, $expr.res); }
+    | map_def '[' expr ']' { $res = hql_complex_type_access($map_def.res, $expr.res); }
+    | ident '.' expr  { $res = hql_complex_type_access($ident.res, $expr.res); }
+    | struct_def '.' expr { $res = hql_complex_type_access($struct_def.res, $expr.res); }
+    ;
+
+array_def returns [json res]
     : { vector<ExprContext*> exprs; } T_ARRAY T_OPEN_P exprs+=expr ( ',' exprs+=expr)* T_CLOSE_P {
         vector<json> expr_list_json;
         for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
         $res = hql_complx_typ_array(expr_list_json);
     }
-    | { vector<ExprContext*> key_exprs; vector<ExprContext*> val_exprs; } T_MAP T_OPEN_P key_exprs+=expr ',' val_exprs+=expr ( ',' key_exprs+=expr ',' val_exprs+=expr )* T_CLOSE_P {
+    ;
+
+map_def returns [json res]
+    : { vector<ExprContext*> key_exprs; vector<ExprContext*> val_exprs; } T_MAP T_OPEN_P key_exprs+=expr ',' val_exprs+=expr ( ',' key_exprs+=expr ',' val_exprs+=expr )* T_CLOSE_P {
         vector<json> key_exprs_json; vector<json> val_exprs_json;
         for(int i = 0 ; i < $key_exprs.size() ; i++)
         {
@@ -140,6 +230,30 @@ complex_types returns [json res]
             val_exprs_json.push_back($val_exprs[i]->res);
         }
         $res = hql_complx_typ_map(key_exprs_json, val_exprs_json);
+    }
+    ;
+
+struct_def returns [json res]
+    : { vector<ExprContext*> val_exprs; } T_STRUCT T_OPEN_P val_exprs+=expr ( ',' val_exprs+=expr)* T_CLOSE_P {
+        vector<json> col_exprs_json; vector<json> val_exprs_json;
+        for(int i = 0 ; i < $val_exprs.size() ; i++)
+        {
+            col_exprs_json.push_back(hql_string_type("col" + to_string(i + 1)));
+            val_exprs_json.push_back($val_exprs[i]->res);
+        }
+        $res = hql_complx_typ_struct(col_exprs_json, val_exprs_json);
+    }
+    ;
+
+named_struct_def returns [json res]
+    : { vector<ExprContext*> col_exprs; vector<ExprContext*> val_exprs; } T_NAMED_STRUCT T_OPEN_P col_exprs+=expr ',' val_exprs+=expr ( ',' col_exprs+=expr ',' val_exprs+=expr )* T_CLOSE_P {
+        vector<json> col_exprs_json; vector<json> val_exprs_json;
+        for(int i = 0 ; i < $val_exprs.size() ; i++)
+        {
+            col_exprs_json.push_back($col_exprs[i]->res);
+            val_exprs_json.push_back($val_exprs[i]->res);
+        }
+        $res = hql_complx_typ_struct(col_exprs_json, val_exprs_json);
     }
     ;
 
@@ -446,6 +560,10 @@ ident returns [json res]
     : ( database=IDENTIFIER '.' )? ( tablename=IDENTIFIER '.' )? field=IDENTIFIER { $res = hql_type_identifier($database.text, $tablename.text, $field.text); }
     ;
 
+tab_ident returns [json res]
+    :  ( database=IDENTIFIER '.' )? tablename=IDENTIFIER { $res = hql_type_table_identifier($database.text, $tablename.text); }
+    ;
+
 date_literal returns [string res]
     : T_DATE STRING_LITERAL { $res = $STRING_LITERAL.text; }
     ;
@@ -454,17 +572,29 @@ timestamp_literal returns [string res]
     : T_TIMESTAMP STRING_LITERAL { $res = $STRING_LITERAL.text; }
     ;
 
-set_operators
-    : T_IS 
-    | T_IS T_NOT 
-    | T_IN 
-    | T_NOT T_IN
+set_operators_is returns [string res]
+    : T_IS { $res = "IS"; }
+    | T_IS T_NOT { $res = "IS_NOT"; }
+    ;
+set_operators_like returns [string res]
+    : T_LIKE { $res = "LIKE"; }
+    | T_NOT T_LIKE { $res = "NOT_LIKE"; }
+    | T_RLIKE { $res = "RLIKE"; }
+    | T_REGEXP  { $res = "REGEXP "; }
+    ;
+set_operators_in returns [string res]
+    : T_IN { $res = "IN"; }
+    | T_NOT T_IN { $res = "NOT_IN"; }
+    ;
+set_operators_exists returns [string res]
+    : T_EXISTS { $res = "EXISTS"; }
+    | T_NOT T_EXISTS { $res = "NOT_EXISTS"; }
     ;
 
 unary_operator
     : '-'
     | '+'
-    | '~'
+    | '!'
     | T_NOT
     ;
 
@@ -550,6 +680,7 @@ T_CRC32           : C R C '3' '2' ;
 T_CREATE          : C R E A T E ;
 T_CREATION        : C R E A T I O N ; 
 T_CREATOR         : C R E A T O R ;
+T_CROSS           : C R O S S ;
 T_CS              : C S;
 T_CURRENT         : C U R R E N T ;
 T_CURRENT_SCHEMA  : C U R R E N T '_' S C H E M A ;
@@ -724,6 +855,7 @@ T_MINUTE          : M I N U T E ;
 T_MONTH           : M O N T H ;
 T_MONTHS_BETWEEN  : M O N T H S '_' B E T W E E N ;
 T_MULTISET        : M U L T I S E T ; 
+T_NAMED_STRUCT    : N A M E D '_' S T R U C T ;
 T_NCHAR           : N C H A R ; 
 T_NEGATIVE        : N E G A T I V E ;
 T_NEXT_DAY        : N E X T '_' D A Y ;
@@ -858,6 +990,7 @@ T_STORAGE         : S T O R A G E ;
 T_STORED          : S T O R E D ;
 T_STRING          : S T R I N G ;
 T_STR_TO_MAP      : S T R '_' T O '_' M A P ;
+T_STRUCT          : S T R U C T ;
 T_SUBDIR          : S U B D I R ; 
 T_SUBSTR          : S U B S T R ; 
 T_SUBSTRING       : S U B S T R I N G ; 
