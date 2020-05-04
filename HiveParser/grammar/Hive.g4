@@ -85,7 +85,7 @@ query_stmt returns [json res]
 select_stmt returns [json res] // SELECT statement
     : T_SELECT select_all_distinct select_expr_list { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res); }
     | T_SELECT select_all_distinct tab_generate_func { $res = hql_select_stmt($select_all_distinct.res, $tab_generate_func.res); }
-    | T_SELECT select_all_distinct select_expr_list T_FROM table_reference opt_where_expr opt_group_by_list opt_having_expr opt_order_by_list opt_limit { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res, $table_reference.res, $opt_where_expr.res, $opt_group_by_list.res, $opt_having_expr.res, $opt_order_by_list.res); }
+    | T_SELECT select_all_distinct select_expr_list T_FROM table_reference opt_where_expr opt_group_by_list opt_having_expr opt_order_by_list opt_limit { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res, $table_reference.res, $opt_where_expr.res, $opt_group_by_list.res, $opt_having_expr.res, $opt_order_by_list.res, $opt_limit.res); }
     ;
 
 opt_where_expr returns [json res]
@@ -112,20 +112,29 @@ opt_having_expr returns [json res]
 
 opt_order_by_list returns [json res]
     : { $res = vector<json>(); }
-    | { vector<IdentContext*> order_by_ident_list; } T_ORDER T_BY order_by_ident_list+=ident ( ',' order_by_ident_list+=ident )* {
+    | { vector<IdentContext*> order_by_ident_list; vector<Opt_order_by_modeContext*> order_mode_list; } T_ORDER T_BY order_by_ident_list+=ident order_mode_list+=opt_order_by_mode ( ',' order_by_ident_list+=ident order_mode_list+=opt_order_by_mode )* {
         vector<json> expr_json_list;
-        for(IdentContext* ident_context : $order_by_ident_list)
+        for(int i = 0; i < $order_by_ident_list.size() ; i++)
         {  
-            expr_json_list.push_back(ident_context->res);
+            json j;
+            j["col_name"] = $order_by_ident_list[i]->res;
+            j["col_order"] = $order_mode_list[i]->res;
+            expr_json_list.push_back(expr_json_list);
         }
         $res = expr_json_list;
     }
     ;
 
+opt_order_by_mode returns [string res]
+    : { $res = "ASC"; }
+    | T_ASC { $res = "ASC"; }
+    | T_DESC { $res = "DESC"; }
+    ;
+
 opt_limit returns [json res]
     : { $res = json(); }
-    | T_LIMIT rows=L_INT { $res = hql_select_limit_clause($rows.text); }
-    | T_LIMIT offset=L_INT ',' rows=L_INT { $res = hql_select_limit_clause($rows.text, $offset.text); }
+    | T_LIMIT rows=INT_LITERAL { $res = hql_select_limit_clause($rows.text); }
+    | T_LIMIT offset=INT_LITERAL ',' rows=INT_LITERAL { $res = hql_select_limit_clause($rows.text, $offset.text); }
     ;
 
 table_reference returns [json res]

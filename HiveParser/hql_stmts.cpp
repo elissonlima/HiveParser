@@ -50,6 +50,7 @@ json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json t
 json hql_select_limit_clause(string rows)
 {
 	json j;
+	j["offset"] = 0;
 	j["rows"] = stoi(rows);
 	return j;
 }
