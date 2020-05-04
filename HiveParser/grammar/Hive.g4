@@ -119,7 +119,7 @@ opt_order_by_list returns [json res]
             json j;
             j["col_name"] = $order_by_ident_list[i]->res;
             j["col_order"] = $order_mode_list[i]->res;
-            expr_json_list.push_back(expr_json_list);
+            expr_json_list.push_back(j);
         }
         $res = expr_json_list;
     }

@@ -1369,7 +1369,7 @@ public class HiveParser extends Parser {
 				            json j;
 				            j["col_name"] = ((Opt_order_by_listContext)_localctx).order_by_ident_list[i]->res;
 				            j["col_order"] = ((Opt_order_by_listContext)_localctx).order_mode_list[i]->res;
-				            expr_json_list.push_back(expr_json_list);
+				            expr_json_list.push_back(j);
 				        }
 				        ((Opt_order_by_listContext)_localctx).res =  expr_json_list;
 				    
