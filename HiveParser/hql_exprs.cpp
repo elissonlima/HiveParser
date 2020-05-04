@@ -9,10 +9,20 @@ json hql_unary_operator(string op, json expr)
 	return j;
 }
 
-json hql_generic_operator(string op, json l_expr, json r_expr)
+json hql_math_operator(string op, json l_expr, json r_expr)
 {
 	json j;
-	j["type"] = "EXPR_OPERATOR";
+	j["type"] = "MATH_OPERATOR";
+	j["operator"] = op;
+	j["left_expr"] = l_expr;
+	j["right_expr"] = r_expr;
+	return j;
+}
+
+json hql_bool_operator(string op, json l_expr, json r_expr)
+{
+	json j;
+	j["type"] = "BOOL_OPERATOR";
 	j["operator"] = op;
 	j["left_expr"] = l_expr;
 	j["right_expr"] = r_expr;
@@ -22,10 +32,11 @@ json hql_generic_operator(string op, json l_expr, json r_expr)
 json hql_between_expr(json expr, json start_interval, json end_interval, bool flag_not)
 {
 	json j;
+	j["type"] = "BOOL_OPERATOR";
 	if(flag_not)
-		j["type"] = "NOT_BETWEEN";
+		j["operator"] = "NOT_BETWEEN";
 	else
-		j["type"] = "BETWEEN";
+		j["operator"] = "BETWEEN";
 	j["expr"] = expr;
 	j["start_interval"] = start_interval;
 	j["end_interval"] = end_interval;
@@ -34,7 +45,7 @@ json hql_between_expr(json expr, json start_interval, json end_interval, bool fl
 json hql_set_operators_in(string in_not_op, json expr, vector<json> exprs)
 {
 	json j;
-	j["type"] = "EXPR_OPERATOR";
+	j["type"] = "BOOL_OPERATOR";
 	j["operator"] = in_not_op;
 	j["expr"] = expr;
 	j["expr_list"] = exprs;
@@ -44,7 +55,7 @@ json hql_set_operators_in(string in_not_op, json expr, vector<json> exprs)
 json hql_set_operators_in(string in_not_op, json expr, json select_expr)
 {
 	json j;
-	j["type"] = "EXPR_OPERATOR";
+	j["type"] = "BOOL_OPERATOR";
 	j["operator"] = in_not_op;
 	j["expr"] = expr;
 	j["select_expr"] = select_expr;
