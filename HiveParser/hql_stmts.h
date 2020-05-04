@@ -11,8 +11,12 @@ using json = nlohmann::json;
 
 json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list);
 json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json tab_reference);
-json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json tab_reference, json where_expr, vector<json> group_by_expr, vector<json> order_by_expr);
+json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json tab_reference, 
+	json where_expr, vector<json> group_by_expr, json having_expr, vector<json> order_by_expr,
+	json limit_clause);
 json hql_select_stmt(string all_disctinct_clause, json expr);
+json hql_select_limit_clause(string rows);
+json hql_select_limit_clause(string rows, string offset);
 json hql_stmt_list(vector<json> stmt_list);
 json hql_stmt_table_ref(json tab_ref, string table_alias);
 json hql_stmt_join_table(string join_type, json right_table_expr);

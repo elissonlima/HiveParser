@@ -28,7 +28,9 @@ json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json t
 	return j;
 }
 
-json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json tab_reference, json where_expr, vector<json> group_by_expr, vector<json> order_by_expr)
+json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json tab_reference, 
+	json where_expr, vector<json> group_by_expr, json having_expr, vector<json> order_by_expr,
+	json limit_clause)
 {
 	json j;
 	j = hql_select_stmt(all_disctinct_clause, expr_list, tab_reference);
@@ -36,8 +38,27 @@ json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json t
 		j["where_expr"] = where_expr;
 	if (!group_by_expr.empty())
 		j["group_by_expr_list"] = group_by_expr;
+	if (!having_expr.empty())
+		j["having_expr"] = having_expr;
 	if (!order_by_expr.empty())
-		j["group_by_expr_list"] = order_by_expr;
+		j["order_by_expr_list"] = order_by_expr;
+	if (!limit_clause.empty())
+		j["limit"] = limit_clause;
+	return j;
+}
+
+json hql_select_limit_clause(string rows)
+{
+	json j;
+	j["rows"] = stoi(rows);
+	return j;
+}
+
+json hql_select_limit_clause(string rows, string offset)
+{
+	json j;
+	j["rows"] = stoi(rows);
+	j["offset"] = stoi(offset);
 	return j;
 }
 

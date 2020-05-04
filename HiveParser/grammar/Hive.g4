@@ -85,8 +85,7 @@ query_stmt returns [json res]
 select_stmt returns [json res] // SELECT statement
     : T_SELECT select_all_distinct select_expr_list { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res); }
     | T_SELECT select_all_distinct tab_generate_func { $res = hql_select_stmt($select_all_distinct.res, $tab_generate_func.res); }
-
-    | T_SELECT select_all_distinct select_expr_list T_FROM table_reference opt_where_expr opt_group_by_list opt_order_by_list { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res, $table_reference.res, $opt_where_expr.res, $opt_group_by_list.res, $opt_order_by_list.res); }
+    | T_SELECT select_all_distinct select_expr_list T_FROM table_reference opt_where_expr opt_group_by_list opt_having_expr opt_order_by_list opt_limit { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res, $table_reference.res, $opt_where_expr.res, $opt_group_by_list.res, $opt_having_expr.res, $opt_order_by_list.res); }
     ;
 
 opt_where_expr returns [json res]
@@ -106,6 +105,11 @@ opt_group_by_list returns [json res]
     }
     ;
 
+opt_having_expr returns [json res]
+    : { $res = json(); }
+    | T_HAVING expr { $res = $expr.res; }
+    ;
+
 opt_order_by_list returns [json res]
     : { $res = vector<json>(); }
     | { vector<IdentContext*> order_by_ident_list; } T_ORDER T_BY order_by_ident_list+=ident ( ',' order_by_ident_list+=ident )* {
@@ -116,6 +120,12 @@ opt_order_by_list returns [json res]
         }
         $res = expr_json_list;
     }
+    ;
+
+opt_limit returns [json res]
+    : { $res = json(); }
+    | T_LIMIT rows=L_INT { $res = hql_select_limit_clause($rows.text); }
+    | T_LIMIT offset=L_INT ',' rows=L_INT { $res = hql_select_limit_clause($rows.text, $offset.text); }
     ;
 
 table_reference returns [json res]
