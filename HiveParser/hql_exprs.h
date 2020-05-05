@@ -20,3 +20,4 @@ json hql_select_all_expr(json tab_ref);
 json hql_over_clause_partition(json over_func, json partition_by_list);
 json hql_over_clause_order(json over_func, json order_by_list);
 json hql_over_clause_partition_order(json over_func, json partition_by_list, json order_by_list);
+json hql_lateral_view_expr(json udtf_expr, string table_alias, vector<string> column_alias);

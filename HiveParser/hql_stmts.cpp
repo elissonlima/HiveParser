@@ -27,13 +27,14 @@ json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json t
 	j["tab_reference"] = tab_reference;
 	return j;
 }
-
-json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json tab_reference, 
-	json where_expr, vector<json> group_by_expr, json having_expr, vector<json> order_by_expr,
-	json limit_clause)
+json hql_select_stmt(string all_disctinct_clause, vector<json> expr_list, json tab_reference,
+	json lateral_view_expr, json where_expr, vector<json> group_by_expr, json having_expr,
+	vector<json> order_by_expr, json limit_clause)
 {
 	json j;
 	j = hql_select_stmt(all_disctinct_clause, expr_list, tab_reference);
+	if (!lateral_view_expr.empty())
+		j["lateral_view_expr"] = lateral_view_expr;
 	if(!where_expr.empty())
 		j["where_expr"] = where_expr;
 	if (!group_by_expr.empty())

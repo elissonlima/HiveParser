@@ -123,3 +123,16 @@ json hql_over_clause_partition_order(json over_func, json partition_by_list, jso
 	j["order_by_list"] = order_by_list;
 	return j;
 }
+
+json hql_lateral_view_expr(json udtf_expr, string table_alias, vector<string> column_alias)
+{
+	json j;
+	j["type"] = "LATERAL_VIEW_EXPR";
+	j["udtf_expr"] = udtf_expr;
+	j["table_alias"] = table_alias;
+	if (column_alias.size() == 1)
+		j["column_alias"] = column_alias[0];
+	else
+		j["column_alias_list"] = column_alias;
+	return j;
+}

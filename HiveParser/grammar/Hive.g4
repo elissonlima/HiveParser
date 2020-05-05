@@ -85,7 +85,23 @@ query_stmt returns [json res]
 select_stmt returns [json res] // SELECT statement
     : T_SELECT select_all_distinct select_expr_list { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res); }
     | T_SELECT select_all_distinct tab_generate_func { $res = hql_select_stmt($select_all_distinct.res, $tab_generate_func.res); }
-    | T_SELECT select_all_distinct select_expr_list T_FROM table_reference opt_where_expr opt_group_by_list opt_having_expr opt_order_by_list opt_limit { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res, $table_reference.res, $opt_where_expr.res, $opt_group_by_list.res, $opt_having_expr.res, $opt_order_by_list.res, $opt_limit.res); }
+    | T_SELECT select_all_distinct select_expr_list T_FROM table_reference opt_lateral_view_expr opt_where_expr opt_group_by_list opt_having_expr opt_order_by_list opt_limit { $res = hql_select_stmt($select_all_distinct.res, $select_expr_list.res, $table_reference.res, $opt_lateral_view_expr.res, $opt_where_expr.res, $opt_group_by_list.res, $opt_having_expr.res, $opt_order_by_list.res, $opt_limit.res); }
+    ;
+
+opt_lateral_view_expr returns [json res]
+    : { $res = json(); }
+    | { vector<Column_identifierContext*> column_alias_list; } T_LATERAL T_VIEW tab_generate_func tab_alias=column_identifier T_AS column_alias_list+=column_identifier ( ',' column_alias_list+=column_identifier)* {
+        vector<string> column_alias_json_list;
+        for(Column_identifierContext* column_ctxt:$column_alias_list)
+        {
+            column_alias_json_list.push_back(column_ctxt->res);
+        }
+        $res = hql_lateral_view_expr($tab_generate_func.res, $tab_alias.res, column_alias_json_list);
+    }
+    ;
+
+column_identifier returns [string res]
+    : IDENTIFIER { $res = $IDENTIFIER.text; }
     ;
 
 opt_where_expr returns [json res]
@@ -903,6 +919,7 @@ T_KEY             : K E Y ;
 T_KEYS            : K E Y S ;
 T_LANGUAGE        : L A N G U A G E ;
 T_LASTDAY         : L A S T '_' D A Y ;
+T_LATERAL         : L A T E R A L ;
 T_LCASE           : L C A S E ;
 T_LEAVE           : L E A V E ;
 T_LEFT            : L E F T ;
@@ -1129,6 +1146,7 @@ T_VARCHAR         : V A R C H A R ;
 T_VARCHAR2        : V A R C H A R '2' ;
 T_VARYING         : V A R Y I N G ;
 T_VERSION         : V E R S I O N;
+T_VIEW            : V I E W ;
 T_VOLATILE        : V O L A T I L E ;
 T_WEEKOFYEAR      : W E E K O F Y E A R ;
 T_WHEN            : W H E N ;
