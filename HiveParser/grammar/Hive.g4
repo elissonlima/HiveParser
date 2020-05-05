@@ -204,7 +204,49 @@ select_expr returns [json res]
     | expr { $res = hql_select_expr($expr.res); }
     | '*' { $res = hql_select_all_expr(); } 
     | IDENTIFIER '.' '*' { $res = hql_select_all_expr($IDENTIFIER.text); }
+    | over_clause { $res = $over_clause.res; }
     ;
+
+over_clause returns [json res]
+    : { vector<IdentContext*> ident_cntxt_list; } over_func T_OVER T_OPEN_P T_PARTITION T_BY ident_cntxt_list+=ident ( ',' ident_cntxt_list+=ident)* T_CLOSE_P {
+        vector<json> ident_json_list;
+        for(IdentContext* ident_context:$ident_cntxt_list)
+        {
+            ident_json_list.push_back(ident_context->res);
+        }
+        $res = hql_over_clause_partition($over_func.res, ident_json_list);
+    }
+    | { vector<IdentContext*> ident_cntxt_list; } over_func T_OVER T_OPEN_P T_ORDER T_BY ident_cntxt_list+=ident ( ',' ident_cntxt_list+=ident)* T_CLOSE_P {
+        vector<json> ident_json_list;
+        for(IdentContext* ident_context:$ident_cntxt_list)
+        {
+            ident_json_list.push_back(ident_context->res);
+        }
+        $res = hql_over_clause_order($over_func.res, ident_json_list);
+    }
+    | { vector<IdentContext*> partition_cntxt_list; vector<IdentContext*> order_cntxt_list; } over_func T_OVER T_OPEN_P T_PARTITION T_BY partition_cntxt_list+=ident ( ',' partition_cntxt_list+=ident)* T_ORDER T_BY order_cntxt_list+=ident ( ',' order_cntxt_list+=ident)* T_CLOSE_P {
+        vector<json> partition_json_list; vector<json> order_json_list;
+        for(IdentContext* ident_context:$partition_cntxt_list)
+        {
+            partition_json_list.push_back(ident_context->res);
+        }
+        for(IdentContext* ident_context:$order_cntxt_list)
+        {
+            order_json_list.push_back(ident_context->res);
+        }
+        $res = hql_over_clause_partition_order($over_func.res, partition_json_list, order_json_list);
+    }
+    ;
+
+over_func returns [json res]
+    : basic_aggr_func { $res = $basic_aggr_func.res; }
+    | analytic_func { $res = $analytic_func.res; }
+    ;
+
+analytic_func returns [json res]
+    : func_name=( T_RANK | T_DENSE_RANK | T_ROW_NUMBER | T_CUME_DIST | T_PERCENT_RANK ) T_OPEN_P T_CLOSE_P { $res = hql_fixed_func($func_name.text); }
+    ;
+
 
 expr_list returns [vector<json> res]
     : { vector<ExprContext*> exprs; } T_OPEN_P exprs+=expr (',' exprs+=expr)* T_CLOSE_P {
@@ -523,7 +565,7 @@ dat_convrt_func returns [json res]
     | T_BINARY T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("BINARY", "expr", $expr.res); }
     ;
 
-aggr_func returns [json res]
+basic_aggr_func returns [json res]
     : T_COUNT T_OPEN_P r=expr T_CLOSE_P { $res = hql_count_func($r.res); }
     | { vector<ExprContext*> exprs; } T_COUNT T_OPEN_P T_DISTINCT exprs+=expr ( ',' exprs+=expr )* T_CLOSE_P {
         vector<json> expr_list_json;
@@ -535,7 +577,12 @@ aggr_func returns [json res]
     | T_SUM T_OPEN_P T_DISTINCT expr T_CLOSE_P { $res = hql_double_param_func("SUM", "flag_distinct", true, "col", $expr.res); }
     | T_AVG T_OPEN_P expr T_CLOSE_P { $res = hql_double_param_func("AVG", "flag_distinct", false, "col", $expr.res); }
     | T_AVG T_OPEN_P T_DISTINCT expr T_CLOSE_P { $res = hql_double_param_func("AVG", "flag_distinct", true, "col", $expr.res); }
-    | fun_name=(T_MIN | T_MAX | T_VARIANCE | T_VAR_POP | T_VAR_SAMP | T_STDDEV_POP | T_STDDEV_SAMP) T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func($fun_name.text, "col", $expr.res); }
+    | fun_name=( T_MIN | T_MAX ) T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func($fun_name.text, "col", $expr.res); }
+    ; 
+
+aggr_func returns [json res]
+    : basic_aggr_func { $res = $basic_aggr_func.res; }    
+    | fun_name=( T_VARIANCE | T_VAR_POP | T_VAR_SAMP | T_STDDEV_POP | T_STDDEV_SAMP ) T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func($fun_name.text, "col", $expr.res); }
     | fun_name=( T_COVAR_POP | T_COVAR_SAMP | T_CORR ) T_OPEN_P col1=expr ',' col2=expr T_CLOSE_P { $res = hql_double_param_func($fun_name.text, "col1", $col1.res, "col2", $col2.res); }
     | T_PERCENTILE T_OPEN_P col=expr ',' p_expr=expr T_CLOSE_P { $res = hql_double_param_func("PERCENTILE", "col", $col.res, "percentile", $p_expr.res); }
     | T_PERCENTILE_APPROX T_OPEN_P col=expr ',' p_expr=expr T_CLOSE_P { $res = hql_double_param_func("PERCENTILE_APPROX", "col", $col.res, "percentile", $p_expr.res); }
@@ -733,7 +780,6 @@ T_CURRENT_SCHEMA  : C U R R E N T '_' S C H E M A ;
 T_CURRENT_DATABASE : C U R R E N T '_' D A T A B A S E ;
 T_CURSOR          : C U R S O R ;
 T_DATABASE        : D A T A B A S E ;
-T_DATA            : D A T A ;
 T_DATE            : D A T E ;
 T_DATEADD         : D A T E '_' A D D ;
 T_DATEDIFF        : D A T E D I F F ;
@@ -937,6 +983,7 @@ T_PARSE_URL       : P A R S E '_' U R L ;
 T_PARTITION       : P A R T I T I O N ; 
 T_PCTFREE         : P C T F R E E ; 
 T_PCTUSED         : P C T U S E D ;
+T_PERCENT_RANK    : P E R C E N T '_' R A N K ;
 T_PERCENTILE      : P E R C E N T I L E ;
 T_PERCENTILE_APPROX : P E R C E N T I L E '_' A P P R O X ;
 T_PLS_INTEGER     : P L S '_' I N T E G E R ;

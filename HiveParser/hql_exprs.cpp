@@ -95,3 +95,31 @@ json hql_select_all_expr(json tab_ref)
 	j["reference"] = tab_ref;
 	return j;
 }
+
+json hql_over_clause_partition(json over_func, json partition_by_list)
+{
+	json j;
+	j["type"] = "OVER_CLAUSE_EXPR";
+	j["func"] = over_func;
+	j["partition_by_list"] = partition_by_list;
+	return j;
+}
+
+json hql_over_clause_order(json over_func, json order_by_list)
+{
+	json j;
+	j["type"] = "OVER_CLAUSE_EXPR";
+	j["func"] = over_func;
+	j["order_by_list"] = order_by_list;
+	return j;
+}
+
+json hql_over_clause_partition_order(json over_func, json partition_by_list, json order_by_list)
+{
+	json j;
+	j["type"] = "OVER_CLAUSE_EXPR";
+	j["func"] = over_func;
+	j["partition_by_list"] = partition_by_list;
+	j["order_by_list"] = order_by_list;
+	return j;
+}
