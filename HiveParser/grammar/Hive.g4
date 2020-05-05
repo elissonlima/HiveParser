@@ -204,7 +204,8 @@ select_expr returns [json res]
     | expr { $res = hql_select_expr($expr.res); }
     | '*' { $res = hql_select_all_expr(); } 
     | IDENTIFIER '.' '*' { $res = hql_select_all_expr($IDENTIFIER.text); }
-    | over_clause { $res = $over_clause.res; }
+    | over_clause { $res = hql_select_expr($over_clause.res, "DEFAULT"); }
+    | over_clause  T_AS? IDENTIFIER { $res = hql_select_expr($over_clause.res, $IDENTIFIER.text); }
     ;
 
 over_clause returns [json res]
