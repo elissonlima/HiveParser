@@ -18,6 +18,6 @@
 SELECT cpf, cnpj FROM tab1
 UNION 
 SELECT cpf, cnpj FROM tab2
-UNION
+UNION ALL
 SELECT cpf, cnpj FROM tab3
 ;
