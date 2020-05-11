@@ -8,6 +8,7 @@
     #include "hql_exprs.h"
     #include "hql_stmts.h"
     #include "hql_functions.h"
+    #include "utils.h"
 
     using namespace std;
     using json = nlohmann::json;
@@ -34,133 +35,166 @@ public class HiveParser extends Parser {
 		T__9=10, NULL_CONST=11, BOOL_LITERAL=12, T_ABS=13, T_ACOS=14, T_ADD_MONTHS=15, 
 		T_AES_ENCRYPT=16, T_AES_DECRYPT=17, T_ALL=18, T_ALTER=19, T_AND=20, T_ARRAY=21, 
 		T_AS=22, T_ASC=23, T_ASCII=24, T_ASIN=25, T_ASSERT_TRUE=26, T_AT=27, T_ATAN=28, 
-		T_AUTO_INCREMENT=29, T_AVG=30, T_BASE64=31, T_BEGIN=32, T_BETWEEN=33, 
-		T_BIGINT=34, T_BIN=35, T_BINARY=36, T_BIT=37, T_BODY=38, T_BREAK=39, T_BY=40, 
-		T_BYTE=41, T_CALL=42, T_CALLER=43, T_CASCADE=44, T_CASE=45, T_CAST=46, 
-		T_CBR=47, T_CEIL=48, T_CEILING=49, T_CHAR=50, T_CHARACTER=51, T_CHARACTER_LENGTH=52, 
-		T_CHARSET=53, T_CHR=54, T_CLIENT=55, T_CLOSE=56, T_CLUSTERED=57, T_CMP=58, 
-		T_COALESCE=59, T_COLLECT=60, T_COLLECT_SET=61, T_COLLECT_LIST=62, T_COLLECTION=63, 
-		T_COLUMN=64, T_COMMENT=65, T_CONSTANT=66, T_COMMIT=67, T_COMPRESS=68, 
-		T_CONCAT=69, T_CONCAT_WS=70, T_CONDITION=71, T_CONSTRAINT=72, T_CONTINUE=73, 
-		T_CONV=74, T_COPY=75, T_CORR=76, T_COS=77, T_COUNT=78, T_COUNT_BIG=79, 
-		T_COVAR_POP=80, T_COVAR_SAMP=81, T_CRC32=82, T_CREATE=83, T_CREATION=84, 
-		T_CREATOR=85, T_CROSS=86, T_CS=87, T_CURRENT=88, T_CURRENT_SCHEMA=89, 
-		T_CURRENT_DATABASE=90, T_CURSOR=91, T_DATABASE=92, T_DATE=93, T_DATEADD=94, 
-		T_DATEDIFF=95, T_DATE_FORMAT=96, T_DATESUB=97, T_DATETIME=98, T_DAY=99, 
-		T_DAYS=100, T_DEC=101, T_DECIMAL=102, T_DECODE=103, T_DECLARE=104, T_DEFAULT=105, 
-		T_DEFERRED=106, T_DEFINED=107, T_DEFINER=108, T_DEFINITION=109, T_DEGREES=110, 
-		T_DELETE=111, T_DELIMITED=112, T_DELIMITER=113, T_DESC=114, T_DESCRIBE=115, 
-		T_DIAGNOSTICS=116, T_DIR=117, T_DIRECTORY=118, T_DISTINCT=119, T_DISTRIBUTE=120, 
-		T_DO=121, T_DOUBLE=122, T_DROP=123, T_DYNAMIC=124, T_ELSE=125, T_ELSEIF=126, 
-		T_ELSIF=127, T_ELT=128, T_ENABLE=129, T_ENCODE=130, T_END=131, T_ENGINE=132, 
-		T_ESCAPED=133, T_EXCEPT=134, T_EXEC=135, T_EXECUTE=136, T_EXCEPTION=137, 
-		T_EXCLUSIVE=138, T_EXISTS=139, T_EXIT=140, T_EXP=141, T_EXPLODE=142, T_FACTORIAL=143, 
-		T_FALLBACK=144, T_FALSE=145, T_FETCH=146, T_FIELD=147, T_FIELDS=148, T_FIELD_IN_SET=149, 
-		T_FILE=150, T_FILES=151, T_FLOAT=152, T_FLOOR=153, T_FOR=154, T_FOREIGN=155, 
-		T_FORMAT=156, T_FORMAT_NUMBER=157, T_FOUND=158, T_FROM=159, T_FROMUTCTIMESTAMP=160, 
-		T_FULL=161, T_FUNCTION=162, T_GET=163, T_GET_JSON_OBJECTS=164, T_GLOBAL=165, 
-		T_GO=166, T_GRANT=167, T_GROUP=168, T_HANDLER=169, T_HASH=170, T_HAVING=171, 
-		T_HDFS=172, T_HEX=173, T_HISTOGRAM_NUMERIC=174, T_HIVE=175, T_HOST=176, 
-		T_HOUR=177, T_IDENTITY=178, T_IF=179, T_IGNORE=180, T_IMMEDIATE=181, T_IN=182, 
-		T_INCLUDE=183, T_INDEX=184, T_IN_FILE=185, T_INITCAP=186, T_INITRANS=187, 
-		T_INLINE=188, T_INNER=189, T_INOUT=190, T_INSERT=191, T_IN_STR=192, T_INT=193, 
-		T_INT2=194, T_INT4=195, T_INT8=196, T_INTEGER=197, T_INTERSECT=198, T_INTERVAL=199, 
-		T_INTO=200, T_INVOKER=201, T_IS=202, T_ISNOTNULL=203, T_ISNULL=204, T_NVL=205, 
-		T_ISOPEN=206, T_ITEMS=207, T_JAVA_METHOD=208, T_JOIN=209, T_KEEP=210, 
-		T_KEY=211, T_KEYS=212, T_LANGUAGE=213, T_LASTDAY=214, T_LATERAL=215, T_LCASE=216, 
-		T_LEAVE=217, T_LEFT=218, T_LENGTH=219, T_LEVENSHTEIN=220, T_LIKE=221, 
-		T_LIMIT=222, T_LINES=223, T_LOCAL=224, T_LOCATE=225, T_LOCATION=226, T_LOCATOR=227, 
-		T_LOCATORS=228, T_LOCKS=229, T_LOG=230, T_LOG10=231, T_LOG2=232, T_LOGGED=233, 
-		T_LOGGED_IN_USER=234, T_LOGGING=235, T_LOOP=236, T_LOWER=237, T_LPAD=238, 
-		T_LN=239, T_LTRIM=240, T_MAP=241, T_MASK=242, T_MASK_FIRST_N=243, T_MASK_HASH=244, 
-		T_MASK_LAST_N=245, T_MASK_SHOW_FIRST_N=246, T_MASK_SHOW_LAST_N=247, T_MATCHED=248, 
-		T_MAX=249, T_MAXTRANS=250, T_MD5=251, T_MERGE=252, T_MESSAGE_TEXT=253, 
-		T_MICROSECOND=254, T_MICROSECONDS=255, T_MIN=256, T_MINUTE=257, T_MONTH=258, 
-		T_MONTHS_BETWEEN=259, T_MULTISET=260, T_NAMED_STRUCT=261, T_NCHAR=262, 
-		T_NEGATIVE=263, T_NEXT_DAY=264, T_NEW=265, T_NVARCHAR=266, T_NO=267, T_NOCOUNT=268, 
-		T_NOCOMPRESS=269, T_NOLOGGING=270, T_NONE=271, T_NOT=272, T_NOTFOUND=273, 
-		T_NTILE=274, T_NULL=275, T_NULLIF=276, T_NUMERIC=277, T_NUMBER=278, T_OBJECT=279, 
-		T_OCTET_LENGTH=280, T_OFF=281, T_ON=282, T_ONLY=283, T_OPEN=284, T_OR=285, 
-		T_ORDER=286, T_OUT=287, T_OUTER=288, T_OVER=289, T_OVERWRITE=290, T_OWNER=291, 
-		T_PACKAGE=292, T_PARSE_URL=293, T_PARTITION=294, T_PCTFREE=295, T_PCTUSED=296, 
-		T_PERCENT_RANK=297, T_PERCENTILE=298, T_PERCENTILE_APPROX=299, T_PLS_INTEGER=300, 
-		T_PMOD=301, T_POSITIVE=302, T_POSEXPLODE=303, T_POW=304, T_POWER=305, 
-		T_PRECISION=306, T_PRESERVE=307, T_PRIMARY=308, T_PRINTF=309, T_PROC=310, 
-		T_PROCEDURE=311, T_QUALIFY=312, T_QUARTER=313, T_QUERY_BAND=314, T_QUIT=315, 
-		T_QUOTE=316, T_RADIANS=317, T_RAISE=318, T_RAND=319, T_REAL=320, T_REFERENCES=321, 
-		T_REFLECT=322, T_REGEXP=323, T_REGEXP_EXTRACT=324, T_REGEXP_REPLACE=325, 
-		T_REGR_AVGX=326, T_REGR_AVGY=327, T_REGR_COUNT=328, T_REGR_INTERCEPT=329, 
-		T_REGR_R2=330, T_REGR_SLOPE=331, T_REGR_SXX=332, T_REGR_SXY=333, T_REGR_SYY=334, 
-		T_REPEAT=335, T_REPLACE=336, T_RESIGNAL=337, T_RESTRICT=338, T_RESULT=339, 
-		T_RESULT_SET_LOCATOR=340, T_RETURN=341, T_RETURNS=342, T_REVERSE=343, 
-		T_RIGHT=344, T_RLIKE=345, T_ROLE=346, T_ROLLBACK=347, T_ROUND=348, T_ROW=349, 
-		T_ROWS=350, T_ROWTYPE=351, T_ROW_COUNT=352, T_RPAD=353, T_RR=354, T_RS=355, 
-		T_RTRIM=356, T_PWD=357, T_TRIM=358, T_SCHEMA=359, T_SECOND=360, T_SECONDS=361, 
-		T_SECURITY=362, T_SEGMENT=363, T_SEL=364, T_SELECT=365, T_SENTENCES=366, 
-		T_SET=367, T_SETS=368, T_SHA=369, T_SHA1=370, T_SHA2=371, T_SIGN=372, 
-		T_SIN=373, T_SIMPLE_DOUBLE=374, T_SIMPLE_FLOAT=375, T_SIMPLE_INTEGER=376, 
-		T_SMALLDATETIME=377, T_SMALLINT=378, T_SOUNDEX=379, T_SPACE=380, T_SPLIT=381, 
-		T_SQL=382, T_SQLEXCEPTION=383, T_SQLINSERT=384, T_SQLSTATE=385, T_SQLWARNING=386, 
-		T_SQRT=387, T_STATS=388, T_STATISTICS=389, T_STDDEV_POP=390, T_STDDEV_SAMP=391, 
-		T_STEP=392, T_STORAGE=393, T_STORED=394, T_STRING=395, T_STR_TO_MAP=396, 
-		T_STRUCT=397, T_SUBDIR=398, T_SUBSTR=399, T_SUBSTRING=400, T_SUBSTRING_INDEX=401, 
-		T_SUM=402, T_SUMMARY=403, T_SYS_REFCURSOR=404, T_TABLE=405, T_TABLESPACE=406, 
-		T_TAN=407, T_TEMPORARY=408, T_TERMINATED=409, T_TEXTIMAGE_ON=410, T_THEN=411, 
-		T_TIMESTAMP=412, T_TINYINT=413, T_TITLE=414, T_TO=415, T_TOP=416, T_TOUTCTIMESTAMP=417, 
-		T_TRANSACTION=418, T_TRANSLATE=419, T_TRUE=420, T_TRUNCATE=421, T_TRUNC=422, 
-		T_TYPE=423, T_UCASE=424, T_UNBASE64=425, T_UNHEX=426, T_UNION=427, T_UNIQUE=428, 
-		T_UNIX_TIMESTAMP=429, T_UPDATE=430, T_UPPER=431, T_UR=432, T_USE=433, 
-		T_USING=434, T_VALUE=435, T_VALUES=436, T_VAR=437, T_VARCHAR=438, T_VARCHAR2=439, 
-		T_VARYING=440, T_VERSION=441, T_VIEW=442, T_VOLATILE=443, T_WEEKOFYEAR=444, 
-		T_WHEN=445, T_WHERE=446, T_WHILE=447, T_WITH=448, T_WITHOUT=449, T_WORK=450, 
-		T_XACT_ABORT=451, T_XML=452, T_XPATH=453, T_XPATH_BOOLEAN=454, T_XPATH_DOUBLE=455, 
-		T_XPATH_FLOAT=456, T_XPATH_INT=457, T_XPATH_LONG=458, T_XPATH_NUMBER=459, 
-		T_XPATH_SHORT=460, T_XPATH_STRING=461, T_YEAR=462, T_YES=463, T_ACTIVITY_COUNT=464, 
-		T_CUME_DIST=465, T_CURRENT_DATE=466, T_CURRENT_TIMESTAMP=467, T_CURRENT_USER=468, 
-		T_DENSE_RANK=469, T_FIRST_VALUE=470, T_LAG=471, T_LAST_VALUE=472, T_LEAD=473, 
-		T_MAX_PART_STRING=474, T_MIN_PART_STRING=475, T_MAX_PART_INT=476, T_MIN_PART_INT=477, 
-		T_MAX_PART_DATE=478, T_MIN_PART_DATE=479, T_PART_COUNT=480, T_PART_LOC=481, 
-		T_RANK=482, T_ROW_NUMBER=483, T_STDEV=484, T_SYSDATE=485, T_VARIANCE=486, 
-		T_VAR_POP=487, T_VAR_SAMP=488, T_USER=489, T_ADD=490, T_COLON=491, T_COMMA=492, 
-		T_PIPE=493, T_DIV=494, T_DOT2=495, T_EQUAL=496, T_EQUAL2=497, T_NOTEQUAL=498, 
-		T_NOTEQUAL2=499, T_GREATER=500, T_GREATEREQUAL=501, T_LESS=502, T_LESSEQUAL=503, 
-		T_MUL=504, T_OPEN_B=505, T_OPEN_P=506, T_OPEN_SB=507, T_CLOSE_B=508, T_CLOSE_P=509, 
-		T_CLOSE_SB=510, T_SEMICOLON=511, T_SUB=512, IDENTIFIER=513, INT_LITERAL=514, 
-		DECIMAL_LITERAL=515, STRING_LITERAL=516, L_INT=517, L_DEC=518, SPACES=519, 
-		UNEXPECTED_CHAR=520;
+		T_AUTO_INCREMENT=29, T_AVG=30, T_AVRO=31, T_BASE64=32, T_BEGIN=33, T_BETWEEN=34, 
+		T_BIGINT=35, T_BIN=36, T_BINARY=37, T_BIT=38, T_BODY=39, T_BOOLEAN=40, 
+		T_BREAK=41, T_BUCKETS=42, T_BY=43, T_BYTE=44, T_CALL=45, T_CALLER=46, 
+		T_CASCADE=47, T_CASE=48, T_CAST=49, T_CBR=50, T_CEIL=51, T_CEILING=52, 
+		T_CHAR=53, T_CHARACTER=54, T_CHARACTER_LENGTH=55, T_CHARSET=56, T_CHECK=57, 
+		T_CHR=58, T_CLIENT=59, T_CLOSE=60, T_CLUSTERED=61, T_CMP=62, T_COALESCE=63, 
+		T_COLLECT=64, T_COLLECT_SET=65, T_COLLECT_LIST=66, T_COLLECTION=67, T_COLUMN=68, 
+		T_COMMENT=69, T_CONSTANT=70, T_COMMIT=71, T_COMPRESS=72, T_CONCAT=73, 
+		T_CONCAT_WS=74, T_CONDITION=75, T_CONSTRAINT=76, T_CONTINUE=77, T_CONV=78, 
+		T_COPY=79, T_CORR=80, T_COS=81, T_COUNT=82, T_COUNT_BIG=83, T_COVAR_POP=84, 
+		T_COVAR_SAMP=85, T_CRC32=86, T_CREATE=87, T_CREATION=88, T_CREATOR=89, 
+		T_CROSS=90, T_CS=91, T_CURRENT=92, T_CURRENT_SCHEMA=93, T_CURRENT_DATABASE=94, 
+		T_CURSOR=95, T_DATABASE=96, T_DATE=97, T_DATEADD=98, T_DATEDIFF=99, T_DATE_FORMAT=100, 
+		T_DATESUB=101, T_DATETIME=102, T_DAY=103, T_DAYS=104, T_DEC=105, T_DECIMAL=106, 
+		T_DECODE=107, T_DECLARE=108, T_DEFAULT=109, T_DEFERRED=110, T_DEFINED=111, 
+		T_DEFINER=112, T_DEFINITION=113, T_DEGREES=114, T_DELETE=115, T_DELIMITED=116, 
+		T_DELIMITER=117, T_DESC=118, T_DESCRIBE=119, T_DIAGNOSTICS=120, T_DIR=121, 
+		T_DIRECTORY=122, T_DISABLE=123, T_DISTINCT=124, T_DISTRIBUTE=125, T_DO=126, 
+		T_DOUBLE=127, T_DROP=128, T_DYNAMIC=129, T_ELSE=130, T_ELSEIF=131, T_ELSIF=132, 
+		T_ELT=133, T_ENABLE=134, T_ENCODE=135, T_END=136, T_ENGINE=137, T_ESCAPED=138, 
+		T_EXCEPT=139, T_EXEC=140, T_EXECUTE=141, T_EXCEPTION=142, T_EXCLUSIVE=143, 
+		T_EXISTS=144, T_EXIT=145, T_EXP=146, T_EXPLODE=147, T_EXTERNAL=148, T_FACTORIAL=149, 
+		T_FALLBACK=150, T_FALSE=151, T_FETCH=152, T_FIELD=153, T_FIELDS=154, T_FIELD_IN_SET=155, 
+		T_FILE=156, T_FILES=157, T_FLOAT=158, T_FLOOR=159, T_FOR=160, T_FOREIGN=161, 
+		T_FORMAT=162, T_FORMAT_NUMBER=163, T_FOUND=164, T_FROM=165, T_FROMUTCTIMESTAMP=166, 
+		T_FULL=167, T_FUNCTION=168, T_GET=169, T_GET_JSON_OBJECTS=170, T_GLOBAL=171, 
+		T_GO=172, T_GRANT=173, T_GROUP=174, T_HANDLER=175, T_HASH=176, T_HAVING=177, 
+		T_HDFS=178, T_HEX=179, T_HISTOGRAM_NUMERIC=180, T_HIVE=181, T_HOST=182, 
+		T_HOUR=183, T_IDENTITY=184, T_IF=185, T_IGNORE=186, T_IMMEDIATE=187, T_IN=188, 
+		T_INCLUDE=189, T_INDEX=190, T_IN_FILE=191, T_INITCAP=192, T_INITRANS=193, 
+		T_INLINE=194, T_INNER=195, T_INOUT=196, T_INPUTFORMAT=197, T_INSERT=198, 
+		T_IN_STR=199, T_INT=200, T_INT2=201, T_INT4=202, T_INT8=203, T_INTEGER=204, 
+		T_INTERSECT=205, T_INTERVAL=206, T_INTO=207, T_INVOKER=208, T_IS=209, 
+		T_ISNOTNULL=210, T_ISNULL=211, T_NVL=212, T_ISOPEN=213, T_ITEMS=214, T_JAVA_METHOD=215, 
+		T_JOIN=216, T_JSONFILE=217, T_KEEP=218, T_KEY=219, T_KEYS=220, T_LANGUAGE=221, 
+		T_LASTDAY=222, T_LATERAL=223, T_LCASE=224, T_LEAVE=225, T_LEFT=226, T_LENGTH=227, 
+		T_LEVENSHTEIN=228, T_LIKE=229, T_LIMIT=230, T_LINES=231, T_LOCAL=232, 
+		T_LOCATE=233, T_LOCATION=234, T_LOCATOR=235, T_LOCATORS=236, T_LOCKS=237, 
+		T_LOG=238, T_LOG10=239, T_LOG2=240, T_LOGGED=241, T_LOGGED_IN_USER=242, 
+		T_LOGGING=243, T_LOOP=244, T_LOWER=245, T_LPAD=246, T_LN=247, T_LTRIM=248, 
+		T_MAP=249, T_MASK=250, T_MASK_FIRST_N=251, T_MASK_HASH=252, T_MASK_LAST_N=253, 
+		T_MASK_SHOW_FIRST_N=254, T_MASK_SHOW_LAST_N=255, T_MATCHED=256, T_MAX=257, 
+		T_MAXTRANS=258, T_MD5=259, T_MERGE=260, T_MESSAGE_TEXT=261, T_MICROSECOND=262, 
+		T_MICROSECONDS=263, T_MIN=264, T_MINUTE=265, T_MONTH=266, T_MONTHS_BETWEEN=267, 
+		T_MULTISET=268, T_NAMED_STRUCT=269, T_NCHAR=270, T_NEGATIVE=271, T_NEXT_DAY=272, 
+		T_NEW=273, T_NVARCHAR=274, T_NO=275, T_NOCOUNT=276, T_NOCOMPRESS=277, 
+		T_NOLOGGING=278, T_NONE=279, T_NORELY=280, T_NOT=281, T_NOTFOUND=282, 
+		T_NOVALIDATE=283, T_NTILE=284, T_NULL=285, T_NULLIF=286, T_NUMERIC=287, 
+		T_NUMBER=288, T_OBJECT=289, T_OCTET_LENGTH=290, T_OFF=291, T_ON=292, T_ONLY=293, 
+		T_OPEN=294, T_OR=295, T_ORC=296, T_ORDER=297, T_OUT=298, T_OUTER=299, 
+		T_OUTPUTFORMAT=300, T_OVER=301, T_OVERWRITE=302, T_OWNER=303, T_PACKAGE=304, 
+		T_PARQUET=305, T_PARSE_URL=306, T_PARTITION=307, T_PARTITIONED=308, T_PCTFREE=309, 
+		T_PCTUSED=310, T_PERCENT_RANK=311, T_PERCENTILE=312, T_PERCENTILE_APPROX=313, 
+		T_PLS_INTEGER=314, T_PMOD=315, T_POSITIVE=316, T_POSEXPLODE=317, T_POW=318, 
+		T_POWER=319, T_PRECISION=320, T_PRESERVE=321, T_PRIMARY=322, T_PRINTF=323, 
+		T_PROC=324, T_PROCEDURE=325, T_QUALIFY=326, T_QUARTER=327, T_QUERY_BAND=328, 
+		T_QUIT=329, T_QUOTE=330, T_RADIANS=331, T_RAISE=332, T_RAND=333, T_RCFILE=334, 
+		T_REAL=335, T_REFERENCES=336, T_REFLECT=337, T_REGEXP=338, T_REGEXP_EXTRACT=339, 
+		T_REGEXP_REPLACE=340, T_REGR_AVGX=341, T_REGR_AVGY=342, T_REGR_COUNT=343, 
+		T_REGR_INTERCEPT=344, T_REGR_R2=345, T_REGR_SLOPE=346, T_REGR_SXX=347, 
+		T_REGR_SXY=348, T_REGR_SYY=349, T_RELY=350, T_REPEAT=351, T_REPLACE=352, 
+		T_RESIGNAL=353, T_RESTRICT=354, T_RESULT=355, T_RESULT_SET_LOCATOR=356, 
+		T_RETURN=357, T_RETURNS=358, T_REVERSE=359, T_RIGHT=360, T_RLIKE=361, 
+		T_ROLE=362, T_ROLLBACK=363, T_ROUND=364, T_ROW=365, T_ROWS=366, T_ROWTYPE=367, 
+		T_ROW_COUNT=368, T_RPAD=369, T_RR=370, T_RS=371, T_RTRIM=372, T_PWD=373, 
+		T_TRIM=374, T_SCHEMA=375, T_SECOND=376, T_SECONDS=377, T_SECURITY=378, 
+		T_SERDE=379, T_SERDEPROPERTIES=380, T_SEGMENT=381, T_SEL=382, T_SELECT=383, 
+		T_SEQUENCEFILE=384, T_SENTENCES=385, T_SET=386, T_SETS=387, T_SHA=388, 
+		T_SHA1=389, T_SHA2=390, T_SIGN=391, T_SIN=392, T_SIMPLE_DOUBLE=393, T_SIMPLE_FLOAT=394, 
+		T_SIMPLE_INTEGER=395, T_SKEWED=396, T_SMALLDATETIME=397, T_SMALLINT=398, 
+		T_SOUNDEX=399, T_SPACE=400, T_SPLIT=401, T_SQL=402, T_SQLEXCEPTION=403, 
+		T_SQLINSERT=404, T_SQLSTATE=405, T_SQLWARNING=406, T_SQRT=407, T_STATS=408, 
+		T_STATISTICS=409, T_STDDEV_POP=410, T_STDDEV_SAMP=411, T_STEP=412, T_STORAGE=413, 
+		T_STORED=414, T_STRING=415, T_STR_TO_MAP=416, T_STRUCT=417, T_SUBDIR=418, 
+		T_SUBSTR=419, T_SUBSTRING=420, T_SUBSTRING_INDEX=421, T_SUM=422, T_SUMMARY=423, 
+		T_SYS_REFCURSOR=424, T_TABLE=425, T_TABLESPACE=426, T_TAN=427, T_TBLPROPERTIES=428, 
+		T_TEMPORARY=429, T_TERMINATED=430, T_TEXTFILE=431, T_TEXTIMAGE_ON=432, 
+		T_THEN=433, T_TIMESTAMP=434, T_TINYINT=435, T_TITLE=436, T_TO=437, T_TOP=438, 
+		T_TOUTCTIMESTAMP=439, T_TRANSACTION=440, T_TRANSLATE=441, T_TRUE=442, 
+		T_TRUNCATE=443, T_TRUNC=444, T_TYPE=445, T_UCASE=446, T_UNBASE64=447, 
+		T_UNHEX=448, T_UNION=449, T_UNIONTYPE=450, T_UNIQUE=451, T_UNIX_TIMESTAMP=452, 
+		T_UPDATE=453, T_UPPER=454, T_UR=455, T_USE=456, T_USING=457, T_VALUE=458, 
+		T_VALUES=459, T_VAR=460, T_VARCHAR=461, T_VARCHAR2=462, T_VARYING=463, 
+		T_VERSION=464, T_VIEW=465, T_VOLATILE=466, T_WEEKOFYEAR=467, T_WHEN=468, 
+		T_WHERE=469, T_WHILE=470, T_WITH=471, T_WITHOUT=472, T_WORK=473, T_XACT_ABORT=474, 
+		T_XML=475, T_XPATH=476, T_XPATH_BOOLEAN=477, T_XPATH_DOUBLE=478, T_XPATH_FLOAT=479, 
+		T_XPATH_INT=480, T_XPATH_LONG=481, T_XPATH_NUMBER=482, T_XPATH_SHORT=483, 
+		T_XPATH_STRING=484, T_YEAR=485, T_YES=486, T_ACTIVITY_COUNT=487, T_CUME_DIST=488, 
+		T_CURRENT_DATE=489, T_CURRENT_TIMESTAMP=490, T_CURRENT_USER=491, T_DENSE_RANK=492, 
+		T_FIRST_VALUE=493, T_LAG=494, T_LAST_VALUE=495, T_LEAD=496, T_MAX_PART_STRING=497, 
+		T_MIN_PART_STRING=498, T_MAX_PART_INT=499, T_MIN_PART_INT=500, T_MAX_PART_DATE=501, 
+		T_MIN_PART_DATE=502, T_PART_COUNT=503, T_PART_LOC=504, T_RANK=505, T_ROW_NUMBER=506, 
+		T_STDEV=507, T_SYSDATE=508, T_VARIANCE=509, T_VAR_POP=510, T_VAR_SAMP=511, 
+		T_USER=512, T_ADD=513, T_COLON=514, T_COMMA=515, T_PIPE=516, T_DIV=517, 
+		T_DOT2=518, T_EQUAL=519, T_EQUAL2=520, T_NOTEQUAL=521, T_NOTEQUAL2=522, 
+		T_GREATER=523, T_GREATEREQUAL=524, T_LESS=525, T_LESSEQUAL=526, T_MUL=527, 
+		T_OPEN_B=528, T_OPEN_P=529, T_OPEN_SB=530, T_CLOSE_B=531, T_CLOSE_P=532, 
+		T_CLOSE_SB=533, T_SEMICOLON=534, T_SUB=535, IDENTIFIER=536, INT_LITERAL=537, 
+		DECIMAL_LITERAL=538, STRING_LITERAL=539, L_INT=540, L_DEC=541, SPACES=542, 
+		UNEXPECTED_CHAR=543;
 	public static final int
-		RULE_program = 0, RULE_stmt_list = 1, RULE_dtype = 2, RULE_dtype_len = 3, 
-		RULE_stmt = 4, RULE_query_stmt = 5, RULE_select_stmt = 6, RULE_opt_lateral_view_expr = 7, 
-		RULE_column_identifier = 8, RULE_opt_where_expr = 9, RULE_opt_group_by_list = 10, 
-		RULE_opt_having_expr = 11, RULE_opt_order_by_list = 12, RULE_opt_order_by_mode = 13, 
-		RULE_opt_limit = 14, RULE_table_reference = 15, RULE_join_table = 16, 
-		RULE_join_condition = 17, RULE_table_factor = 18, RULE_select_all_distinct = 19, 
-		RULE_select_expr_list = 20, RULE_select_expr = 21, RULE_over_clause = 22, 
-		RULE_over_func = 23, RULE_analytic_func = 24, RULE_expr_list = 25, RULE_expr = 26, 
-		RULE_complex_types = 27, RULE_array_def = 28, RULE_map_def = 29, RULE_struct_def = 30, 
-		RULE_named_struct_def = 31, RULE_str_func = 32, RULE_misc_func = 33, RULE_expr_concat = 34, 
-		RULE_expr_concat_item = 35, RULE_cond_func = 36, RULE_date_func = 37, 
-		RULE_dat_convrt_func = 38, RULE_basic_aggr_func = 39, RULE_aggr_func = 40, 
-		RULE_tab_generate_func = 41, RULE_math_func = 42, RULE_literal_values = 43, 
-		RULE_ident = 44, RULE_tab_ident = 45, RULE_date_literal = 46, RULE_timestamp_literal = 47, 
-		RULE_set_operators_is = 48, RULE_set_operators_like = 49, RULE_set_operators_in = 50, 
-		RULE_set_operators_exists = 51, RULE_unary_operator = 52;
+		RULE_program = 0, RULE_stmt_list = 1, RULE_data_type = 2, RULE_primitive_type = 3, 
+		RULE_complex_type = 4, RULE_dtype_len = 5, RULE_stmt = 6, RULE_ddl_stmt = 7, 
+		RULE_create_table_stmt = 8, RULE_opt_column_specs = 9, RULE_opt_constraint_specification = 10, 
+		RULE_opt_comment = 11, RULE_table_options = 12, RULE_opt_partitioned_table = 13, 
+		RULE_partition_spec = 14, RULE_opt_clustered_by_table = 15, RULE_opt_sorted_by_table = 16, 
+		RULE_opt_sorted_by_asc_desc = 17, RULE_opt_skewed_by_table = 18, RULE_opt_on_skewed = 19, 
+		RULE_opt_skewed_stored_as_directory = 20, RULE_opt_row_formated = 21, 
+		RULE_row_format = 22, RULE_opt_field_terminated_by = 23, RULE_opt_collection_items_terminated_by = 24, 
+		RULE_opt_map_keys_terminated_by = 25, RULE_opt_lines_terminated_by = 26, 
+		RULE_opt_null_defined_as = 27, RULE_opt_serde_properties = 28, RULE_serde_val = 29, 
+		RULE_opt_stored_as = 30, RULE_opt_location = 31, RULE_opt_table_properties = 32, 
+		RULE_opt_table_val = 33, RULE_opt_as_select = 34, RULE_file_format = 35, 
+		RULE_column_definition = 36, RULE_column_constraint = 37, RULE_default_value = 38, 
+		RULE_constraint_specification = 39, RULE_opt_constraint_enable_disable = 40, 
+		RULE_opt_constraint_enable = 41, RULE_opt_constraint_disable = 42, RULE_opt_constraint_novalidate = 43, 
+		RULE_opt_constraint_rely_no_rely = 44, RULE_opt_if_not_exists_flag = 45, 
+		RULE_table_type = 46, RULE_query_stmt = 47, RULE_select_stmt = 48, RULE_opt_lateral_view_expr = 49, 
+		RULE_column_identifier = 50, RULE_opt_where_expr = 51, RULE_opt_group_by_list = 52, 
+		RULE_opt_having_expr = 53, RULE_opt_order_by_list = 54, RULE_opt_order_by_mode = 55, 
+		RULE_opt_limit = 56, RULE_table_reference = 57, RULE_join_table = 58, 
+		RULE_join_condition = 59, RULE_table_factor = 60, RULE_select_all_distinct = 61, 
+		RULE_select_expr_list = 62, RULE_select_expr = 63, RULE_over_clause = 64, 
+		RULE_over_func = 65, RULE_analytic_func = 66, RULE_expr_list = 67, RULE_expr = 68, 
+		RULE_complex_types = 69, RULE_array_def = 70, RULE_map_def = 71, RULE_struct_def = 72, 
+		RULE_named_struct_def = 73, RULE_str_func = 74, RULE_misc_func = 75, RULE_expr_concat = 76, 
+		RULE_expr_concat_item = 77, RULE_cond_func = 78, RULE_date_func = 79, 
+		RULE_dat_convrt_func = 80, RULE_basic_aggr_func = 81, RULE_aggr_func = 82, 
+		RULE_tab_generate_func = 83, RULE_math_func = 84, RULE_literal_values = 85, 
+		RULE_ident = 86, RULE_tab_ident = 87, RULE_date_literal = 88, RULE_timestamp_literal = 89, 
+		RULE_set_operators_is = 90, RULE_set_operators_like = 91, RULE_set_operators_in = 92, 
+		RULE_set_operators_exists = 93, RULE_unary_operator = 94;
 	public static final String[] ruleNames = {
-		"program", "stmt_list", "dtype", "dtype_len", "stmt", "query_stmt", "select_stmt", 
-		"opt_lateral_view_expr", "column_identifier", "opt_where_expr", "opt_group_by_list", 
-		"opt_having_expr", "opt_order_by_list", "opt_order_by_mode", "opt_limit", 
-		"table_reference", "join_table", "join_condition", "table_factor", "select_all_distinct", 
-		"select_expr_list", "select_expr", "over_clause", "over_func", "analytic_func", 
-		"expr_list", "expr", "complex_types", "array_def", "map_def", "struct_def", 
-		"named_struct_def", "str_func", "misc_func", "expr_concat", "expr_concat_item", 
-		"cond_func", "date_func", "dat_convrt_func", "basic_aggr_func", "aggr_func", 
-		"tab_generate_func", "math_func", "literal_values", "ident", "tab_ident", 
-		"date_literal", "timestamp_literal", "set_operators_is", "set_operators_like", 
-		"set_operators_in", "set_operators_exists", "unary_operator"
+		"program", "stmt_list", "data_type", "primitive_type", "complex_type", 
+		"dtype_len", "stmt", "ddl_stmt", "create_table_stmt", "opt_column_specs", 
+		"opt_constraint_specification", "opt_comment", "table_options", "opt_partitioned_table", 
+		"partition_spec", "opt_clustered_by_table", "opt_sorted_by_table", "opt_sorted_by_asc_desc", 
+		"opt_skewed_by_table", "opt_on_skewed", "opt_skewed_stored_as_directory", 
+		"opt_row_formated", "row_format", "opt_field_terminated_by", "opt_collection_items_terminated_by", 
+		"opt_map_keys_terminated_by", "opt_lines_terminated_by", "opt_null_defined_as", 
+		"opt_serde_properties", "serde_val", "opt_stored_as", "opt_location", 
+		"opt_table_properties", "opt_table_val", "opt_as_select", "file_format", 
+		"column_definition", "column_constraint", "default_value", "constraint_specification", 
+		"opt_constraint_enable_disable", "opt_constraint_enable", "opt_constraint_disable", 
+		"opt_constraint_novalidate", "opt_constraint_rely_no_rely", "opt_if_not_exists_flag", 
+		"table_type", "query_stmt", "select_stmt", "opt_lateral_view_expr", "column_identifier", 
+		"opt_where_expr", "opt_group_by_list", "opt_having_expr", "opt_order_by_list", 
+		"opt_order_by_mode", "opt_limit", "table_reference", "join_table", "join_condition", 
+		"table_factor", "select_all_distinct", "select_expr_list", "select_expr", 
+		"over_clause", "over_func", "analytic_func", "expr_list", "expr", "complex_types", 
+		"array_def", "map_def", "struct_def", "named_struct_def", "str_func", 
+		"misc_func", "expr_concat", "expr_concat_item", "cond_func", "date_func", 
+		"dat_convrt_func", "basic_aggr_func", "aggr_func", "tab_generate_func", 
+		"math_func", "literal_values", "ident", "tab_ident", "date_literal", "timestamp_literal", 
+		"set_operators_is", "set_operators_like", "set_operators_in", "set_operators_exists", 
+		"unary_operator"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, "'%'", "'.'", "'<<'", "'>>'", "'&'", "'|'", "'<=>'", "'E'", "'PI'", 
+		null, "'.'", "'%'", "'<<'", "'>>'", "'&'", "'|'", "'<=>'", "'E'", "'PI'", 
 		"'!'", null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
@@ -201,19 +235,22 @@ public class HiveParser extends Parser {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
-		"'+'", "':'", "','", "'||'", "'/'", "'..'", "'='", "'=='", "'<>'", "'!='", 
-		"'>'", "'>='", "'<'", "'<='", "'*'", "'{'", "'('", "'['", "'}'", "')'", 
-		"']'", "';'", "'-'"
+		null, null, null, null, null, null, null, null, null, null, null, null, 
+		null, null, null, null, null, null, null, null, null, null, null, "'+'", 
+		"':'", "','", "'||'", "'/'", "'..'", "'='", "'=='", "'<>'", "'!='", "'>'", 
+		"'>='", "'<'", "'<='", "'*'", "'{'", "'('", "'['", "'}'", "')'", "']'", 
+		"';'", "'-'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, null, null, null, null, null, null, null, null, null, null, "NULL_CONST", 
 		"BOOL_LITERAL", "T_ABS", "T_ACOS", "T_ADD_MONTHS", "T_AES_ENCRYPT", "T_AES_DECRYPT", 
 		"T_ALL", "T_ALTER", "T_AND", "T_ARRAY", "T_AS", "T_ASC", "T_ASCII", "T_ASIN", 
-		"T_ASSERT_TRUE", "T_AT", "T_ATAN", "T_AUTO_INCREMENT", "T_AVG", "T_BASE64", 
-		"T_BEGIN", "T_BETWEEN", "T_BIGINT", "T_BIN", "T_BINARY", "T_BIT", "T_BODY", 
-		"T_BREAK", "T_BY", "T_BYTE", "T_CALL", "T_CALLER", "T_CASCADE", "T_CASE", 
-		"T_CAST", "T_CBR", "T_CEIL", "T_CEILING", "T_CHAR", "T_CHARACTER", "T_CHARACTER_LENGTH", 
-		"T_CHARSET", "T_CHR", "T_CLIENT", "T_CLOSE", "T_CLUSTERED", "T_CMP", "T_COALESCE", 
+		"T_ASSERT_TRUE", "T_AT", "T_ATAN", "T_AUTO_INCREMENT", "T_AVG", "T_AVRO", 
+		"T_BASE64", "T_BEGIN", "T_BETWEEN", "T_BIGINT", "T_BIN", "T_BINARY", "T_BIT", 
+		"T_BODY", "T_BOOLEAN", "T_BREAK", "T_BUCKETS", "T_BY", "T_BYTE", "T_CALL", 
+		"T_CALLER", "T_CASCADE", "T_CASE", "T_CAST", "T_CBR", "T_CEIL", "T_CEILING", 
+		"T_CHAR", "T_CHARACTER", "T_CHARACTER_LENGTH", "T_CHARSET", "T_CHECK", 
+		"T_CHR", "T_CLIENT", "T_CLOSE", "T_CLUSTERED", "T_CMP", "T_COALESCE", 
 		"T_COLLECT", "T_COLLECT_SET", "T_COLLECT_LIST", "T_COLLECTION", "T_COLUMN", 
 		"T_COMMENT", "T_CONSTANT", "T_COMMIT", "T_COMPRESS", "T_CONCAT", "T_CONCAT_WS", 
 		"T_CONDITION", "T_CONSTRAINT", "T_CONTINUE", "T_CONV", "T_COPY", "T_CORR", 
@@ -224,21 +261,22 @@ public class HiveParser extends Parser {
 		"T_DAY", "T_DAYS", "T_DEC", "T_DECIMAL", "T_DECODE", "T_DECLARE", "T_DEFAULT", 
 		"T_DEFERRED", "T_DEFINED", "T_DEFINER", "T_DEFINITION", "T_DEGREES", "T_DELETE", 
 		"T_DELIMITED", "T_DELIMITER", "T_DESC", "T_DESCRIBE", "T_DIAGNOSTICS", 
-		"T_DIR", "T_DIRECTORY", "T_DISTINCT", "T_DISTRIBUTE", "T_DO", "T_DOUBLE", 
-		"T_DROP", "T_DYNAMIC", "T_ELSE", "T_ELSEIF", "T_ELSIF", "T_ELT", "T_ENABLE", 
-		"T_ENCODE", "T_END", "T_ENGINE", "T_ESCAPED", "T_EXCEPT", "T_EXEC", "T_EXECUTE", 
-		"T_EXCEPTION", "T_EXCLUSIVE", "T_EXISTS", "T_EXIT", "T_EXP", "T_EXPLODE", 
-		"T_FACTORIAL", "T_FALLBACK", "T_FALSE", "T_FETCH", "T_FIELD", "T_FIELDS", 
-		"T_FIELD_IN_SET", "T_FILE", "T_FILES", "T_FLOAT", "T_FLOOR", "T_FOR", 
-		"T_FOREIGN", "T_FORMAT", "T_FORMAT_NUMBER", "T_FOUND", "T_FROM", "T_FROMUTCTIMESTAMP", 
-		"T_FULL", "T_FUNCTION", "T_GET", "T_GET_JSON_OBJECTS", "T_GLOBAL", "T_GO", 
-		"T_GRANT", "T_GROUP", "T_HANDLER", "T_HASH", "T_HAVING", "T_HDFS", "T_HEX", 
-		"T_HISTOGRAM_NUMERIC", "T_HIVE", "T_HOST", "T_HOUR", "T_IDENTITY", "T_IF", 
-		"T_IGNORE", "T_IMMEDIATE", "T_IN", "T_INCLUDE", "T_INDEX", "T_IN_FILE", 
-		"T_INITCAP", "T_INITRANS", "T_INLINE", "T_INNER", "T_INOUT", "T_INSERT", 
-		"T_IN_STR", "T_INT", "T_INT2", "T_INT4", "T_INT8", "T_INTEGER", "T_INTERSECT", 
-		"T_INTERVAL", "T_INTO", "T_INVOKER", "T_IS", "T_ISNOTNULL", "T_ISNULL", 
-		"T_NVL", "T_ISOPEN", "T_ITEMS", "T_JAVA_METHOD", "T_JOIN", "T_KEEP", "T_KEY", 
+		"T_DIR", "T_DIRECTORY", "T_DISABLE", "T_DISTINCT", "T_DISTRIBUTE", "T_DO", 
+		"T_DOUBLE", "T_DROP", "T_DYNAMIC", "T_ELSE", "T_ELSEIF", "T_ELSIF", "T_ELT", 
+		"T_ENABLE", "T_ENCODE", "T_END", "T_ENGINE", "T_ESCAPED", "T_EXCEPT", 
+		"T_EXEC", "T_EXECUTE", "T_EXCEPTION", "T_EXCLUSIVE", "T_EXISTS", "T_EXIT", 
+		"T_EXP", "T_EXPLODE", "T_EXTERNAL", "T_FACTORIAL", "T_FALLBACK", "T_FALSE", 
+		"T_FETCH", "T_FIELD", "T_FIELDS", "T_FIELD_IN_SET", "T_FILE", "T_FILES", 
+		"T_FLOAT", "T_FLOOR", "T_FOR", "T_FOREIGN", "T_FORMAT", "T_FORMAT_NUMBER", 
+		"T_FOUND", "T_FROM", "T_FROMUTCTIMESTAMP", "T_FULL", "T_FUNCTION", "T_GET", 
+		"T_GET_JSON_OBJECTS", "T_GLOBAL", "T_GO", "T_GRANT", "T_GROUP", "T_HANDLER", 
+		"T_HASH", "T_HAVING", "T_HDFS", "T_HEX", "T_HISTOGRAM_NUMERIC", "T_HIVE", 
+		"T_HOST", "T_HOUR", "T_IDENTITY", "T_IF", "T_IGNORE", "T_IMMEDIATE", "T_IN", 
+		"T_INCLUDE", "T_INDEX", "T_IN_FILE", "T_INITCAP", "T_INITRANS", "T_INLINE", 
+		"T_INNER", "T_INOUT", "T_INPUTFORMAT", "T_INSERT", "T_IN_STR", "T_INT", 
+		"T_INT2", "T_INT4", "T_INT8", "T_INTEGER", "T_INTERSECT", "T_INTERVAL", 
+		"T_INTO", "T_INVOKER", "T_IS", "T_ISNOTNULL", "T_ISNULL", "T_NVL", "T_ISOPEN", 
+		"T_ITEMS", "T_JAVA_METHOD", "T_JOIN", "T_JSONFILE", "T_KEEP", "T_KEY", 
 		"T_KEYS", "T_LANGUAGE", "T_LASTDAY", "T_LATERAL", "T_LCASE", "T_LEAVE", 
 		"T_LEFT", "T_LENGTH", "T_LEVENSHTEIN", "T_LIKE", "T_LIMIT", "T_LINES", 
 		"T_LOCAL", "T_LOCATE", "T_LOCATION", "T_LOCATOR", "T_LOCATORS", "T_LOCKS", 
@@ -249,49 +287,53 @@ public class HiveParser extends Parser {
 		"T_MICROSECOND", "T_MICROSECONDS", "T_MIN", "T_MINUTE", "T_MONTH", "T_MONTHS_BETWEEN", 
 		"T_MULTISET", "T_NAMED_STRUCT", "T_NCHAR", "T_NEGATIVE", "T_NEXT_DAY", 
 		"T_NEW", "T_NVARCHAR", "T_NO", "T_NOCOUNT", "T_NOCOMPRESS", "T_NOLOGGING", 
-		"T_NONE", "T_NOT", "T_NOTFOUND", "T_NTILE", "T_NULL", "T_NULLIF", "T_NUMERIC", 
-		"T_NUMBER", "T_OBJECT", "T_OCTET_LENGTH", "T_OFF", "T_ON", "T_ONLY", "T_OPEN", 
-		"T_OR", "T_ORDER", "T_OUT", "T_OUTER", "T_OVER", "T_OVERWRITE", "T_OWNER", 
-		"T_PACKAGE", "T_PARSE_URL", "T_PARTITION", "T_PCTFREE", "T_PCTUSED", "T_PERCENT_RANK", 
-		"T_PERCENTILE", "T_PERCENTILE_APPROX", "T_PLS_INTEGER", "T_PMOD", "T_POSITIVE", 
-		"T_POSEXPLODE", "T_POW", "T_POWER", "T_PRECISION", "T_PRESERVE", "T_PRIMARY", 
-		"T_PRINTF", "T_PROC", "T_PROCEDURE", "T_QUALIFY", "T_QUARTER", "T_QUERY_BAND", 
-		"T_QUIT", "T_QUOTE", "T_RADIANS", "T_RAISE", "T_RAND", "T_REAL", "T_REFERENCES", 
-		"T_REFLECT", "T_REGEXP", "T_REGEXP_EXTRACT", "T_REGEXP_REPLACE", "T_REGR_AVGX", 
-		"T_REGR_AVGY", "T_REGR_COUNT", "T_REGR_INTERCEPT", "T_REGR_R2", "T_REGR_SLOPE", 
-		"T_REGR_SXX", "T_REGR_SXY", "T_REGR_SYY", "T_REPEAT", "T_REPLACE", "T_RESIGNAL", 
+		"T_NONE", "T_NORELY", "T_NOT", "T_NOTFOUND", "T_NOVALIDATE", "T_NTILE", 
+		"T_NULL", "T_NULLIF", "T_NUMERIC", "T_NUMBER", "T_OBJECT", "T_OCTET_LENGTH", 
+		"T_OFF", "T_ON", "T_ONLY", "T_OPEN", "T_OR", "T_ORC", "T_ORDER", "T_OUT", 
+		"T_OUTER", "T_OUTPUTFORMAT", "T_OVER", "T_OVERWRITE", "T_OWNER", "T_PACKAGE", 
+		"T_PARQUET", "T_PARSE_URL", "T_PARTITION", "T_PARTITIONED", "T_PCTFREE", 
+		"T_PCTUSED", "T_PERCENT_RANK", "T_PERCENTILE", "T_PERCENTILE_APPROX", 
+		"T_PLS_INTEGER", "T_PMOD", "T_POSITIVE", "T_POSEXPLODE", "T_POW", "T_POWER", 
+		"T_PRECISION", "T_PRESERVE", "T_PRIMARY", "T_PRINTF", "T_PROC", "T_PROCEDURE", 
+		"T_QUALIFY", "T_QUARTER", "T_QUERY_BAND", "T_QUIT", "T_QUOTE", "T_RADIANS", 
+		"T_RAISE", "T_RAND", "T_RCFILE", "T_REAL", "T_REFERENCES", "T_REFLECT", 
+		"T_REGEXP", "T_REGEXP_EXTRACT", "T_REGEXP_REPLACE", "T_REGR_AVGX", "T_REGR_AVGY", 
+		"T_REGR_COUNT", "T_REGR_INTERCEPT", "T_REGR_R2", "T_REGR_SLOPE", "T_REGR_SXX", 
+		"T_REGR_SXY", "T_REGR_SYY", "T_RELY", "T_REPEAT", "T_REPLACE", "T_RESIGNAL", 
 		"T_RESTRICT", "T_RESULT", "T_RESULT_SET_LOCATOR", "T_RETURN", "T_RETURNS", 
 		"T_REVERSE", "T_RIGHT", "T_RLIKE", "T_ROLE", "T_ROLLBACK", "T_ROUND", 
 		"T_ROW", "T_ROWS", "T_ROWTYPE", "T_ROW_COUNT", "T_RPAD", "T_RR", "T_RS", 
 		"T_RTRIM", "T_PWD", "T_TRIM", "T_SCHEMA", "T_SECOND", "T_SECONDS", "T_SECURITY", 
-		"T_SEGMENT", "T_SEL", "T_SELECT", "T_SENTENCES", "T_SET", "T_SETS", "T_SHA", 
-		"T_SHA1", "T_SHA2", "T_SIGN", "T_SIN", "T_SIMPLE_DOUBLE", "T_SIMPLE_FLOAT", 
-		"T_SIMPLE_INTEGER", "T_SMALLDATETIME", "T_SMALLINT", "T_SOUNDEX", "T_SPACE", 
-		"T_SPLIT", "T_SQL", "T_SQLEXCEPTION", "T_SQLINSERT", "T_SQLSTATE", "T_SQLWARNING", 
-		"T_SQRT", "T_STATS", "T_STATISTICS", "T_STDDEV_POP", "T_STDDEV_SAMP", 
-		"T_STEP", "T_STORAGE", "T_STORED", "T_STRING", "T_STR_TO_MAP", "T_STRUCT", 
-		"T_SUBDIR", "T_SUBSTR", "T_SUBSTRING", "T_SUBSTRING_INDEX", "T_SUM", "T_SUMMARY", 
-		"T_SYS_REFCURSOR", "T_TABLE", "T_TABLESPACE", "T_TAN", "T_TEMPORARY", 
-		"T_TERMINATED", "T_TEXTIMAGE_ON", "T_THEN", "T_TIMESTAMP", "T_TINYINT", 
-		"T_TITLE", "T_TO", "T_TOP", "T_TOUTCTIMESTAMP", "T_TRANSACTION", "T_TRANSLATE", 
-		"T_TRUE", "T_TRUNCATE", "T_TRUNC", "T_TYPE", "T_UCASE", "T_UNBASE64", 
-		"T_UNHEX", "T_UNION", "T_UNIQUE", "T_UNIX_TIMESTAMP", "T_UPDATE", "T_UPPER", 
-		"T_UR", "T_USE", "T_USING", "T_VALUE", "T_VALUES", "T_VAR", "T_VARCHAR", 
-		"T_VARCHAR2", "T_VARYING", "T_VERSION", "T_VIEW", "T_VOLATILE", "T_WEEKOFYEAR", 
-		"T_WHEN", "T_WHERE", "T_WHILE", "T_WITH", "T_WITHOUT", "T_WORK", "T_XACT_ABORT", 
-		"T_XML", "T_XPATH", "T_XPATH_BOOLEAN", "T_XPATH_DOUBLE", "T_XPATH_FLOAT", 
-		"T_XPATH_INT", "T_XPATH_LONG", "T_XPATH_NUMBER", "T_XPATH_SHORT", "T_XPATH_STRING", 
-		"T_YEAR", "T_YES", "T_ACTIVITY_COUNT", "T_CUME_DIST", "T_CURRENT_DATE", 
-		"T_CURRENT_TIMESTAMP", "T_CURRENT_USER", "T_DENSE_RANK", "T_FIRST_VALUE", 
-		"T_LAG", "T_LAST_VALUE", "T_LEAD", "T_MAX_PART_STRING", "T_MIN_PART_STRING", 
-		"T_MAX_PART_INT", "T_MIN_PART_INT", "T_MAX_PART_DATE", "T_MIN_PART_DATE", 
-		"T_PART_COUNT", "T_PART_LOC", "T_RANK", "T_ROW_NUMBER", "T_STDEV", "T_SYSDATE", 
-		"T_VARIANCE", "T_VAR_POP", "T_VAR_SAMP", "T_USER", "T_ADD", "T_COLON", 
-		"T_COMMA", "T_PIPE", "T_DIV", "T_DOT2", "T_EQUAL", "T_EQUAL2", "T_NOTEQUAL", 
-		"T_NOTEQUAL2", "T_GREATER", "T_GREATEREQUAL", "T_LESS", "T_LESSEQUAL", 
-		"T_MUL", "T_OPEN_B", "T_OPEN_P", "T_OPEN_SB", "T_CLOSE_B", "T_CLOSE_P", 
-		"T_CLOSE_SB", "T_SEMICOLON", "T_SUB", "IDENTIFIER", "INT_LITERAL", "DECIMAL_LITERAL", 
-		"STRING_LITERAL", "L_INT", "L_DEC", "SPACES", "UNEXPECTED_CHAR"
+		"T_SERDE", "T_SERDEPROPERTIES", "T_SEGMENT", "T_SEL", "T_SELECT", "T_SEQUENCEFILE", 
+		"T_SENTENCES", "T_SET", "T_SETS", "T_SHA", "T_SHA1", "T_SHA2", "T_SIGN", 
+		"T_SIN", "T_SIMPLE_DOUBLE", "T_SIMPLE_FLOAT", "T_SIMPLE_INTEGER", "T_SKEWED", 
+		"T_SMALLDATETIME", "T_SMALLINT", "T_SOUNDEX", "T_SPACE", "T_SPLIT", "T_SQL", 
+		"T_SQLEXCEPTION", "T_SQLINSERT", "T_SQLSTATE", "T_SQLWARNING", "T_SQRT", 
+		"T_STATS", "T_STATISTICS", "T_STDDEV_POP", "T_STDDEV_SAMP", "T_STEP", 
+		"T_STORAGE", "T_STORED", "T_STRING", "T_STR_TO_MAP", "T_STRUCT", "T_SUBDIR", 
+		"T_SUBSTR", "T_SUBSTRING", "T_SUBSTRING_INDEX", "T_SUM", "T_SUMMARY", 
+		"T_SYS_REFCURSOR", "T_TABLE", "T_TABLESPACE", "T_TAN", "T_TBLPROPERTIES", 
+		"T_TEMPORARY", "T_TERMINATED", "T_TEXTFILE", "T_TEXTIMAGE_ON", "T_THEN", 
+		"T_TIMESTAMP", "T_TINYINT", "T_TITLE", "T_TO", "T_TOP", "T_TOUTCTIMESTAMP", 
+		"T_TRANSACTION", "T_TRANSLATE", "T_TRUE", "T_TRUNCATE", "T_TRUNC", "T_TYPE", 
+		"T_UCASE", "T_UNBASE64", "T_UNHEX", "T_UNION", "T_UNIONTYPE", "T_UNIQUE", 
+		"T_UNIX_TIMESTAMP", "T_UPDATE", "T_UPPER", "T_UR", "T_USE", "T_USING", 
+		"T_VALUE", "T_VALUES", "T_VAR", "T_VARCHAR", "T_VARCHAR2", "T_VARYING", 
+		"T_VERSION", "T_VIEW", "T_VOLATILE", "T_WEEKOFYEAR", "T_WHEN", "T_WHERE", 
+		"T_WHILE", "T_WITH", "T_WITHOUT", "T_WORK", "T_XACT_ABORT", "T_XML", "T_XPATH", 
+		"T_XPATH_BOOLEAN", "T_XPATH_DOUBLE", "T_XPATH_FLOAT", "T_XPATH_INT", "T_XPATH_LONG", 
+		"T_XPATH_NUMBER", "T_XPATH_SHORT", "T_XPATH_STRING", "T_YEAR", "T_YES", 
+		"T_ACTIVITY_COUNT", "T_CUME_DIST", "T_CURRENT_DATE", "T_CURRENT_TIMESTAMP", 
+		"T_CURRENT_USER", "T_DENSE_RANK", "T_FIRST_VALUE", "T_LAG", "T_LAST_VALUE", 
+		"T_LEAD", "T_MAX_PART_STRING", "T_MIN_PART_STRING", "T_MAX_PART_INT", 
+		"T_MIN_PART_INT", "T_MAX_PART_DATE", "T_MIN_PART_DATE", "T_PART_COUNT", 
+		"T_PART_LOC", "T_RANK", "T_ROW_NUMBER", "T_STDEV", "T_SYSDATE", "T_VARIANCE", 
+		"T_VAR_POP", "T_VAR_SAMP", "T_USER", "T_ADD", "T_COLON", "T_COMMA", "T_PIPE", 
+		"T_DIV", "T_DOT2", "T_EQUAL", "T_EQUAL2", "T_NOTEQUAL", "T_NOTEQUAL2", 
+		"T_GREATER", "T_GREATEREQUAL", "T_LESS", "T_LESSEQUAL", "T_MUL", "T_OPEN_B", 
+		"T_OPEN_P", "T_OPEN_SB", "T_CLOSE_B", "T_CLOSE_P", "T_CLOSE_SB", "T_SEMICOLON", 
+		"T_SUB", "IDENTIFIER", "INT_LITERAL", "DECIMAL_LITERAL", "STRING_LITERAL", 
+		"L_INT", "L_DEC", "SPACES", "UNEXPECTED_CHAR"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -361,9 +403,9 @@ public class HiveParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(106);
+			setState(190);
 			((ProgramContext)_localctx).stmt_list = stmt_list();
-			setState(107);
+			setState(191);
 			match(EOF);
 			 ((ProgramContext)_localctx).res =  ((ProgramContext)_localctx).stmt_list.res; 
 			}
@@ -403,23 +445,23 @@ public class HiveParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			 vector<StmtContext*> stmts; 
-			setState(114); 
+			setState(198); 
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			do {
 				{
 				{
-				setState(111);
+				setState(195);
 				((Stmt_listContext)_localctx).stmt = stmt();
 				((Stmt_listContext)_localctx).stmts.add(((Stmt_listContext)_localctx).stmt);
-				setState(112);
+				setState(196);
 				match(T_SEMICOLON);
 				}
 				}
-				setState(116); 
+				setState(200); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( _la==T_SELECT );
+			} while ( _la==T_CREATE || _la==T_SELECT );
 			 
 			        vector<json> stmt_list;
 			        for(StmtContext* stmt : ((Stmt_listContext)_localctx).stmts) {stmt_list.push_back(stmt->res);}
@@ -437,374 +479,427 @@ public class HiveParser extends Parser {
 		return _localctx;
 	}
 
-	public static class DtypeContext extends ParserRuleContext {
-		public std::string res;
-		public IdentContext ident;
-		public TerminalNode T_CHAR() { return getToken(HiveParser.T_CHAR, 0); }
-		public TerminalNode T_CHARACTER() { return getToken(HiveParser.T_CHARACTER, 0); }
-		public TerminalNode T_BIGINT() { return getToken(HiveParser.T_BIGINT, 0); }
-		public TerminalNode T_BIT() { return getToken(HiveParser.T_BIT, 0); }
-		public TerminalNode T_DATE() { return getToken(HiveParser.T_DATE, 0); }
-		public TerminalNode T_DATETIME() { return getToken(HiveParser.T_DATETIME, 0); }
-		public TerminalNode T_DEC() { return getToken(HiveParser.T_DEC, 0); }
-		public TerminalNode T_DECIMAL() { return getToken(HiveParser.T_DECIMAL, 0); }
-		public TerminalNode T_DOUBLE() { return getToken(HiveParser.T_DOUBLE, 0); }
-		public TerminalNode T_PRECISION() { return getToken(HiveParser.T_PRECISION, 0); }
-		public TerminalNode T_FLOAT() { return getToken(HiveParser.T_FLOAT, 0); }
-		public TerminalNode T_INT() { return getToken(HiveParser.T_INT, 0); }
-		public TerminalNode T_INT2() { return getToken(HiveParser.T_INT2, 0); }
-		public TerminalNode T_INT4() { return getToken(HiveParser.T_INT4, 0); }
-		public TerminalNode T_INT8() { return getToken(HiveParser.T_INT8, 0); }
-		public TerminalNode T_INTEGER() { return getToken(HiveParser.T_INTEGER, 0); }
-		public TerminalNode T_NCHAR() { return getToken(HiveParser.T_NCHAR, 0); }
-		public TerminalNode T_NVARCHAR() { return getToken(HiveParser.T_NVARCHAR, 0); }
-		public TerminalNode T_NUMBER() { return getToken(HiveParser.T_NUMBER, 0); }
-		public TerminalNode T_NUMERIC() { return getToken(HiveParser.T_NUMERIC, 0); }
-		public TerminalNode T_PLS_INTEGER() { return getToken(HiveParser.T_PLS_INTEGER, 0); }
-		public TerminalNode T_REAL() { return getToken(HiveParser.T_REAL, 0); }
-		public TerminalNode T_RESULT_SET_LOCATOR() { return getToken(HiveParser.T_RESULT_SET_LOCATOR, 0); }
-		public TerminalNode T_VARYING() { return getToken(HiveParser.T_VARYING, 0); }
-		public TerminalNode T_SIMPLE_FLOAT() { return getToken(HiveParser.T_SIMPLE_FLOAT, 0); }
-		public TerminalNode T_SIMPLE_DOUBLE() { return getToken(HiveParser.T_SIMPLE_DOUBLE, 0); }
-		public TerminalNode T_SIMPLE_INTEGER() { return getToken(HiveParser.T_SIMPLE_INTEGER, 0); }
-		public TerminalNode T_SMALLINT() { return getToken(HiveParser.T_SMALLINT, 0); }
-		public TerminalNode T_SMALLDATETIME() { return getToken(HiveParser.T_SMALLDATETIME, 0); }
-		public TerminalNode T_STRING() { return getToken(HiveParser.T_STRING, 0); }
-		public TerminalNode T_SYS_REFCURSOR() { return getToken(HiveParser.T_SYS_REFCURSOR, 0); }
-		public TerminalNode T_TIMESTAMP() { return getToken(HiveParser.T_TIMESTAMP, 0); }
-		public TerminalNode T_TINYINT() { return getToken(HiveParser.T_TINYINT, 0); }
-		public TerminalNode T_VARCHAR() { return getToken(HiveParser.T_VARCHAR, 0); }
-		public TerminalNode T_VARCHAR2() { return getToken(HiveParser.T_VARCHAR2, 0); }
-		public TerminalNode T_XML() { return getToken(HiveParser.T_XML, 0); }
-		public IdentContext ident() {
-			return getRuleContext(IdentContext.class,0);
+	public static class Data_typeContext extends ParserRuleContext {
+		public json res;
+		public Primitive_typeContext primitive_type;
+		public Complex_typeContext complex_type;
+		public Primitive_typeContext primitive_type() {
+			return getRuleContext(Primitive_typeContext.class,0);
 		}
-		public TerminalNode T_TYPE() { return getToken(HiveParser.T_TYPE, 0); }
-		public TerminalNode T_ROWTYPE() { return getToken(HiveParser.T_ROWTYPE, 0); }
-		public DtypeContext(ParserRuleContext parent, int invokingState) {
+		public Complex_typeContext complex_type() {
+			return getRuleContext(Complex_typeContext.class,0);
+		}
+		public Data_typeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_dtype; }
+		@Override public int getRuleIndex() { return RULE_data_type; }
 	}
 
-	public final DtypeContext dtype() throws RecognitionException {
-		DtypeContext _localctx = new DtypeContext(_ctx, getState());
-		enterRule(_localctx, 4, RULE_dtype);
-		int _la;
+	public final Data_typeContext data_type() throws RecognitionException {
+		Data_typeContext _localctx = new Data_typeContext(_ctx, getState());
+		enterRule(_localctx, 4, RULE_data_type);
 		try {
-			setState(199);
+			setState(210);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
+			case T_BIGINT:
+			case T_BINARY:
+			case T_BOOLEAN:
 			case T_CHAR:
+			case T_DATE:
+			case T_DECIMAL:
+			case T_DOUBLE:
+			case T_FLOAT:
+			case T_INT:
+			case T_SMALLINT:
+			case T_STRING:
+			case T_TIMESTAMP:
+			case T_TINYINT:
+			case T_VARCHAR:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(120);
-				match(T_CHAR);
-				 ((DtypeContext)_localctx).res =  "CHAR"; 
+				setState(204);
+				((Data_typeContext)_localctx).primitive_type = primitive_type();
+				 ((Data_typeContext)_localctx).res =  hql_primitive_type_spec(((Data_typeContext)_localctx).primitive_type.res); 
 				}
 				break;
-			case T_CHARACTER:
+			case T_ARRAY:
+			case T_MAP:
+			case T_STRUCT:
+			case T_UNIONTYPE:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(122);
-				match(T_CHARACTER);
-				 ((DtypeContext)_localctx).res =  "CHAR"; 
+				setState(207);
+				((Data_typeContext)_localctx).complex_type = complex_type();
+				 ((Data_typeContext)_localctx).res =  ((Data_typeContext)_localctx).complex_type.res; 
 				}
 				break;
-			case T_BIGINT:
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Primitive_typeContext extends ParserRuleContext {
+		public std::string res;
+		public Token precision;
+		public Token scale;
+		public TerminalNode T_TINYINT() { return getToken(HiveParser.T_TINYINT, 0); }
+		public TerminalNode T_SMALLINT() { return getToken(HiveParser.T_SMALLINT, 0); }
+		public TerminalNode T_INT() { return getToken(HiveParser.T_INT, 0); }
+		public TerminalNode T_BIGINT() { return getToken(HiveParser.T_BIGINT, 0); }
+		public TerminalNode T_BOOLEAN() { return getToken(HiveParser.T_BOOLEAN, 0); }
+		public TerminalNode T_FLOAT() { return getToken(HiveParser.T_FLOAT, 0); }
+		public TerminalNode T_DOUBLE() { return getToken(HiveParser.T_DOUBLE, 0); }
+		public TerminalNode T_PRECISION() { return getToken(HiveParser.T_PRECISION, 0); }
+		public TerminalNode T_STRING() { return getToken(HiveParser.T_STRING, 0); }
+		public TerminalNode T_BINARY() { return getToken(HiveParser.T_BINARY, 0); }
+		public TerminalNode T_TIMESTAMP() { return getToken(HiveParser.T_TIMESTAMP, 0); }
+		public TerminalNode T_DECIMAL() { return getToken(HiveParser.T_DECIMAL, 0); }
+		public List<TerminalNode> INT_LITERAL() { return getTokens(HiveParser.INT_LITERAL); }
+		public TerminalNode INT_LITERAL(int i) {
+			return getToken(HiveParser.INT_LITERAL, i);
+		}
+		public TerminalNode T_DATE() { return getToken(HiveParser.T_DATE, 0); }
+		public TerminalNode T_VARCHAR() { return getToken(HiveParser.T_VARCHAR, 0); }
+		public TerminalNode T_CHAR() { return getToken(HiveParser.T_CHAR, 0); }
+		public Primitive_typeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_primitive_type; }
+	}
+
+	public final Primitive_typeContext primitive_type() throws RecognitionException {
+		Primitive_typeContext _localctx = new Primitive_typeContext(_ctx, getState());
+		enterRule(_localctx, 6, RULE_primitive_type);
+		int _la;
+		try {
+			setState(250);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(212);
+				match(T_TINYINT);
+				 ((Primitive_typeContext)_localctx).res =  "TINYINT"; 
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(214);
+				match(T_SMALLINT);
+				 ((Primitive_typeContext)_localctx).res =  "SMALLINT"; 
+				}
+				break;
+			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(124);
-				match(T_BIGINT);
-				 ((DtypeContext)_localctx).res =  "BIGINT"; 
+				setState(216);
+				match(T_INT);
+				 ((Primitive_typeContext)_localctx).res =  "INT"; 
 				}
 				break;
-			case T_BIT:
+			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(126);
-				match(T_BIT);
-				 ((DtypeContext)_localctx).res =  "BIT"; 
+				setState(218);
+				match(T_BIGINT);
+				 ((Primitive_typeContext)_localctx).res =  "BIGINT"; 
 				}
 				break;
-			case T_DATE:
+			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(128);
-				match(T_DATE);
-				 ((DtypeContext)_localctx).res =  "DATE"; 
+				setState(220);
+				match(T_BOOLEAN);
+				 ((Primitive_typeContext)_localctx).res =  "BOOLEAN"; 
 				}
 				break;
-			case T_DATETIME:
+			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(130);
-				match(T_DATETIME);
-				 ((DtypeContext)_localctx).res =  "DATETIME"; 
+				setState(222);
+				match(T_FLOAT);
+				 ((Primitive_typeContext)_localctx).res =  "FLOAT"; 
 				}
 				break;
-			case T_DEC:
+			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(132);
-				match(T_DEC);
-				 ((DtypeContext)_localctx).res =  "DECIMAL"; 
-				}
-				break;
-			case T_DECIMAL:
-				enterOuterAlt(_localctx, 8);
-				{
-				setState(134);
-				match(T_DECIMAL);
-				 ((DtypeContext)_localctx).res =  "DECIMAL"; 
-				}
-				break;
-			case T_DOUBLE:
-				enterOuterAlt(_localctx, 9);
-				{
-				setState(136);
+				setState(224);
 				match(T_DOUBLE);
-				setState(138);
+				setState(226);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_PRECISION) {
 					{
-					setState(137);
+					setState(225);
 					match(T_PRECISION);
 					}
 				}
 
-				 ((DtypeContext)_localctx).res =  "DOUBLE"; 
+				 ((Primitive_typeContext)_localctx).res =  "DOUBLE"; 
 				}
 				break;
-			case T_FLOAT:
+			case 8:
+				enterOuterAlt(_localctx, 8);
+				{
+				setState(229);
+				match(T_STRING);
+				 ((Primitive_typeContext)_localctx).res =  "STRING"; 
+				}
+				break;
+			case 9:
+				enterOuterAlt(_localctx, 9);
+				{
+				setState(231);
+				match(T_BINARY);
+				 ((Primitive_typeContext)_localctx).res =  "BINARY"; 
+				}
+				break;
+			case 10:
 				enterOuterAlt(_localctx, 10);
 				{
-				setState(141);
-				match(T_FLOAT);
-				 ((DtypeContext)_localctx).res =  "FLOAT"; 
+				setState(233);
+				match(T_TIMESTAMP);
+				 ((Primitive_typeContext)_localctx).res =  "TIMESTAMP"; 
 				}
 				break;
-			case T_INT:
+			case 11:
 				enterOuterAlt(_localctx, 11);
 				{
-				setState(143);
-				match(T_INT);
-				 ((DtypeContext)_localctx).res =  "INT"; 
+				setState(235);
+				match(T_DECIMAL);
+				 ((Primitive_typeContext)_localctx).res =  "DECIMAL"; 
 				}
 				break;
-			case T_INT2:
+			case 12:
 				enterOuterAlt(_localctx, 12);
 				{
-				setState(145);
-				match(T_INT2);
-				 ((DtypeContext)_localctx).res =  "TINYINT"; 
+				setState(237);
+				match(T_DECIMAL);
+				setState(238);
+				match(T_OPEN_P);
+				setState(239);
+				((Primitive_typeContext)_localctx).precision = match(INT_LITERAL);
+				setState(240);
+				match(T_COMMA);
+				setState(241);
+				((Primitive_typeContext)_localctx).scale = match(INT_LITERAL);
+				setState(242);
+				match(T_CLOSE_P);
+				 ((Primitive_typeContext)_localctx).res =  "DECIMAL"; 
 				}
 				break;
-			case T_INT4:
+			case 13:
 				enterOuterAlt(_localctx, 13);
 				{
-				setState(147);
-				match(T_INT4);
-				 ((DtypeContext)_localctx).res =  "SMALLINT"; 
+				setState(244);
+				match(T_DATE);
+				 ((Primitive_typeContext)_localctx).res =  "DATE"; 
 				}
 				break;
-			case T_INT8:
+			case 14:
 				enterOuterAlt(_localctx, 14);
 				{
-				setState(149);
-				match(T_INT8);
-				 ((DtypeContext)_localctx).res =  "INT"; 
+				setState(246);
+				match(T_VARCHAR);
+				 ((Primitive_typeContext)_localctx).res =  "VARCHAR"; 
 				}
 				break;
-			case T_INTEGER:
+			case 15:
 				enterOuterAlt(_localctx, 15);
 				{
-				setState(151);
-				match(T_INTEGER);
-				 ((DtypeContext)_localctx).res =  "INT"; 
+				setState(248);
+				match(T_CHAR);
+				 ((Primitive_typeContext)_localctx).res =  "CHAR"; 
 				}
 				break;
-			case T_NCHAR:
-				enterOuterAlt(_localctx, 16);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Complex_typeContext extends ParserRuleContext {
+		public json res;
+		public Primitive_typeContext primitive_type;
+		public Data_typeContext data_type;
+		public Column_identifierContext column_identifier;
+		public List<Column_identifierContext> column_list = new ArrayList<Column_identifierContext>();
+		public List<Data_typeContext> data_type_list = new ArrayList<Data_typeContext>();
+		public TerminalNode T_ARRAY() { return getToken(HiveParser.T_ARRAY, 0); }
+		public Primitive_typeContext primitive_type() {
+			return getRuleContext(Primitive_typeContext.class,0);
+		}
+		public TerminalNode T_MAP() { return getToken(HiveParser.T_MAP, 0); }
+		public List<Data_typeContext> data_type() {
+			return getRuleContexts(Data_typeContext.class);
+		}
+		public Data_typeContext data_type(int i) {
+			return getRuleContext(Data_typeContext.class,i);
+		}
+		public TerminalNode T_STRUCT() { return getToken(HiveParser.T_STRUCT, 0); }
+		public List<Column_identifierContext> column_identifier() {
+			return getRuleContexts(Column_identifierContext.class);
+		}
+		public Column_identifierContext column_identifier(int i) {
+			return getRuleContext(Column_identifierContext.class,i);
+		}
+		public TerminalNode T_UNIONTYPE() { return getToken(HiveParser.T_UNIONTYPE, 0); }
+		public Complex_typeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_complex_type; }
+	}
+
+	public final Complex_typeContext complex_type() throws RecognitionException {
+		Complex_typeContext _localctx = new Complex_typeContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_complex_type);
+		int _la;
+		try {
+			setState(299);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_ARRAY:
+				enterOuterAlt(_localctx, 1);
 				{
-				setState(153);
-				match(T_NCHAR);
-				 ((DtypeContext)_localctx).res =  "NCHAR"; 
+				setState(252);
+				match(T_ARRAY);
+				setState(253);
+				match(T_LESS);
+				setState(254);
+				((Complex_typeContext)_localctx).primitive_type = primitive_type();
+				setState(255);
+				match(T_GREATER);
+				 ((Complex_typeContext)_localctx).res =  hql_array_type_spec(((Complex_typeContext)_localctx).primitive_type.res); 
 				}
 				break;
-			case T_NVARCHAR:
-				enterOuterAlt(_localctx, 17);
+			case T_MAP:
+				enterOuterAlt(_localctx, 2);
 				{
-				setState(155);
-				match(T_NVARCHAR);
-				 ((DtypeContext)_localctx).res =  "NVARCHAR"; 
+				setState(258);
+				match(T_MAP);
+				setState(259);
+				match(T_LESS);
+				setState(260);
+				((Complex_typeContext)_localctx).primitive_type = primitive_type();
+				setState(261);
+				match(T_COMMA);
+				setState(262);
+				((Complex_typeContext)_localctx).data_type = data_type();
+				setState(263);
+				match(T_GREATER);
+				 ((Complex_typeContext)_localctx).res =  hql_map_type_spec(((Complex_typeContext)_localctx).primitive_type.res, ((Complex_typeContext)_localctx).data_type.res); 
 				}
 				break;
-			case T_NUMBER:
-				enterOuterAlt(_localctx, 18);
+			case T_STRUCT:
+				enterOuterAlt(_localctx, 3);
 				{
-				setState(157);
-				match(T_NUMBER);
-				 ((DtypeContext)_localctx).res =  "NUMBER"; 
-				}
-				break;
-			case T_NUMERIC:
-				enterOuterAlt(_localctx, 19);
-				{
-				setState(159);
-				match(T_NUMERIC);
-				 ((DtypeContext)_localctx).res =  "NUMERIC"; 
-				}
-				break;
-			case T_PLS_INTEGER:
-				enterOuterAlt(_localctx, 20);
-				{
-				setState(161);
-				match(T_PLS_INTEGER);
-				 ((DtypeContext)_localctx).res =  "PLS_INTEGER"; 
-				}
-				break;
-			case T_REAL:
-				enterOuterAlt(_localctx, 21);
-				{
-				setState(163);
-				match(T_REAL);
-				 ((DtypeContext)_localctx).res =  "REAL"; 
-				}
-				break;
-			case T_RESULT_SET_LOCATOR:
-				enterOuterAlt(_localctx, 22);
-				{
-				setState(165);
-				match(T_RESULT_SET_LOCATOR);
-				setState(166);
-				match(T_VARYING);
-				 ((DtypeContext)_localctx).res =  "RESULT_SET_LOCATOR"; 
-				}
-				break;
-			case T_SIMPLE_FLOAT:
-				enterOuterAlt(_localctx, 23);
-				{
-				setState(168);
-				match(T_SIMPLE_FLOAT);
-				 ((DtypeContext)_localctx).res =  "SIMPLE_FLOAT"; 
-				}
-				break;
-			case T_SIMPLE_DOUBLE:
-				enterOuterAlt(_localctx, 24);
-				{
-				setState(170);
-				match(T_SIMPLE_DOUBLE);
-				 ((DtypeContext)_localctx).res =  "SIMPLE_DOUBLE"; 
-				}
-				break;
-			case T_SIMPLE_INTEGER:
-				enterOuterAlt(_localctx, 25);
-				{
-				setState(172);
-				match(T_SIMPLE_INTEGER);
-				 ((DtypeContext)_localctx).res =  "SIMPLE_INTEGER"; 
-				}
-				break;
-			case T_SMALLINT:
-				enterOuterAlt(_localctx, 26);
-				{
-				setState(174);
-				match(T_SMALLINT);
-				 ((DtypeContext)_localctx).res =  "SMALLINT"; 
-				}
-				break;
-			case T_SMALLDATETIME:
-				enterOuterAlt(_localctx, 27);
-				{
-				setState(176);
-				match(T_SMALLDATETIME);
-				 ((DtypeContext)_localctx).res =  "SMALLDATETIME"; 
-				}
-				break;
-			case T_STRING:
-				enterOuterAlt(_localctx, 28);
-				{
-				setState(178);
-				match(T_STRING);
-				 ((DtypeContext)_localctx).res =  "STRING"; 
-				}
-				break;
-			case T_SYS_REFCURSOR:
-				enterOuterAlt(_localctx, 29);
-				{
-				setState(180);
-				match(T_SYS_REFCURSOR);
-				 ((DtypeContext)_localctx).res =  "SYS_REFCURSOR"; 
-				}
-				break;
-			case T_TIMESTAMP:
-				enterOuterAlt(_localctx, 30);
-				{
-				setState(182);
-				match(T_TIMESTAMP);
-				 ((DtypeContext)_localctx).res =  "TIMESTAMP"; 
-				}
-				break;
-			case T_TINYINT:
-				enterOuterAlt(_localctx, 31);
-				{
-				setState(184);
-				match(T_TINYINT);
-				 ((DtypeContext)_localctx).res =  "TINYINT"; 
-				}
-				break;
-			case T_VARCHAR:
-				enterOuterAlt(_localctx, 32);
-				{
-				setState(186);
-				match(T_VARCHAR);
-				 ((DtypeContext)_localctx).res =  "VARCHAR"; 
-				}
-				break;
-			case T_VARCHAR2:
-				enterOuterAlt(_localctx, 33);
-				{
-				setState(188);
-				match(T_VARCHAR2);
-				 ((DtypeContext)_localctx).res =  "VARCHAR2"; 
-				}
-				break;
-			case T_XML:
-				enterOuterAlt(_localctx, 34);
-				{
-				setState(190);
-				match(T_XML);
-				 ((DtypeContext)_localctx).res =  "XML"; 
-				}
-				break;
-			case IDENTIFIER:
-				enterOuterAlt(_localctx, 35);
-				{
-				setState(192);
-				((DtypeContext)_localctx).ident = ident();
-				setState(195);
+				 vector<Column_identifierContext*> column_list; vector<Data_typeContext*> data_type_list; 
+				setState(267);
+				match(T_STRUCT);
+				setState(268);
+				match(T_LESS);
+				setState(269);
+				((Complex_typeContext)_localctx).column_identifier = column_identifier();
+				((Complex_typeContext)_localctx).column_list.add(((Complex_typeContext)_localctx).column_identifier);
+				setState(270);
+				match(T_COLON);
+				setState(271);
+				((Complex_typeContext)_localctx).data_type = data_type();
+				((Complex_typeContext)_localctx).data_type_list.add(((Complex_typeContext)_localctx).data_type);
+				setState(279);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				if (_la==T__0) {
+				while (_la==T_COMMA) {
 					{
-					setState(193);
-					match(T__0);
-					setState(194);
+					{
+					setState(272);
+					match(T_COMMA);
+					setState(273);
+					((Complex_typeContext)_localctx).column_identifier = column_identifier();
+					((Complex_typeContext)_localctx).column_list.add(((Complex_typeContext)_localctx).column_identifier);
+					setState(274);
+					match(T_COLON);
+					setState(275);
+					((Complex_typeContext)_localctx).data_type = data_type();
+					((Complex_typeContext)_localctx).data_type_list.add(((Complex_typeContext)_localctx).data_type);
+					}
+					}
+					setState(281);
+					_errHandler.sync(this);
 					_la = _input.LA(1);
-					if ( !(_la==T_ROWTYPE || _la==T_TYPE) ) {
-					_errHandler.recoverInline(this);
-					}
-					else {
-						if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-						_errHandler.reportMatch(this);
-						consume();
-					}
-					}
 				}
+				setState(282);
+				match(T_GREATER);
 
-				 ((DtypeContext)_localctx).res =  (((DtypeContext)_localctx).ident!=null?_input.getText(((DtypeContext)_localctx).ident.start,((DtypeContext)_localctx).ident.stop):null); 
+				        vector<string> column_json_list; vector<json> data_type_json_list;
+				        for(int i = 0 ; i < ((Complex_typeContext)_localctx).column_list.size(); i++)
+				        {
+				            column_json_list.push_back(((Complex_typeContext)_localctx).column_list[i]->res);
+				            data_type_json_list.push_back(((Complex_typeContext)_localctx).data_type_list[i]->res);
+				        }
+				        ((Complex_typeContext)_localctx).res =  hql_struct_type_spec(column_json_list, data_type_json_list);
+				    
+				}
+				break;
+			case T_UNIONTYPE:
+				enterOuterAlt(_localctx, 4);
+				{
+				 vector<Data_typeContext*> data_type_list; 
+				setState(286);
+				match(T_UNIONTYPE);
+				setState(287);
+				match(T_LESS);
+				setState(288);
+				((Complex_typeContext)_localctx).data_type = data_type();
+				((Complex_typeContext)_localctx).data_type_list.add(((Complex_typeContext)_localctx).data_type);
+				setState(293);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(289);
+					match(T_COMMA);
+					setState(290);
+					((Complex_typeContext)_localctx).data_type = data_type();
+					((Complex_typeContext)_localctx).data_type_list.add(((Complex_typeContext)_localctx).data_type);
+					}
+					}
+					setState(295);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(296);
+				match(T_GREATER);
+
+				        vector<json> data_type_json_list;
+				        for(Data_typeContext* dtyp:((Complex_typeContext)_localctx).data_type_list)
+				        {
+				            data_type_json_list.push_back(dtyp->res);
+				        }
+				        ((Complex_typeContext)_localctx).res =  hql_uniontype_type_spec(data_type_json_list);
+				    
 				}
 				break;
 			default:
@@ -842,14 +937,14 @@ public class HiveParser extends Parser {
 
 	public final Dtype_lenContext dtype_len() throws RecognitionException {
 		Dtype_lenContext _localctx = new Dtype_lenContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_dtype_len);
+		enterRule(_localctx, 10, RULE_dtype_len);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(201);
+			setState(301);
 			match(T_OPEN_P);
-			setState(202);
+			setState(302);
 			((Dtype_lenContext)_localctx).size = _input.LT(1);
 			_la = _input.LA(1);
 			if ( !(_la==T_MAX || _la==L_INT) ) {
@@ -860,12 +955,12 @@ public class HiveParser extends Parser {
 				_errHandler.reportMatch(this);
 				consume();
 			}
-			setState(204);
+			setState(304);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==T_BYTE || _la==T_CHAR) {
 				{
-				setState(203);
+				setState(303);
 				_la = _input.LA(1);
 				if ( !(_la==T_BYTE || _la==T_CHAR) ) {
 				_errHandler.recoverInline(this);
@@ -878,19 +973,19 @@ public class HiveParser extends Parser {
 				}
 			}
 
-			setState(208);
+			setState(308);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			if (_la==T_COMMA) {
 				{
-				setState(206);
+				setState(306);
 				match(T_COMMA);
-				setState(207);
+				setState(307);
 				match(L_INT);
 				}
 			}
 
-			setState(210);
+			setState(310);
 			match(T_CLOSE_P);
 			}
 		}
@@ -908,8 +1003,12 @@ public class HiveParser extends Parser {
 	public static class StmtContext extends ParserRuleContext {
 		public json res;
 		public Query_stmtContext query_stmt;
+		public Ddl_stmtContext ddl_stmt;
 		public Query_stmtContext query_stmt() {
 			return getRuleContext(Query_stmtContext.class,0);
+		}
+		public Ddl_stmtContext ddl_stmt() {
+			return getRuleContext(Ddl_stmtContext.class,0);
 		}
 		public StmtContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -919,13 +1018,3290 @@ public class HiveParser extends Parser {
 
 	public final StmtContext stmt() throws RecognitionException {
 		StmtContext _localctx = new StmtContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_stmt);
+		enterRule(_localctx, 12, RULE_stmt);
+		try {
+			setState(318);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_SELECT:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(312);
+				((StmtContext)_localctx).query_stmt = query_stmt();
+				 ((StmtContext)_localctx).res =  ((StmtContext)_localctx).query_stmt.res; 
+				}
+				break;
+			case T_CREATE:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(315);
+				((StmtContext)_localctx).ddl_stmt = ddl_stmt();
+				 ((StmtContext)_localctx).res =  ((StmtContext)_localctx).ddl_stmt.res; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Ddl_stmtContext extends ParserRuleContext {
+		public json res;
+		public Create_table_stmtContext create_table_stmt;
+		public Create_table_stmtContext create_table_stmt() {
+			return getRuleContext(Create_table_stmtContext.class,0);
+		}
+		public Ddl_stmtContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_ddl_stmt; }
+	}
+
+	public final Ddl_stmtContext ddl_stmt() throws RecognitionException {
+		Ddl_stmtContext _localctx = new Ddl_stmtContext(_ctx, getState());
+		enterRule(_localctx, 14, RULE_ddl_stmt);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(212);
-			((StmtContext)_localctx).query_stmt = query_stmt();
-			 ((StmtContext)_localctx).res =  ((StmtContext)_localctx).query_stmt.res; 
+			setState(320);
+			((Ddl_stmtContext)_localctx).create_table_stmt = create_table_stmt();
+			 ((Ddl_stmtContext)_localctx).res =  ((Ddl_stmtContext)_localctx).create_table_stmt.res; 
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Create_table_stmtContext extends ParserRuleContext {
+		public json res;
+		public Table_typeContext table_type;
+		public Opt_if_not_exists_flagContext opt_if_not_exists_flag;
+		public Tab_identContext tab_ident;
+		public Opt_column_specsContext opt_column_specs;
+		public Opt_constraint_specificationContext opt_constraint_specification;
+		public Opt_commentContext opt_comment;
+		public Opt_partitioned_tableContext opt_partitioned_table;
+		public Opt_clustered_by_tableContext opt_clustered_by_table;
+		public Opt_skewed_by_tableContext opt_skewed_by_table;
+		public Opt_row_formatedContext opt_row_formated;
+		public Opt_stored_asContext opt_stored_as;
+		public Opt_locationContext opt_location;
+		public Opt_table_propertiesContext opt_table_properties;
+		public Opt_as_selectContext opt_as_select;
+		public TerminalNode T_CREATE() { return getToken(HiveParser.T_CREATE, 0); }
+		public Table_typeContext table_type() {
+			return getRuleContext(Table_typeContext.class,0);
+		}
+		public TerminalNode T_TABLE() { return getToken(HiveParser.T_TABLE, 0); }
+		public Opt_if_not_exists_flagContext opt_if_not_exists_flag() {
+			return getRuleContext(Opt_if_not_exists_flagContext.class,0);
+		}
+		public Tab_identContext tab_ident() {
+			return getRuleContext(Tab_identContext.class,0);
+		}
+		public Opt_column_specsContext opt_column_specs() {
+			return getRuleContext(Opt_column_specsContext.class,0);
+		}
+		public Opt_constraint_specificationContext opt_constraint_specification() {
+			return getRuleContext(Opt_constraint_specificationContext.class,0);
+		}
+		public Opt_commentContext opt_comment() {
+			return getRuleContext(Opt_commentContext.class,0);
+		}
+		public Opt_partitioned_tableContext opt_partitioned_table() {
+			return getRuleContext(Opt_partitioned_tableContext.class,0);
+		}
+		public Opt_clustered_by_tableContext opt_clustered_by_table() {
+			return getRuleContext(Opt_clustered_by_tableContext.class,0);
+		}
+		public Opt_skewed_by_tableContext opt_skewed_by_table() {
+			return getRuleContext(Opt_skewed_by_tableContext.class,0);
+		}
+		public Opt_row_formatedContext opt_row_formated() {
+			return getRuleContext(Opt_row_formatedContext.class,0);
+		}
+		public Opt_stored_asContext opt_stored_as() {
+			return getRuleContext(Opt_stored_asContext.class,0);
+		}
+		public Opt_locationContext opt_location() {
+			return getRuleContext(Opt_locationContext.class,0);
+		}
+		public Opt_table_propertiesContext opt_table_properties() {
+			return getRuleContext(Opt_table_propertiesContext.class,0);
+		}
+		public Opt_as_selectContext opt_as_select() {
+			return getRuleContext(Opt_as_selectContext.class,0);
+		}
+		public Create_table_stmtContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_create_table_stmt; }
+	}
+
+	public final Create_table_stmtContext create_table_stmt() throws RecognitionException {
+		Create_table_stmtContext _localctx = new Create_table_stmtContext(_ctx, getState());
+		enterRule(_localctx, 16, RULE_create_table_stmt);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(323);
+			match(T_CREATE);
+			setState(324);
+			((Create_table_stmtContext)_localctx).table_type = table_type();
+			setState(325);
+			match(T_TABLE);
+			setState(326);
+			((Create_table_stmtContext)_localctx).opt_if_not_exists_flag = opt_if_not_exists_flag();
+			setState(327);
+			((Create_table_stmtContext)_localctx).tab_ident = tab_ident();
+			setState(328);
+			((Create_table_stmtContext)_localctx).opt_column_specs = opt_column_specs();
+			setState(329);
+			((Create_table_stmtContext)_localctx).opt_constraint_specification = opt_constraint_specification();
+			setState(330);
+			((Create_table_stmtContext)_localctx).opt_comment = opt_comment();
+			setState(331);
+			((Create_table_stmtContext)_localctx).opt_partitioned_table = opt_partitioned_table();
+			setState(332);
+			((Create_table_stmtContext)_localctx).opt_clustered_by_table = opt_clustered_by_table();
+			setState(333);
+			((Create_table_stmtContext)_localctx).opt_skewed_by_table = opt_skewed_by_table();
+			setState(334);
+			((Create_table_stmtContext)_localctx).opt_row_formated = opt_row_formated();
+			setState(335);
+			((Create_table_stmtContext)_localctx).opt_stored_as = opt_stored_as();
+			setState(336);
+			((Create_table_stmtContext)_localctx).opt_location = opt_location();
+			setState(337);
+			((Create_table_stmtContext)_localctx).opt_table_properties = opt_table_properties();
+			setState(338);
+			((Create_table_stmtContext)_localctx).opt_as_select = opt_as_select();
+
+			            ((Create_table_stmtContext)_localctx).res =  hql_stmt_create_table(((Create_table_stmtContext)_localctx).table_type.res, ((Create_table_stmtContext)_localctx).opt_if_not_exists_flag.res, ((Create_table_stmtContext)_localctx).tab_ident.res, 
+			                ((Create_table_stmtContext)_localctx).opt_column_specs.res, ((Create_table_stmtContext)_localctx).opt_constraint_specification.res, ((Create_table_stmtContext)_localctx).opt_comment.res, 
+			                ((Create_table_stmtContext)_localctx).opt_partitioned_table.res, ((Create_table_stmtContext)_localctx).opt_clustered_by_table.res, ((Create_table_stmtContext)_localctx).opt_skewed_by_table.res,
+			                ((Create_table_stmtContext)_localctx).opt_row_formated.res, ((Create_table_stmtContext)_localctx).opt_stored_as.res, ((Create_table_stmtContext)_localctx).opt_location.res, 
+			                ((Create_table_stmtContext)_localctx).opt_table_properties.res, ((Create_table_stmtContext)_localctx).opt_as_select.res);
+			        
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_column_specsContext extends ParserRuleContext {
+		public vector<json> res;
+		public Column_definitionContext column_definition;
+		public List<Column_definitionContext> column_def_list = new ArrayList<Column_definitionContext>();
+		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
+		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
+		public List<Column_definitionContext> column_definition() {
+			return getRuleContexts(Column_definitionContext.class);
+		}
+		public Column_definitionContext column_definition(int i) {
+			return getRuleContext(Column_definitionContext.class,i);
+		}
+		public Opt_column_specsContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_column_specs; }
+	}
+
+	public final Opt_column_specsContext opt_column_specs() throws RecognitionException {
+		Opt_column_specsContext _localctx = new Opt_column_specsContext(_ctx, getState());
+		enterRule(_localctx, 18, RULE_opt_column_specs);
+		int _la;
+		try {
+			setState(355);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_CLUSTERED:
+			case T_COMMENT:
+			case T_CONSTRAINT:
+			case T_LOCATION:
+			case T_PARTITIONED:
+			case T_PRIMARY:
+			case T_ROW:
+			case T_SKEWED:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_column_specsContext)_localctx).res =  vector<json>(); 
+				}
+				break;
+			case T_OPEN_P:
+				enterOuterAlt(_localctx, 2);
+				{
+				vector<Column_definitionContext*> column_def_list; 
+				setState(343);
+				match(T_OPEN_P);
+				setState(344);
+				((Opt_column_specsContext)_localctx).column_definition = column_definition();
+				((Opt_column_specsContext)_localctx).column_def_list.add(((Opt_column_specsContext)_localctx).column_definition);
+				setState(349);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(345);
+					match(T_COMMA);
+					setState(346);
+					((Opt_column_specsContext)_localctx).column_definition = column_definition();
+					((Opt_column_specsContext)_localctx).column_def_list.add(((Opt_column_specsContext)_localctx).column_definition);
+					}
+					}
+					setState(351);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(352);
+				match(T_CLOSE_P);
+
+				        vector<json> column_def_json_list;
+				        for(Column_definitionContext* column_ctxt:((Opt_column_specsContext)_localctx).column_def_list)
+				        {
+				            column_def_json_list.push_back(column_ctxt->res);
+				        }
+				        ((Opt_column_specsContext)_localctx).res =  column_def_json_list;
+				    
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_constraint_specificationContext extends ParserRuleContext {
+		public vector<json> res;
+		public Constraint_specificationContext constraint_specification;
+		public List<Constraint_specificationContext> constraint_list = new ArrayList<Constraint_specificationContext>();
+		public List<Constraint_specificationContext> constraint_specification() {
+			return getRuleContexts(Constraint_specificationContext.class);
+		}
+		public Constraint_specificationContext constraint_specification(int i) {
+			return getRuleContext(Constraint_specificationContext.class,i);
+		}
+		public Opt_constraint_specificationContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_constraint_specification; }
+	}
+
+	public final Opt_constraint_specificationContext opt_constraint_specification() throws RecognitionException {
+		Opt_constraint_specificationContext _localctx = new Opt_constraint_specificationContext(_ctx, getState());
+		enterRule(_localctx, 20, RULE_opt_constraint_specification);
+		int _la;
+		try {
+			setState(368);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_CLUSTERED:
+			case T_COMMENT:
+			case T_LOCATION:
+			case T_PARTITIONED:
+			case T_ROW:
+			case T_SKEWED:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_constraint_specificationContext)_localctx).res =  vector<json>(); 
+				}
+				break;
+			case T_CONSTRAINT:
+			case T_PRIMARY:
+				enterOuterAlt(_localctx, 2);
+				{
+				 vector<Constraint_specificationContext*> constraint_list; 
+				setState(359);
+				((Opt_constraint_specificationContext)_localctx).constraint_specification = constraint_specification();
+				((Opt_constraint_specificationContext)_localctx).constraint_list.add(((Opt_constraint_specificationContext)_localctx).constraint_specification);
+				setState(363);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_CONSTRAINT || _la==T_PRIMARY) {
+					{
+					{
+					setState(360);
+					((Opt_constraint_specificationContext)_localctx).constraint_specification = constraint_specification();
+					((Opt_constraint_specificationContext)_localctx).constraint_list.add(((Opt_constraint_specificationContext)_localctx).constraint_specification);
+					}
+					}
+					setState(365);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+
+				        vector<json> contraint_json_list;
+				        for(Constraint_specificationContext* contraint_ctxt:((Opt_constraint_specificationContext)_localctx).constraint_list)
+				            contraint_json_list.push_back(contraint_ctxt->res);
+				        ((Opt_constraint_specificationContext)_localctx).res =  contraint_json_list;
+				    
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_commentContext extends ParserRuleContext {
+		public string res;
+		public Token table_comment;
+		public TerminalNode T_COMMENT() { return getToken(HiveParser.T_COMMENT, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Opt_commentContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_comment; }
+	}
+
+	public final Opt_commentContext opt_comment() throws RecognitionException {
+		Opt_commentContext _localctx = new Opt_commentContext(_ctx, getState());
+		enterRule(_localctx, 22, RULE_opt_comment);
+		try {
+			setState(374);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_CLUSTERED:
+			case T_LOCATION:
+			case T_PARTITIONED:
+			case T_ROW:
+			case T_SKEWED:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_commentContext)_localctx).res =  string(); 
+				}
+				break;
+			case T_COMMENT:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(371);
+				match(T_COMMENT);
+				setState(372);
+				((Opt_commentContext)_localctx).table_comment = match(STRING_LITERAL);
+				 ((Opt_commentContext)_localctx).res =  remove_quotes((((Opt_commentContext)_localctx).table_comment!=null?((Opt_commentContext)_localctx).table_comment.getText():null));
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Table_optionsContext extends ParserRuleContext {
+		public json res;
+		public Opt_partitioned_tableContext opt_partitioned_table() {
+			return getRuleContext(Opt_partitioned_tableContext.class,0);
+		}
+		public Table_optionsContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_table_options; }
+	}
+
+	public final Table_optionsContext table_options() throws RecognitionException {
+		Table_optionsContext _localctx = new Table_optionsContext(_ctx, getState());
+		enterRule(_localctx, 24, RULE_table_options);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(376);
+			opt_partitioned_table();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_partitioned_tableContext extends ParserRuleContext {
+		public vector<json> res;
+		public Partition_specContext partition_spec;
+		public List<Partition_specContext> partition_field_list = new ArrayList<Partition_specContext>();
+		public TerminalNode T_PARTITIONED() { return getToken(HiveParser.T_PARTITIONED, 0); }
+		public TerminalNode T_BY() { return getToken(HiveParser.T_BY, 0); }
+		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
+		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
+		public List<Partition_specContext> partition_spec() {
+			return getRuleContexts(Partition_specContext.class);
+		}
+		public Partition_specContext partition_spec(int i) {
+			return getRuleContext(Partition_specContext.class,i);
+		}
+		public Opt_partitioned_tableContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_partitioned_table; }
+	}
+
+	public final Opt_partitioned_tableContext opt_partitioned_table() throws RecognitionException {
+		Opt_partitioned_tableContext _localctx = new Opt_partitioned_tableContext(_ctx, getState());
+		enterRule(_localctx, 26, RULE_opt_partitioned_table);
+		int _la;
+		try {
+			setState(394);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case EOF:
+			case T_AS:
+			case T_CLUSTERED:
+			case T_LOCATION:
+			case T_ROW:
+			case T_SKEWED:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_partitioned_tableContext)_localctx).res =  vector<json>(); 
+				}
+				break;
+			case T_PARTITIONED:
+				enterOuterAlt(_localctx, 2);
+				{
+				 vector<Partition_specContext*> partition_field_list; 
+				setState(380);
+				match(T_PARTITIONED);
+				setState(381);
+				match(T_BY);
+				setState(382);
+				match(T_OPEN_P);
+				setState(383);
+				((Opt_partitioned_tableContext)_localctx).partition_spec = partition_spec();
+				((Opt_partitioned_tableContext)_localctx).partition_field_list.add(((Opt_partitioned_tableContext)_localctx).partition_spec);
+				setState(388);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(384);
+					match(T_COMMA);
+					setState(385);
+					((Opt_partitioned_tableContext)_localctx).partition_spec = partition_spec();
+					((Opt_partitioned_tableContext)_localctx).partition_field_list.add(((Opt_partitioned_tableContext)_localctx).partition_spec);
+					}
+					}
+					setState(390);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(391);
+				match(T_CLOSE_P);
+
+				        vector<json> partition_json_list;
+				        for(Partition_specContext* part_cxt:((Opt_partitioned_tableContext)_localctx).partition_field_list)
+				        {
+				            partition_json_list.push_back(part_cxt->res);
+				        }
+				        ((Opt_partitioned_tableContext)_localctx).res =  partition_json_list;
+				    
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Partition_specContext extends ParserRuleContext {
+		public json res;
+		public Column_identifierContext column_identifier;
+		public Data_typeContext data_type;
+		public Token STRING_LITERAL;
+		public Column_identifierContext column_identifier() {
+			return getRuleContext(Column_identifierContext.class,0);
+		}
+		public Data_typeContext data_type() {
+			return getRuleContext(Data_typeContext.class,0);
+		}
+		public TerminalNode T_COMMENT() { return getToken(HiveParser.T_COMMENT, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Partition_specContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_partition_spec; }
+	}
+
+	public final Partition_specContext partition_spec() throws RecognitionException {
+		Partition_specContext _localctx = new Partition_specContext(_ctx, getState());
+		enterRule(_localctx, 28, RULE_partition_spec);
+		try {
+			setState(406);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,17,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(396);
+				((Partition_specContext)_localctx).column_identifier = column_identifier();
+				setState(397);
+				((Partition_specContext)_localctx).data_type = data_type();
+				 ((Partition_specContext)_localctx).res =  hql_column_definition(((Partition_specContext)_localctx).column_identifier.res, ((Partition_specContext)_localctx).data_type.res); 
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(400);
+				((Partition_specContext)_localctx).column_identifier = column_identifier();
+				setState(401);
+				((Partition_specContext)_localctx).data_type = data_type();
+				setState(402);
+				match(T_COMMENT);
+				setState(403);
+				((Partition_specContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				 ((Partition_specContext)_localctx).res =  hql_column_definition(((Partition_specContext)_localctx).column_identifier.res, ((Partition_specContext)_localctx).data_type.res, (((Partition_specContext)_localctx).STRING_LITERAL!=null?((Partition_specContext)_localctx).STRING_LITERAL.getText():null)); 
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_clustered_by_tableContext extends ParserRuleContext {
+		public json res;
+		public Column_identifierContext column_identifier;
+		public List<Column_identifierContext> column_list = new ArrayList<Column_identifierContext>();
+		public Opt_sorted_by_tableContext opt_sorted_by_table;
+		public Token INT_LITERAL;
+		public TerminalNode T_CLUSTERED() { return getToken(HiveParser.T_CLUSTERED, 0); }
+		public TerminalNode T_BY() { return getToken(HiveParser.T_BY, 0); }
+		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
+		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
+		public Opt_sorted_by_tableContext opt_sorted_by_table() {
+			return getRuleContext(Opt_sorted_by_tableContext.class,0);
+		}
+		public TerminalNode T_INTO() { return getToken(HiveParser.T_INTO, 0); }
+		public TerminalNode INT_LITERAL() { return getToken(HiveParser.INT_LITERAL, 0); }
+		public TerminalNode T_BUCKETS() { return getToken(HiveParser.T_BUCKETS, 0); }
+		public List<Column_identifierContext> column_identifier() {
+			return getRuleContexts(Column_identifierContext.class);
+		}
+		public Column_identifierContext column_identifier(int i) {
+			return getRuleContext(Column_identifierContext.class,i);
+		}
+		public Opt_clustered_by_tableContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_clustered_by_table; }
+	}
+
+	public final Opt_clustered_by_tableContext opt_clustered_by_table() throws RecognitionException {
+		Opt_clustered_by_tableContext _localctx = new Opt_clustered_by_tableContext(_ctx, getState());
+		enterRule(_localctx, 30, RULE_opt_clustered_by_table);
+		int _la;
+		try {
+			setState(428);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_LOCATION:
+			case T_ROW:
+			case T_SKEWED:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_clustered_by_tableContext)_localctx).res =  json(); 
+				}
+				break;
+			case T_CLUSTERED:
+				enterOuterAlt(_localctx, 2);
+				{
+				 vector<Column_identifierContext*> column_list; 
+				setState(410);
+				match(T_CLUSTERED);
+				setState(411);
+				match(T_BY);
+				setState(412);
+				match(T_OPEN_P);
+				setState(413);
+				((Opt_clustered_by_tableContext)_localctx).column_identifier = column_identifier();
+				((Opt_clustered_by_tableContext)_localctx).column_list.add(((Opt_clustered_by_tableContext)_localctx).column_identifier);
+				setState(418);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(414);
+					match(T_COMMA);
+					setState(415);
+					((Opt_clustered_by_tableContext)_localctx).column_identifier = column_identifier();
+					((Opt_clustered_by_tableContext)_localctx).column_list.add(((Opt_clustered_by_tableContext)_localctx).column_identifier);
+					}
+					}
+					setState(420);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(421);
+				match(T_CLOSE_P);
+				setState(422);
+				((Opt_clustered_by_tableContext)_localctx).opt_sorted_by_table = opt_sorted_by_table();
+				setState(423);
+				match(T_INTO);
+				setState(424);
+				((Opt_clustered_by_tableContext)_localctx).INT_LITERAL = match(INT_LITERAL);
+				setState(425);
+				match(T_BUCKETS);
+
+				        vector<string> column_str_list;
+				        for(Column_identifierContext* column_ctxt:((Opt_clustered_by_tableContext)_localctx).column_list)
+				            column_str_list.push_back(column_ctxt->res);
+				        ((Opt_clustered_by_tableContext)_localctx).res =  hql_clustered_by_expr(column_str_list, ((Opt_clustered_by_tableContext)_localctx).opt_sorted_by_table.res, (((Opt_clustered_by_tableContext)_localctx).INT_LITERAL!=null?((Opt_clustered_by_tableContext)_localctx).INT_LITERAL.getText():null));
+				    
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_sorted_by_tableContext extends ParserRuleContext {
+		public vector<json> res;
+		public Column_identifierContext column_identifier;
+		public List<Column_identifierContext> column_list = new ArrayList<Column_identifierContext>();
+		public Opt_sorted_by_asc_descContext opt_sorted_by_asc_desc;
+		public List<Opt_sorted_by_asc_descContext> sort_type_list = new ArrayList<Opt_sorted_by_asc_descContext>();
+		public TerminalNode T_STORED() { return getToken(HiveParser.T_STORED, 0); }
+		public TerminalNode T_BY() { return getToken(HiveParser.T_BY, 0); }
+		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
+		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
+		public List<Column_identifierContext> column_identifier() {
+			return getRuleContexts(Column_identifierContext.class);
+		}
+		public Column_identifierContext column_identifier(int i) {
+			return getRuleContext(Column_identifierContext.class,i);
+		}
+		public List<Opt_sorted_by_asc_descContext> opt_sorted_by_asc_desc() {
+			return getRuleContexts(Opt_sorted_by_asc_descContext.class);
+		}
+		public Opt_sorted_by_asc_descContext opt_sorted_by_asc_desc(int i) {
+			return getRuleContext(Opt_sorted_by_asc_descContext.class,i);
+		}
+		public Opt_sorted_by_tableContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_sorted_by_table; }
+	}
+
+	public final Opt_sorted_by_tableContext opt_sorted_by_table() throws RecognitionException {
+		Opt_sorted_by_tableContext _localctx = new Opt_sorted_by_tableContext(_ctx, getState());
+		enterRule(_localctx, 32, RULE_opt_sorted_by_table);
+		int _la;
+		try {
+			setState(449);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_INTO:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_sorted_by_tableContext)_localctx).res =  vector<json>(); 
+				}
+				break;
+			case T_STORED:
+				enterOuterAlt(_localctx, 2);
+				{
+				 vector<string> column_list; vector<string> sort_type_list; 
+				setState(432);
+				match(T_STORED);
+				setState(433);
+				match(T_BY);
+				setState(434);
+				match(T_OPEN_P);
+				setState(435);
+				((Opt_sorted_by_tableContext)_localctx).column_identifier = column_identifier();
+				((Opt_sorted_by_tableContext)_localctx).column_list.add(((Opt_sorted_by_tableContext)_localctx).column_identifier);
+				setState(436);
+				((Opt_sorted_by_tableContext)_localctx).opt_sorted_by_asc_desc = opt_sorted_by_asc_desc();
+				((Opt_sorted_by_tableContext)_localctx).sort_type_list.add(((Opt_sorted_by_tableContext)_localctx).opt_sorted_by_asc_desc);
+				setState(443);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(437);
+					match(T_COMMA);
+					setState(438);
+					((Opt_sorted_by_tableContext)_localctx).column_identifier = column_identifier();
+					((Opt_sorted_by_tableContext)_localctx).column_list.add(((Opt_sorted_by_tableContext)_localctx).column_identifier);
+					setState(439);
+					((Opt_sorted_by_tableContext)_localctx).opt_sorted_by_asc_desc = opt_sorted_by_asc_desc();
+					((Opt_sorted_by_tableContext)_localctx).sort_type_list.add(((Opt_sorted_by_tableContext)_localctx).opt_sorted_by_asc_desc);
+					}
+					}
+					setState(445);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(446);
+				match(T_CLOSE_P);
+
+				        vector<json> result_list;
+				        for(int i = 0 ; i < ((Opt_sorted_by_tableContext)_localctx).column_list.size() ; i++)
+				        {
+				            json tmp;
+				            tmp["column"] = ((Opt_sorted_by_tableContext)_localctx).column_list[i]->res;
+				            tmp["sort_type"] = ((Opt_sorted_by_tableContext)_localctx).sort_type_list[i]->res;
+				            result_list.push_back(tmp);
+				        }
+				        ((Opt_sorted_by_tableContext)_localctx).res =  result_list;
+				    
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_sorted_by_asc_descContext extends ParserRuleContext {
+		public string res;
+		public TerminalNode T_ASC() { return getToken(HiveParser.T_ASC, 0); }
+		public TerminalNode T_DESC() { return getToken(HiveParser.T_DESC, 0); }
+		public Opt_sorted_by_asc_descContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_sorted_by_asc_desc; }
+	}
+
+	public final Opt_sorted_by_asc_descContext opt_sorted_by_asc_desc() throws RecognitionException {
+		Opt_sorted_by_asc_descContext _localctx = new Opt_sorted_by_asc_descContext(_ctx, getState());
+		enterRule(_localctx, 34, RULE_opt_sorted_by_asc_desc);
+		try {
+			setState(456);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_COMMA:
+			case T_CLOSE_P:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_sorted_by_asc_descContext)_localctx).res =  "ASC"; 
+				}
+				break;
+			case T_ASC:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(452);
+				match(T_ASC);
+				 ((Opt_sorted_by_asc_descContext)_localctx).res =  "ASC"; 
+				}
+				break;
+			case T_DESC:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(454);
+				match(T_DESC);
+				 ((Opt_sorted_by_asc_descContext)_localctx).res =  "DESC"; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_skewed_by_tableContext extends ParserRuleContext {
+		public json res;
+		public Column_identifierContext column_identifier;
+		public List<Column_identifierContext> column_list = new ArrayList<Column_identifierContext>();
+		public Opt_on_skewedContext opt_on_skewed;
+		public Opt_skewed_stored_as_directoryContext opt_skewed_stored_as_directory;
+		public TerminalNode T_SKEWED() { return getToken(HiveParser.T_SKEWED, 0); }
+		public TerminalNode T_BY() { return getToken(HiveParser.T_BY, 0); }
+		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
+		public Opt_on_skewedContext opt_on_skewed() {
+			return getRuleContext(Opt_on_skewedContext.class,0);
+		}
+		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
+		public Opt_skewed_stored_as_directoryContext opt_skewed_stored_as_directory() {
+			return getRuleContext(Opt_skewed_stored_as_directoryContext.class,0);
+		}
+		public List<Column_identifierContext> column_identifier() {
+			return getRuleContexts(Column_identifierContext.class);
+		}
+		public Column_identifierContext column_identifier(int i) {
+			return getRuleContext(Column_identifierContext.class,i);
+		}
+		public Opt_skewed_by_tableContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_skewed_by_table; }
+	}
+
+	public final Opt_skewed_by_tableContext opt_skewed_by_table() throws RecognitionException {
+		Opt_skewed_by_tableContext _localctx = new Opt_skewed_by_tableContext(_ctx, getState());
+		enterRule(_localctx, 36, RULE_opt_skewed_by_table);
+		int _la;
+		try {
+			setState(476);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_LOCATION:
+			case T_ROW:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_skewed_by_tableContext)_localctx).res =  json(); 
+				}
+				break;
+			case T_SKEWED:
+				enterOuterAlt(_localctx, 2);
+				{
+				 vector<Column_identifierContext*> column_list; 
+				setState(460);
+				match(T_SKEWED);
+				setState(461);
+				match(T_BY);
+				setState(462);
+				match(T_OPEN_P);
+				setState(463);
+				((Opt_skewed_by_tableContext)_localctx).column_identifier = column_identifier();
+				((Opt_skewed_by_tableContext)_localctx).column_list.add(((Opt_skewed_by_tableContext)_localctx).column_identifier);
+				setState(468);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(464);
+					match(T_COMMA);
+					setState(465);
+					((Opt_skewed_by_tableContext)_localctx).column_identifier = column_identifier();
+					((Opt_skewed_by_tableContext)_localctx).column_list.add(((Opt_skewed_by_tableContext)_localctx).column_identifier);
+					}
+					}
+					setState(470);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(471);
+				((Opt_skewed_by_tableContext)_localctx).opt_on_skewed = opt_on_skewed();
+				setState(472);
+				match(T_CLOSE_P);
+				setState(473);
+				((Opt_skewed_by_tableContext)_localctx).opt_skewed_stored_as_directory = opt_skewed_stored_as_directory();
+
+				        vector<string> column_str_list;
+				        for(Column_identifierContext* column_ctxt:((Opt_skewed_by_tableContext)_localctx).column_list)
+				            column_str_list.push_back(column_ctxt->res);
+				        ((Opt_skewed_by_tableContext)_localctx).res =  hql_skewed_by_expr(column_str_list,((Opt_skewed_by_tableContext)_localctx).opt_on_skewed.res, ((Opt_skewed_by_tableContext)_localctx).opt_skewed_stored_as_directory.res);
+				    
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_on_skewedContext extends ParserRuleContext {
+		public vector<json> res;
+		public Literal_valuesContext literal_values;
+		public List<Literal_valuesContext> values_list = new ArrayList<Literal_valuesContext>();
+		public TerminalNode T_ON() { return getToken(HiveParser.T_ON, 0); }
+		public List<TerminalNode> T_OPEN_P() { return getTokens(HiveParser.T_OPEN_P); }
+		public TerminalNode T_OPEN_P(int i) {
+			return getToken(HiveParser.T_OPEN_P, i);
+		}
+		public List<TerminalNode> T_CLOSE_P() { return getTokens(HiveParser.T_CLOSE_P); }
+		public TerminalNode T_CLOSE_P(int i) {
+			return getToken(HiveParser.T_CLOSE_P, i);
+		}
+		public List<Literal_valuesContext> literal_values() {
+			return getRuleContexts(Literal_valuesContext.class);
+		}
+		public Literal_valuesContext literal_values(int i) {
+			return getRuleContext(Literal_valuesContext.class,i);
+		}
+		public Opt_on_skewedContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_on_skewed; }
+	}
+
+	public final Opt_on_skewedContext opt_on_skewed() throws RecognitionException {
+		Opt_on_skewedContext _localctx = new Opt_on_skewedContext(_ctx, getState());
+		enterRule(_localctx, 38, RULE_opt_on_skewed);
+		int _la;
+		try {
+			setState(526);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,29,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_on_skewedContext)_localctx).res =  vector<json>(); 
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				 vector<Literal_valuesContext*> values_list; 
+				setState(480);
+				match(T_ON);
+				setState(481);
+				match(T_OPEN_P);
+				setState(482);
+				((Opt_on_skewedContext)_localctx).literal_values = literal_values();
+				((Opt_on_skewedContext)_localctx).values_list.add(((Opt_on_skewedContext)_localctx).literal_values);
+				setState(487);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(483);
+					match(T_COMMA);
+					setState(484);
+					((Opt_on_skewedContext)_localctx).literal_values = literal_values();
+					((Opt_on_skewedContext)_localctx).values_list.add(((Opt_on_skewedContext)_localctx).literal_values);
+					}
+					}
+					setState(489);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(490);
+				match(T_CLOSE_P);
+
+				        vector<json> values_json_list;
+				        for(Literal_valuesContext* value_ctxt:((Opt_on_skewedContext)_localctx).values_list)
+				            values_json_list.push_back(value_ctxt->res);
+				        ((Opt_on_skewedContext)_localctx).res =  values_json_list;
+				    
+				}
+				break;
+			case 3:
+				enterOuterAlt(_localctx, 3);
+				{
+				 vector<Literal_valuesContext*> values_list; 
+				setState(494);
+				match(T_ON);
+				setState(495);
+				match(T_OPEN_P);
+				setState(496);
+				match(T_OPEN_P);
+				setState(497);
+				((Opt_on_skewedContext)_localctx).literal_values = literal_values();
+				((Opt_on_skewedContext)_localctx).values_list.add(((Opt_on_skewedContext)_localctx).literal_values);
+				setState(502);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(498);
+					match(T_COMMA);
+					setState(499);
+					((Opt_on_skewedContext)_localctx).literal_values = literal_values();
+					((Opt_on_skewedContext)_localctx).values_list.add(((Opt_on_skewedContext)_localctx).literal_values);
+					}
+					}
+					setState(504);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(505);
+				match(T_CLOSE_P);
+				setState(520);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(506);
+					match(T_COMMA);
+					setState(507);
+					match(T_OPEN_P);
+					setState(508);
+					((Opt_on_skewedContext)_localctx).literal_values = literal_values();
+					((Opt_on_skewedContext)_localctx).values_list.add(((Opt_on_skewedContext)_localctx).literal_values);
+					setState(513);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+					while (_la==T_COMMA) {
+						{
+						{
+						setState(509);
+						match(T_COMMA);
+						setState(510);
+						((Opt_on_skewedContext)_localctx).literal_values = literal_values();
+						((Opt_on_skewedContext)_localctx).values_list.add(((Opt_on_skewedContext)_localctx).literal_values);
+						}
+						}
+						setState(515);
+						_errHandler.sync(this);
+						_la = _input.LA(1);
+					}
+					setState(516);
+					match(T_CLOSE_P);
+					}
+					}
+					setState(522);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(523);
+				match(T_CLOSE_P);
+
+				        vector<json> values_json_list;
+				        for(Literal_valuesContext* value_ctxt:((Opt_on_skewedContext)_localctx).values_list)
+				            values_json_list.push_back(value_ctxt->res);
+				        ((Opt_on_skewedContext)_localctx).res =  values_json_list;
+				    
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_skewed_stored_as_directoryContext extends ParserRuleContext {
+		public bool res;
+		public TerminalNode T_STORED() { return getToken(HiveParser.T_STORED, 0); }
+		public TerminalNode T_AS() { return getToken(HiveParser.T_AS, 0); }
+		public TerminalNode T_DIRECTORY() { return getToken(HiveParser.T_DIRECTORY, 0); }
+		public Opt_skewed_stored_as_directoryContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_skewed_stored_as_directory; }
+	}
+
+	public final Opt_skewed_stored_as_directoryContext opt_skewed_stored_as_directory() throws RecognitionException {
+		Opt_skewed_stored_as_directoryContext _localctx = new Opt_skewed_stored_as_directoryContext(_ctx, getState());
+		enterRule(_localctx, 40, RULE_opt_skewed_stored_as_directory);
+		try {
+			setState(533);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,30,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_skewed_stored_as_directoryContext)_localctx).res =  false; 
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(529);
+				match(T_STORED);
+				setState(530);
+				match(T_AS);
+				setState(531);
+				match(T_DIRECTORY);
+				 ((Opt_skewed_stored_as_directoryContext)_localctx).res =  true; 
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_row_formatedContext extends ParserRuleContext {
+		public json res;
+		public Row_formatContext row_format;
+		public TerminalNode T_ROW() { return getToken(HiveParser.T_ROW, 0); }
+		public TerminalNode T_FORMAT() { return getToken(HiveParser.T_FORMAT, 0); }
+		public Row_formatContext row_format() {
+			return getRuleContext(Row_formatContext.class,0);
+		}
+		public Opt_row_formatedContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_row_formated; }
+	}
+
+	public final Opt_row_formatedContext opt_row_formated() throws RecognitionException {
+		Opt_row_formatedContext _localctx = new Opt_row_formatedContext(_ctx, getState());
+		enterRule(_localctx, 42, RULE_opt_row_formated);
+		try {
+			setState(541);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_LOCATION:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_row_formatedContext)_localctx).res =  json(); 
+				}
+				break;
+			case T_ROW:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(536);
+				match(T_ROW);
+				setState(537);
+				match(T_FORMAT);
+				setState(538);
+				((Opt_row_formatedContext)_localctx).row_format = row_format();
+				 ((Opt_row_formatedContext)_localctx).res =  ((Opt_row_formatedContext)_localctx).row_format.res; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Row_formatContext extends ParserRuleContext {
+		public json res;
+		public Opt_field_terminated_byContext opt_field_terminated_by;
+		public Opt_collection_items_terminated_byContext opt_collection_items_terminated_by;
+		public Opt_map_keys_terminated_byContext opt_map_keys_terminated_by;
+		public Opt_lines_terminated_byContext opt_lines_terminated_by;
+		public Opt_null_defined_asContext opt_null_defined_as;
+		public Token STRING_LITERAL;
+		public Opt_serde_propertiesContext opt_serde_properties;
+		public TerminalNode T_DELIMITED() { return getToken(HiveParser.T_DELIMITED, 0); }
+		public Opt_field_terminated_byContext opt_field_terminated_by() {
+			return getRuleContext(Opt_field_terminated_byContext.class,0);
+		}
+		public Opt_collection_items_terminated_byContext opt_collection_items_terminated_by() {
+			return getRuleContext(Opt_collection_items_terminated_byContext.class,0);
+		}
+		public Opt_map_keys_terminated_byContext opt_map_keys_terminated_by() {
+			return getRuleContext(Opt_map_keys_terminated_byContext.class,0);
+		}
+		public Opt_lines_terminated_byContext opt_lines_terminated_by() {
+			return getRuleContext(Opt_lines_terminated_byContext.class,0);
+		}
+		public Opt_null_defined_asContext opt_null_defined_as() {
+			return getRuleContext(Opt_null_defined_asContext.class,0);
+		}
+		public TerminalNode T_SERDE() { return getToken(HiveParser.T_SERDE, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Opt_serde_propertiesContext opt_serde_properties() {
+			return getRuleContext(Opt_serde_propertiesContext.class,0);
+		}
+		public Row_formatContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_row_format; }
+	}
+
+	public final Row_formatContext row_format() throws RecognitionException {
+		Row_formatContext _localctx = new Row_formatContext(_ctx, getState());
+		enterRule(_localctx, 44, RULE_row_format);
+		try {
+			setState(556);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_DELIMITED:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(543);
+				match(T_DELIMITED);
+				setState(544);
+				((Row_formatContext)_localctx).opt_field_terminated_by = opt_field_terminated_by();
+				setState(545);
+				((Row_formatContext)_localctx).opt_collection_items_terminated_by = opt_collection_items_terminated_by();
+				setState(546);
+				((Row_formatContext)_localctx).opt_map_keys_terminated_by = opt_map_keys_terminated_by();
+				setState(547);
+				((Row_formatContext)_localctx).opt_lines_terminated_by = opt_lines_terminated_by();
+				setState(548);
+				((Row_formatContext)_localctx).opt_null_defined_as = opt_null_defined_as();
+				 ((Row_formatContext)_localctx).res =  hql_row_format_delimited(((Row_formatContext)_localctx).opt_field_terminated_by.res, ((Row_formatContext)_localctx).opt_collection_items_terminated_by.res, ((Row_formatContext)_localctx).opt_map_keys_terminated_by.res, ((Row_formatContext)_localctx).opt_lines_terminated_by.res, ((Row_formatContext)_localctx).opt_null_defined_as.res); 
+				}
+				break;
+			case T_SERDE:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(551);
+				match(T_SERDE);
+				setState(552);
+				((Row_formatContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				setState(553);
+				((Row_formatContext)_localctx).opt_serde_properties = opt_serde_properties();
+				 ((Row_formatContext)_localctx).res =  hql_row_format_serde(remove_quotes((((Row_formatContext)_localctx).STRING_LITERAL!=null?((Row_formatContext)_localctx).STRING_LITERAL.getText():null)), ((Row_formatContext)_localctx).opt_serde_properties.res); 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_field_terminated_byContext extends ParserRuleContext {
+		public json res;
+		public Token STRING_LITERAL;
+		public Token delimiter;
+		public Token escape;
+		public TerminalNode T_FIELDS() { return getToken(HiveParser.T_FIELDS, 0); }
+		public TerminalNode T_TERMINATED() { return getToken(HiveParser.T_TERMINATED, 0); }
+		public List<TerminalNode> T_BY() { return getTokens(HiveParser.T_BY); }
+		public TerminalNode T_BY(int i) {
+			return getToken(HiveParser.T_BY, i);
+		}
+		public List<TerminalNode> STRING_LITERAL() { return getTokens(HiveParser.STRING_LITERAL); }
+		public TerminalNode STRING_LITERAL(int i) {
+			return getToken(HiveParser.STRING_LITERAL, i);
+		}
+		public TerminalNode T_ESCAPED() { return getToken(HiveParser.T_ESCAPED, 0); }
+		public Opt_field_terminated_byContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_field_terminated_by; }
+	}
+
+	public final Opt_field_terminated_byContext opt_field_terminated_by() throws RecognitionException {
+		Opt_field_terminated_byContext _localctx = new Opt_field_terminated_byContext(_ctx, getState());
+		enterRule(_localctx, 46, RULE_opt_field_terminated_by);
+		try {
+			setState(572);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,33,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_field_terminated_byContext)_localctx).res =  json(); 
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(559);
+				match(T_FIELDS);
+				setState(560);
+				match(T_TERMINATED);
+				setState(561);
+				match(T_BY);
+				setState(562);
+				((Opt_field_terminated_byContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				 ((Opt_field_terminated_byContext)_localctx).res =  remove_quotes((((Opt_field_terminated_byContext)_localctx).STRING_LITERAL!=null?((Opt_field_terminated_byContext)_localctx).STRING_LITERAL.getText():null));
+				}
+				break;
+			case 3:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(564);
+				match(T_FIELDS);
+				setState(565);
+				match(T_TERMINATED);
+				setState(566);
+				match(T_BY);
+				setState(567);
+				((Opt_field_terminated_byContext)_localctx).delimiter = match(STRING_LITERAL);
+				setState(568);
+				match(T_ESCAPED);
+				setState(569);
+				match(T_BY);
+				setState(570);
+				((Opt_field_terminated_byContext)_localctx).escape = match(STRING_LITERAL);
+				 ((Opt_field_terminated_byContext)_localctx).res =  remove_quotes((((Opt_field_terminated_byContext)_localctx).delimiter!=null?((Opt_field_terminated_byContext)_localctx).delimiter.getText():null));
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_collection_items_terminated_byContext extends ParserRuleContext {
+		public string res;
+		public Token STRING_LITERAL;
+		public TerminalNode T_COLLECTION() { return getToken(HiveParser.T_COLLECTION, 0); }
+		public TerminalNode T_ITEMS() { return getToken(HiveParser.T_ITEMS, 0); }
+		public TerminalNode T_TERMINATED() { return getToken(HiveParser.T_TERMINATED, 0); }
+		public TerminalNode T_BY() { return getToken(HiveParser.T_BY, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Opt_collection_items_terminated_byContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_collection_items_terminated_by; }
+	}
+
+	public final Opt_collection_items_terminated_byContext opt_collection_items_terminated_by() throws RecognitionException {
+		Opt_collection_items_terminated_byContext _localctx = new Opt_collection_items_terminated_byContext(_ctx, getState());
+		enterRule(_localctx, 48, RULE_opt_collection_items_terminated_by);
+		try {
+			setState(581);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_LINES:
+			case T_LOCATION:
+			case T_MAP:
+			case T_NULL:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_collection_items_terminated_byContext)_localctx).res =  string(); 
+				}
+				break;
+			case T_COLLECTION:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(575);
+				match(T_COLLECTION);
+				setState(576);
+				match(T_ITEMS);
+				setState(577);
+				match(T_TERMINATED);
+				setState(578);
+				match(T_BY);
+				setState(579);
+				((Opt_collection_items_terminated_byContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				 ((Opt_collection_items_terminated_byContext)_localctx).res =  remove_quotes((((Opt_collection_items_terminated_byContext)_localctx).STRING_LITERAL!=null?((Opt_collection_items_terminated_byContext)_localctx).STRING_LITERAL.getText():null));
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_map_keys_terminated_byContext extends ParserRuleContext {
+		public string res;
+		public Token STRING_LITERAL;
+		public TerminalNode T_MAP() { return getToken(HiveParser.T_MAP, 0); }
+		public TerminalNode T_KEYS() { return getToken(HiveParser.T_KEYS, 0); }
+		public TerminalNode T_TERMINATED() { return getToken(HiveParser.T_TERMINATED, 0); }
+		public TerminalNode T_BY() { return getToken(HiveParser.T_BY, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Opt_map_keys_terminated_byContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_map_keys_terminated_by; }
+	}
+
+	public final Opt_map_keys_terminated_byContext opt_map_keys_terminated_by() throws RecognitionException {
+		Opt_map_keys_terminated_byContext _localctx = new Opt_map_keys_terminated_byContext(_ctx, getState());
+		enterRule(_localctx, 50, RULE_opt_map_keys_terminated_by);
+		try {
+			setState(590);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_LINES:
+			case T_LOCATION:
+			case T_NULL:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_map_keys_terminated_byContext)_localctx).res =  string(); 
+				}
+				break;
+			case T_MAP:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(584);
+				match(T_MAP);
+				setState(585);
+				match(T_KEYS);
+				setState(586);
+				match(T_TERMINATED);
+				setState(587);
+				match(T_BY);
+				setState(588);
+				((Opt_map_keys_terminated_byContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				 ((Opt_map_keys_terminated_byContext)_localctx).res =  remove_quotes((((Opt_map_keys_terminated_byContext)_localctx).STRING_LITERAL!=null?((Opt_map_keys_terminated_byContext)_localctx).STRING_LITERAL.getText():null));
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_lines_terminated_byContext extends ParserRuleContext {
+		public string res;
+		public Token STRING_LITERAL;
+		public TerminalNode T_LINES() { return getToken(HiveParser.T_LINES, 0); }
+		public TerminalNode T_TERMINATED() { return getToken(HiveParser.T_TERMINATED, 0); }
+		public TerminalNode T_BY() { return getToken(HiveParser.T_BY, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Opt_lines_terminated_byContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_lines_terminated_by; }
+	}
+
+	public final Opt_lines_terminated_byContext opt_lines_terminated_by() throws RecognitionException {
+		Opt_lines_terminated_byContext _localctx = new Opt_lines_terminated_byContext(_ctx, getState());
+		enterRule(_localctx, 52, RULE_opt_lines_terminated_by);
+		try {
+			setState(598);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_LOCATION:
+			case T_NULL:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_lines_terminated_byContext)_localctx).res =  string(); 
+				}
+				break;
+			case T_LINES:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(593);
+				match(T_LINES);
+				setState(594);
+				match(T_TERMINATED);
+				setState(595);
+				match(T_BY);
+				setState(596);
+				((Opt_lines_terminated_byContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				 ((Opt_lines_terminated_byContext)_localctx).res =  remove_quotes((((Opt_lines_terminated_byContext)_localctx).STRING_LITERAL!=null?((Opt_lines_terminated_byContext)_localctx).STRING_LITERAL.getText():null));
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_null_defined_asContext extends ParserRuleContext {
+		public string res;
+		public Token STRING_LITERAL;
+		public TerminalNode T_NULL() { return getToken(HiveParser.T_NULL, 0); }
+		public TerminalNode T_DEFINED() { return getToken(HiveParser.T_DEFINED, 0); }
+		public TerminalNode T_AS() { return getToken(HiveParser.T_AS, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Opt_null_defined_asContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_null_defined_as; }
+	}
+
+	public final Opt_null_defined_asContext opt_null_defined_as() throws RecognitionException {
+		Opt_null_defined_asContext _localctx = new Opt_null_defined_asContext(_ctx, getState());
+		enterRule(_localctx, 54, RULE_opt_null_defined_as);
+		try {
+			setState(606);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_LOCATION:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_null_defined_asContext)_localctx).res =  string(); 
+				}
+				break;
+			case T_NULL:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(601);
+				match(T_NULL);
+				setState(602);
+				match(T_DEFINED);
+				setState(603);
+				match(T_AS);
+				setState(604);
+				((Opt_null_defined_asContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				 ((Opt_null_defined_asContext)_localctx).res =  remove_quotes((((Opt_null_defined_asContext)_localctx).STRING_LITERAL!=null?((Opt_null_defined_asContext)_localctx).STRING_LITERAL.getText():null));
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_serde_propertiesContext extends ParserRuleContext {
+		public vector<json> res;
+		public Serde_valContext serde_val;
+		public List<Serde_valContext> opt_name_list = new ArrayList<Serde_valContext>();
+		public List<Serde_valContext> opt_val_list = new ArrayList<Serde_valContext>();
+		public TerminalNode T_WITH() { return getToken(HiveParser.T_WITH, 0); }
+		public TerminalNode T_SERDEPROPERTIES() { return getToken(HiveParser.T_SERDEPROPERTIES, 0); }
+		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
+		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
+		public List<Serde_valContext> serde_val() {
+			return getRuleContexts(Serde_valContext.class);
+		}
+		public Serde_valContext serde_val(int i) {
+			return getRuleContext(Serde_valContext.class,i);
+		}
+		public Opt_serde_propertiesContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_serde_properties; }
+	}
+
+	public final Opt_serde_propertiesContext opt_serde_properties() throws RecognitionException {
+		Opt_serde_propertiesContext _localctx = new Opt_serde_propertiesContext(_ctx, getState());
+		enterRule(_localctx, 56, RULE_opt_serde_properties);
+		int _la;
+		try {
+			setState(629);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_LOCATION:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_serde_propertiesContext)_localctx).res =  vector<json>(); 
+				}
+				break;
+			case T_WITH:
+				enterOuterAlt(_localctx, 2);
+				{
+				 vector<Serde_valContext*> opt_name_list, opt_val_list;  
+				setState(610);
+				match(T_WITH);
+				setState(611);
+				match(T_SERDEPROPERTIES);
+				setState(612);
+				match(T_OPEN_P);
+				setState(613);
+				((Opt_serde_propertiesContext)_localctx).serde_val = serde_val();
+				((Opt_serde_propertiesContext)_localctx).opt_name_list.add(((Opt_serde_propertiesContext)_localctx).serde_val);
+				setState(614);
+				match(T_EQUAL);
+				setState(615);
+				((Opt_serde_propertiesContext)_localctx).serde_val = serde_val();
+				((Opt_serde_propertiesContext)_localctx).opt_val_list.add(((Opt_serde_propertiesContext)_localctx).serde_val);
+				setState(623);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(616);
+					match(T_COMMA);
+					setState(617);
+					((Opt_serde_propertiesContext)_localctx).serde_val = serde_val();
+					((Opt_serde_propertiesContext)_localctx).opt_name_list.add(((Opt_serde_propertiesContext)_localctx).serde_val);
+					setState(618);
+					match(T_EQUAL);
+					setState(619);
+					((Opt_serde_propertiesContext)_localctx).serde_val = serde_val();
+					((Opt_serde_propertiesContext)_localctx).opt_val_list.add(((Opt_serde_propertiesContext)_localctx).serde_val);
+					}
+					}
+					setState(625);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(626);
+				match(T_CLOSE_P);
+
+				        vector<json> serde_opt_json_list;
+				        for(int i = 0 ; i < ((Opt_serde_propertiesContext)_localctx).opt_name_list.size() ; i++)
+				        {
+				            json tmp;
+				            tmp[((Opt_serde_propertiesContext)_localctx).opt_name_list[i]->res] = ((Opt_serde_propertiesContext)_localctx).opt_val_list[i]->res;
+				            serde_opt_json_list.push_back(tmp);
+				        }
+				        ((Opt_serde_propertiesContext)_localctx).res =  serde_opt_json_list;
+				    
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Serde_valContext extends ParserRuleContext {
+		public string res;
+		public Token STRING_LITERAL;
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Serde_valContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_serde_val; }
+	}
+
+	public final Serde_valContext serde_val() throws RecognitionException {
+		Serde_valContext _localctx = new Serde_valContext(_ctx, getState());
+		enterRule(_localctx, 58, RULE_serde_val);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(631);
+			((Serde_valContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+			 ((Serde_valContext)_localctx).res =  remove_quotes((((Serde_valContext)_localctx).STRING_LITERAL!=null?((Serde_valContext)_localctx).STRING_LITERAL.getText():null)); 
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_stored_asContext extends ParserRuleContext {
+		public json res;
+		public File_formatContext file_format;
+		public Token input_format;
+		public Token output_format;
+		public Token STRING_LITERAL;
+		public Opt_serde_propertiesContext opt_serde_properties;
+		public TerminalNode T_STORED() { return getToken(HiveParser.T_STORED, 0); }
+		public TerminalNode T_AS() { return getToken(HiveParser.T_AS, 0); }
+		public File_formatContext file_format() {
+			return getRuleContext(File_formatContext.class,0);
+		}
+		public TerminalNode T_INPUTFORMAT() { return getToken(HiveParser.T_INPUTFORMAT, 0); }
+		public TerminalNode T_OUTPUTFORMAT() { return getToken(HiveParser.T_OUTPUTFORMAT, 0); }
+		public List<TerminalNode> STRING_LITERAL() { return getTokens(HiveParser.STRING_LITERAL); }
+		public TerminalNode STRING_LITERAL(int i) {
+			return getToken(HiveParser.STRING_LITERAL, i);
+		}
+		public TerminalNode T_BY() { return getToken(HiveParser.T_BY, 0); }
+		public Opt_serde_propertiesContext opt_serde_properties() {
+			return getRuleContext(Opt_serde_propertiesContext.class,0);
+		}
+		public Opt_stored_asContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_stored_as; }
+	}
+
+	public final Opt_stored_asContext opt_stored_as() throws RecognitionException {
+		Opt_stored_asContext _localctx = new Opt_stored_asContext(_ctx, getState());
+		enterRule(_localctx, 60, RULE_opt_stored_as);
+		try {
+			setState(653);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,40,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_stored_asContext)_localctx).res =  json(); 
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(635);
+				match(T_STORED);
+				setState(636);
+				match(T_AS);
+				setState(637);
+				((Opt_stored_asContext)_localctx).file_format = file_format();
+				 ((Opt_stored_asContext)_localctx).res =  hql_stored_as_file_format(((Opt_stored_asContext)_localctx).file_format.res); 
+				}
+				break;
+			case 3:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(640);
+				match(T_STORED);
+				setState(641);
+				match(T_AS);
+				setState(642);
+				match(T_INPUTFORMAT);
+				setState(643);
+				((Opt_stored_asContext)_localctx).input_format = match(STRING_LITERAL);
+				setState(644);
+				match(T_OUTPUTFORMAT);
+				setState(645);
+				((Opt_stored_asContext)_localctx).output_format = match(STRING_LITERAL);
+				 ((Opt_stored_asContext)_localctx).res =  hql_stored_as_file_format((((Opt_stored_asContext)_localctx).input_format!=null?((Opt_stored_asContext)_localctx).input_format.getText():null), (((Opt_stored_asContext)_localctx).output_format!=null?((Opt_stored_asContext)_localctx).output_format.getText():null)); 
+				}
+				break;
+			case 4:
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(647);
+				match(T_STORED);
+				setState(648);
+				match(T_BY);
+				setState(649);
+				((Opt_stored_asContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				setState(650);
+				((Opt_stored_asContext)_localctx).opt_serde_properties = opt_serde_properties();
+				 ((Opt_stored_asContext)_localctx).res =  hql_stored_by_serde(remove_quotes((((Opt_stored_asContext)_localctx).STRING_LITERAL!=null?((Opt_stored_asContext)_localctx).STRING_LITERAL.getText():null)), ((Opt_stored_asContext)_localctx).opt_serde_properties.res); 
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_locationContext extends ParserRuleContext {
+		public string res;
+		public Token STRING_LITERAL;
+		public TerminalNode T_LOCATION() { return getToken(HiveParser.T_LOCATION, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Opt_locationContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_location; }
+	}
+
+	public final Opt_locationContext opt_location() throws RecognitionException {
+		Opt_locationContext _localctx = new Opt_locationContext(_ctx, getState());
+		enterRule(_localctx, 62, RULE_opt_location);
+		try {
+			setState(659);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_locationContext)_localctx).res =  string(); 
+				}
+				break;
+			case T_LOCATION:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(656);
+				match(T_LOCATION);
+				setState(657);
+				((Opt_locationContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				 ((Opt_locationContext)_localctx).res =  remove_quotes((((Opt_locationContext)_localctx).STRING_LITERAL!=null?((Opt_locationContext)_localctx).STRING_LITERAL.getText():null)); 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_table_propertiesContext extends ParserRuleContext {
+		public vector<json> res;
+		public Opt_table_valContext opt_table_val;
+		public List<Opt_table_valContext> opt_name_list = new ArrayList<Opt_table_valContext>();
+		public List<Opt_table_valContext> opt_val_list = new ArrayList<Opt_table_valContext>();
+		public TerminalNode T_TBLPROPERTIES() { return getToken(HiveParser.T_TBLPROPERTIES, 0); }
+		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
+		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
+		public List<Opt_table_valContext> opt_table_val() {
+			return getRuleContexts(Opt_table_valContext.class);
+		}
+		public Opt_table_valContext opt_table_val(int i) {
+			return getRuleContext(Opt_table_valContext.class,i);
+		}
+		public Opt_table_propertiesContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_table_properties; }
+	}
+
+	public final Opt_table_propertiesContext opt_table_properties() throws RecognitionException {
+		Opt_table_propertiesContext _localctx = new Opt_table_propertiesContext(_ctx, getState());
+		enterRule(_localctx, 64, RULE_opt_table_properties);
+		try {
+			setState(676);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_table_propertiesContext)_localctx).res =  vector<json>(); 
+				}
+				break;
+			case T_TBLPROPERTIES:
+				enterOuterAlt(_localctx, 2);
+				{
+				 vector<Opt_table_valContext*> opt_name_list, opt_val_list; 
+				setState(663);
+				match(T_TBLPROPERTIES);
+				setState(664);
+				match(T_OPEN_P);
+				setState(665);
+				((Opt_table_propertiesContext)_localctx).opt_table_val = opt_table_val();
+				((Opt_table_propertiesContext)_localctx).opt_name_list.add(((Opt_table_propertiesContext)_localctx).opt_table_val);
+				setState(666);
+				match(T_EQUAL);
+				setState(667);
+				((Opt_table_propertiesContext)_localctx).opt_table_val = opt_table_val();
+				((Opt_table_propertiesContext)_localctx).opt_val_list.add(((Opt_table_propertiesContext)_localctx).opt_table_val);
+				{
+				setState(668);
+				match(T_COMMA);
+				setState(669);
+				((Opt_table_propertiesContext)_localctx).opt_table_val = opt_table_val();
+				((Opt_table_propertiesContext)_localctx).opt_name_list.add(((Opt_table_propertiesContext)_localctx).opt_table_val);
+				setState(670);
+				match(T_EQUAL);
+				setState(671);
+				((Opt_table_propertiesContext)_localctx).opt_table_val = opt_table_val();
+				((Opt_table_propertiesContext)_localctx).opt_val_list.add(((Opt_table_propertiesContext)_localctx).opt_table_val);
+				}
+				setState(673);
+				match(T_CLOSE_P);
+
+				        vector<json> table_option_json_list;
+				        for(int i = 0 ; i < ((Opt_table_propertiesContext)_localctx).opt_name_list.size() ; i++) 
+				        {
+				            json tmp;
+				            tmp[((Opt_table_propertiesContext)_localctx).opt_name_list[i]->res] = ((Opt_table_propertiesContext)_localctx).opt_val_list[i]->res;
+				            table_option_json_list.push_back(tmp);
+				        }
+				        ((Opt_table_propertiesContext)_localctx).res =  table_option_json_list;
+				    
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_table_valContext extends ParserRuleContext {
+		public string res;
+		public Token STRING_LITERAL;
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public Opt_table_valContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_table_val; }
+	}
+
+	public final Opt_table_valContext opt_table_val() throws RecognitionException {
+		Opt_table_valContext _localctx = new Opt_table_valContext(_ctx, getState());
+		enterRule(_localctx, 66, RULE_opt_table_val);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(678);
+			((Opt_table_valContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+			 ((Opt_table_valContext)_localctx).res =  remove_quotes((((Opt_table_valContext)_localctx).STRING_LITERAL!=null?((Opt_table_valContext)_localctx).STRING_LITERAL.getText():null)); 
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_as_selectContext extends ParserRuleContext {
+		public json res;
+		public Select_stmtContext select_stmt;
+		public TerminalNode T_AS() { return getToken(HiveParser.T_AS, 0); }
+		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
+		public Select_stmtContext select_stmt() {
+			return getRuleContext(Select_stmtContext.class,0);
+		}
+		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
+		public Opt_as_selectContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_as_select; }
+	}
+
+	public final Opt_as_selectContext opt_as_select() throws RecognitionException {
+		Opt_as_selectContext _localctx = new Opt_as_selectContext(_ctx, getState());
+		enterRule(_localctx, 68, RULE_opt_as_select);
+		try {
+			setState(688);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_as_selectContext)_localctx).res =  json(); 
+				}
+				break;
+			case T_AS:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(682);
+				match(T_AS);
+				setState(683);
+				match(T_OPEN_P);
+				setState(684);
+				((Opt_as_selectContext)_localctx).select_stmt = select_stmt();
+				setState(685);
+				match(T_CLOSE_P);
+				 ((Opt_as_selectContext)_localctx).res =  ((Opt_as_selectContext)_localctx).select_stmt.res; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class File_formatContext extends ParserRuleContext {
+		public string res;
+		public TerminalNode T_SEQUENCEFILE() { return getToken(HiveParser.T_SEQUENCEFILE, 0); }
+		public TerminalNode T_TEXTFILE() { return getToken(HiveParser.T_TEXTFILE, 0); }
+		public TerminalNode T_RCFILE() { return getToken(HiveParser.T_RCFILE, 0); }
+		public TerminalNode T_ORC() { return getToken(HiveParser.T_ORC, 0); }
+		public TerminalNode T_PARQUET() { return getToken(HiveParser.T_PARQUET, 0); }
+		public TerminalNode T_AVRO() { return getToken(HiveParser.T_AVRO, 0); }
+		public TerminalNode T_JSONFILE() { return getToken(HiveParser.T_JSONFILE, 0); }
+		public File_formatContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_file_format; }
+	}
+
+	public final File_formatContext file_format() throws RecognitionException {
+		File_formatContext _localctx = new File_formatContext(_ctx, getState());
+		enterRule(_localctx, 70, RULE_file_format);
+		try {
+			setState(704);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_SEQUENCEFILE:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(690);
+				match(T_SEQUENCEFILE);
+				 ((File_formatContext)_localctx).res =  "SEQUENCEFILE"; 
+				}
+				break;
+			case T_TEXTFILE:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(692);
+				match(T_TEXTFILE);
+				 ((File_formatContext)_localctx).res =  "TEXTFILE"; 
+				}
+				break;
+			case T_RCFILE:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(694);
+				match(T_RCFILE);
+				 ((File_formatContext)_localctx).res =  "RCFILE"; 
+				}
+				break;
+			case T_ORC:
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(696);
+				match(T_ORC);
+				 ((File_formatContext)_localctx).res =  "ORC"; 
+				}
+				break;
+			case T_PARQUET:
+				enterOuterAlt(_localctx, 5);
+				{
+				setState(698);
+				match(T_PARQUET);
+				 ((File_formatContext)_localctx).res =  "PARQUET"; 
+				}
+				break;
+			case T_AVRO:
+				enterOuterAlt(_localctx, 6);
+				{
+				setState(700);
+				match(T_AVRO);
+				 ((File_formatContext)_localctx).res =  "AVRO"; 
+				}
+				break;
+			case T_JSONFILE:
+				enterOuterAlt(_localctx, 7);
+				{
+				setState(702);
+				match(T_JSONFILE);
+				 ((File_formatContext)_localctx).res =  "JSONFILE"; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Column_definitionContext extends ParserRuleContext {
+		public json res;
+		public Column_identifierContext column_identifier;
+		public Data_typeContext data_type;
+		public Token STRING_LITERAL;
+		public Column_constraintContext column_constraint;
+		public List<Column_constraintContext> constraint_list = new ArrayList<Column_constraintContext>();
+		public Column_identifierContext column_identifier() {
+			return getRuleContext(Column_identifierContext.class,0);
+		}
+		public Data_typeContext data_type() {
+			return getRuleContext(Data_typeContext.class,0);
+		}
+		public TerminalNode T_COMMENT() { return getToken(HiveParser.T_COMMENT, 0); }
+		public TerminalNode STRING_LITERAL() { return getToken(HiveParser.STRING_LITERAL, 0); }
+		public List<Column_constraintContext> column_constraint() {
+			return getRuleContexts(Column_constraintContext.class);
+		}
+		public Column_constraintContext column_constraint(int i) {
+			return getRuleContext(Column_constraintContext.class,i);
+		}
+		public Column_definitionContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_column_definition; }
+	}
+
+	public final Column_definitionContext column_definition() throws RecognitionException {
+		Column_definitionContext _localctx = new Column_definitionContext(_ctx, getState());
+		enterRule(_localctx, 72, RULE_column_definition);
+		int _la;
+		try {
+			setState(738);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,47,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(706);
+				((Column_definitionContext)_localctx).column_identifier = column_identifier();
+				setState(707);
+				((Column_definitionContext)_localctx).data_type = data_type();
+				 ((Column_definitionContext)_localctx).res =  hql_column_definition(((Column_definitionContext)_localctx).column_identifier.res, ((Column_definitionContext)_localctx).data_type.res); 
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(710);
+				((Column_definitionContext)_localctx).column_identifier = column_identifier();
+				setState(711);
+				((Column_definitionContext)_localctx).data_type = data_type();
+				setState(712);
+				match(T_COMMENT);
+				setState(713);
+				((Column_definitionContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				 ((Column_definitionContext)_localctx).res =  hql_column_definition(((Column_definitionContext)_localctx).column_identifier.res, ((Column_definitionContext)_localctx).data_type.res, (((Column_definitionContext)_localctx).STRING_LITERAL!=null?((Column_definitionContext)_localctx).STRING_LITERAL.getText():null)); 
+				}
+				break;
+			case 3:
+				enterOuterAlt(_localctx, 3);
+				{
+				vector<Column_constraintContext*> constraint_list; 
+				setState(717);
+				((Column_definitionContext)_localctx).column_identifier = column_identifier();
+				setState(718);
+				((Column_definitionContext)_localctx).data_type = data_type();
+				setState(720); 
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				do {
+					{
+					{
+					setState(719);
+					((Column_definitionContext)_localctx).column_constraint = column_constraint();
+					((Column_definitionContext)_localctx).constraint_list.add(((Column_definitionContext)_localctx).column_constraint);
+					}
+					}
+					setState(722); 
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				} while ( _la==T_CHECK || ((((_la - 109)) & ~0x3f) == 0 && ((1L << (_la - 109)) & ((1L << (T_DEFAULT - 109)) | (1L << (T_DISABLE - 109)) | (1L << (T_ENABLE - 109)))) != 0) || ((((_la - 280)) & ~0x3f) == 0 && ((1L << (_la - 280)) & ((1L << (T_NORELY - 280)) | (1L << (T_NOT - 280)) | (1L << (T_NOVALIDATE - 280)) | (1L << (T_PRIMARY - 280)))) != 0) || _la==T_RELY || _la==T_UNIQUE );
+				setState(724);
+				match(T_COMMENT);
+				setState(725);
+				((Column_definitionContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
+				 
+				        vector<json> constraint_json_list;
+				        for(Column_constraintContext* cons:((Column_definitionContext)_localctx).constraint_list)
+				        {
+				            constraint_json_list.push_back(cons->res);
+				        }
+				        ((Column_definitionContext)_localctx).res =  hql_column_definition(((Column_definitionContext)_localctx).column_identifier.res, ((Column_definitionContext)_localctx).data_type.res, constraint_json_list, (((Column_definitionContext)_localctx).STRING_LITERAL!=null?((Column_definitionContext)_localctx).STRING_LITERAL.getText():null));
+				    
+				}
+				break;
+			case 4:
+				enterOuterAlt(_localctx, 4);
+				{
+				vector<Column_constraintContext*> constraint_list; 
+				setState(729);
+				((Column_definitionContext)_localctx).column_identifier = column_identifier();
+				setState(730);
+				((Column_definitionContext)_localctx).data_type = data_type();
+				setState(732); 
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				do {
+					{
+					{
+					setState(731);
+					((Column_definitionContext)_localctx).column_constraint = column_constraint();
+					((Column_definitionContext)_localctx).constraint_list.add(((Column_definitionContext)_localctx).column_constraint);
+					}
+					}
+					setState(734); 
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				} while ( _la==T_CHECK || ((((_la - 109)) & ~0x3f) == 0 && ((1L << (_la - 109)) & ((1L << (T_DEFAULT - 109)) | (1L << (T_DISABLE - 109)) | (1L << (T_ENABLE - 109)))) != 0) || ((((_la - 280)) & ~0x3f) == 0 && ((1L << (_la - 280)) & ((1L << (T_NORELY - 280)) | (1L << (T_NOT - 280)) | (1L << (T_NOVALIDATE - 280)) | (1L << (T_PRIMARY - 280)))) != 0) || _la==T_RELY || _la==T_UNIQUE );
+				 
+				        vector<json> constraint_json_list;
+				        for(Column_constraintContext* cons:((Column_definitionContext)_localctx).constraint_list)
+				        {
+				            constraint_json_list.push_back(cons->res);
+				        }
+				        ((Column_definitionContext)_localctx).res =  hql_column_definition(((Column_definitionContext)_localctx).column_identifier.res, ((Column_definitionContext)_localctx).data_type.res, constraint_json_list);
+				    
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Column_constraintContext extends ParserRuleContext {
+		public json res;
+		public Default_valueContext default_value;
+		public ExprContext expr;
+		public TerminalNode T_PRIMARY() { return getToken(HiveParser.T_PRIMARY, 0); }
+		public TerminalNode T_KEY() { return getToken(HiveParser.T_KEY, 0); }
+		public TerminalNode T_UNIQUE() { return getToken(HiveParser.T_UNIQUE, 0); }
+		public TerminalNode T_NOT() { return getToken(HiveParser.T_NOT, 0); }
+		public TerminalNode T_NULL() { return getToken(HiveParser.T_NULL, 0); }
+		public TerminalNode T_DEFAULT() { return getToken(HiveParser.T_DEFAULT, 0); }
+		public Default_valueContext default_value() {
+			return getRuleContext(Default_valueContext.class,0);
+		}
+		public TerminalNode T_CHECK() { return getToken(HiveParser.T_CHECK, 0); }
+		public ExprContext expr() {
+			return getRuleContext(ExprContext.class,0);
+		}
+		public TerminalNode T_ENABLE() { return getToken(HiveParser.T_ENABLE, 0); }
+		public TerminalNode T_DISABLE() { return getToken(HiveParser.T_DISABLE, 0); }
+		public TerminalNode T_NOVALIDATE() { return getToken(HiveParser.T_NOVALIDATE, 0); }
+		public TerminalNode T_RELY() { return getToken(HiveParser.T_RELY, 0); }
+		public TerminalNode T_NORELY() { return getToken(HiveParser.T_NORELY, 0); }
+		public Column_constraintContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_column_constraint; }
+	}
+
+	public final Column_constraintContext column_constraint() throws RecognitionException {
+		Column_constraintContext _localctx = new Column_constraintContext(_ctx, getState());
+		enterRule(_localctx, 74, RULE_column_constraint);
+		try {
+			setState(766);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_PRIMARY:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(740);
+				match(T_PRIMARY);
+				setState(741);
+				match(T_KEY);
+				 ((Column_constraintContext)_localctx).res =  json({"primary_key", true}); 
+				}
+				break;
+			case T_UNIQUE:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(743);
+				match(T_UNIQUE);
+				 ((Column_constraintContext)_localctx).res =  json({"unique", true}); 
+				}
+				break;
+			case T_NOT:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(745);
+				match(T_NOT);
+				setState(746);
+				match(T_NULL);
+				 ((Column_constraintContext)_localctx).res =  json({"not_null", true}); 
+				}
+				break;
+			case T_DEFAULT:
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(748);
+				match(T_DEFAULT);
+				setState(749);
+				((Column_constraintContext)_localctx).default_value = default_value();
+				 ((Column_constraintContext)_localctx).res =  json({"default_value", ((Column_constraintContext)_localctx).default_value.res}); 
+				}
+				break;
+			case T_CHECK:
+				enterOuterAlt(_localctx, 5);
+				{
+				setState(752);
+				match(T_CHECK);
+				setState(753);
+				((Column_constraintContext)_localctx).expr = expr(0);
+				 ((Column_constraintContext)_localctx).res =  json({"check", ((Column_constraintContext)_localctx).expr.res}); 
+				}
+				break;
+			case T_ENABLE:
+				enterOuterAlt(_localctx, 6);
+				{
+				setState(756);
+				match(T_ENABLE);
+				 ((Column_constraintContext)_localctx).res =  json({"enable", true}); 
+				}
+				break;
+			case T_DISABLE:
+				enterOuterAlt(_localctx, 7);
+				{
+				setState(758);
+				match(T_DISABLE);
+				 ((Column_constraintContext)_localctx).res =  json({"enable", false}); 
+				}
+				break;
+			case T_NOVALIDATE:
+				enterOuterAlt(_localctx, 8);
+				{
+				setState(760);
+				match(T_NOVALIDATE);
+				 ((Column_constraintContext)_localctx).res =  json({"novalidate", true}); 
+				}
+				break;
+			case T_RELY:
+				enterOuterAlt(_localctx, 9);
+				{
+				setState(762);
+				match(T_RELY);
+				 ((Column_constraintContext)_localctx).res =  json({"rely", true}); 
+				}
+				break;
+			case T_NORELY:
+				enterOuterAlt(_localctx, 10);
+				{
+				setState(764);
+				match(T_NORELY);
+				 ((Column_constraintContext)_localctx).res =  json({"norely", true}); 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Default_valueContext extends ParserRuleContext {
+		public json res;
+		public Literal_valuesContext literal_values() {
+			return getRuleContext(Literal_valuesContext.class,0);
+		}
+		public TerminalNode T_CURRENT_USER() { return getToken(HiveParser.T_CURRENT_USER, 0); }
+		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
+		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
+		public TerminalNode T_CURRENT_DATE() { return getToken(HiveParser.T_CURRENT_DATE, 0); }
+		public TerminalNode T_CURRENT_TIMESTAMP() { return getToken(HiveParser.T_CURRENT_TIMESTAMP, 0); }
+		public Default_valueContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_default_value; }
+	}
+
+	public final Default_valueContext default_value() throws RecognitionException {
+		Default_valueContext _localctx = new Default_valueContext(_ctx, getState());
+		enterRule(_localctx, 76, RULE_default_value);
+		try {
+			setState(778);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case NULL_CONST:
+			case BOOL_LITERAL:
+			case T_DATE:
+			case T_TIMESTAMP:
+			case INT_LITERAL:
+			case DECIMAL_LITERAL:
+			case STRING_LITERAL:
+				enterOuterAlt(_localctx, 1);
+				{
+				setState(768);
+				literal_values();
+				}
+				break;
+			case T_CURRENT_USER:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(769);
+				match(T_CURRENT_USER);
+				setState(770);
+				match(T_OPEN_P);
+				setState(771);
+				match(T_CLOSE_P);
+				}
+				break;
+			case T_CURRENT_DATE:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(772);
+				match(T_CURRENT_DATE);
+				setState(773);
+				match(T_OPEN_P);
+				setState(774);
+				match(T_CLOSE_P);
+				}
+				break;
+			case T_CURRENT_TIMESTAMP:
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(775);
+				match(T_CURRENT_TIMESTAMP);
+				setState(776);
+				match(T_OPEN_P);
+				setState(777);
+				match(T_CLOSE_P);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Constraint_specificationContext extends ParserRuleContext {
+		public json res;
+		public Column_identifierContext column_identifier;
+		public List<Column_identifierContext> column_list = new ArrayList<Column_identifierContext>();
+		public Opt_constraint_disableContext opt_constraint_disable;
+		public Opt_constraint_novalidateContext opt_constraint_novalidate;
+		public Opt_constraint_rely_no_relyContext opt_constraint_rely_no_rely;
+		public Tab_identContext tab_ident;
+		public List<Column_identifierContext> ref_column_list = new ArrayList<Column_identifierContext>();
+		public ExprContext expr;
+		public Opt_constraint_enable_disableContext opt_constraint_enable_disable;
+		public TerminalNode T_PRIMARY() { return getToken(HiveParser.T_PRIMARY, 0); }
+		public TerminalNode T_KEY() { return getToken(HiveParser.T_KEY, 0); }
+		public List<TerminalNode> T_OPEN_P() { return getTokens(HiveParser.T_OPEN_P); }
+		public TerminalNode T_OPEN_P(int i) {
+			return getToken(HiveParser.T_OPEN_P, i);
+		}
+		public List<TerminalNode> T_CLOSE_P() { return getTokens(HiveParser.T_CLOSE_P); }
+		public TerminalNode T_CLOSE_P(int i) {
+			return getToken(HiveParser.T_CLOSE_P, i);
+		}
+		public Opt_constraint_disableContext opt_constraint_disable() {
+			return getRuleContext(Opt_constraint_disableContext.class,0);
+		}
+		public Opt_constraint_novalidateContext opt_constraint_novalidate() {
+			return getRuleContext(Opt_constraint_novalidateContext.class,0);
+		}
+		public Opt_constraint_rely_no_relyContext opt_constraint_rely_no_rely() {
+			return getRuleContext(Opt_constraint_rely_no_relyContext.class,0);
+		}
+		public List<Column_identifierContext> column_identifier() {
+			return getRuleContexts(Column_identifierContext.class);
+		}
+		public Column_identifierContext column_identifier(int i) {
+			return getRuleContext(Column_identifierContext.class,i);
+		}
+		public TerminalNode T_CONSTRAINT() { return getToken(HiveParser.T_CONSTRAINT, 0); }
+		public TerminalNode IDENTIFIER() { return getToken(HiveParser.IDENTIFIER, 0); }
+		public TerminalNode T_FOREIGN() { return getToken(HiveParser.T_FOREIGN, 0); }
+		public TerminalNode T_REFERENCES() { return getToken(HiveParser.T_REFERENCES, 0); }
+		public Tab_identContext tab_ident() {
+			return getRuleContext(Tab_identContext.class,0);
+		}
+		public TerminalNode T_UNIQUE() { return getToken(HiveParser.T_UNIQUE, 0); }
+		public TerminalNode T_CHECK() { return getToken(HiveParser.T_CHECK, 0); }
+		public ExprContext expr() {
+			return getRuleContext(ExprContext.class,0);
+		}
+		public Opt_constraint_enable_disableContext opt_constraint_enable_disable() {
+			return getRuleContext(Opt_constraint_enable_disableContext.class,0);
+		}
+		public Constraint_specificationContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_constraint_specification; }
+	}
+
+	public final Constraint_specificationContext constraint_specification() throws RecognitionException {
+		Constraint_specificationContext _localctx = new Constraint_specificationContext(_ctx, getState());
+		enterRule(_localctx, 78, RULE_constraint_specification);
+		int _la;
+		try {
+			setState(857);
+			_errHandler.sync(this);
+			switch ( getInterpreter().adaptivePredict(_input,54,_ctx) ) {
+			case 1:
+				enterOuterAlt(_localctx, 1);
+				{
+				vector<Column_identifierContext*> column_list; 
+				setState(781);
+				match(T_PRIMARY);
+				setState(782);
+				match(T_KEY);
+				setState(783);
+				match(T_OPEN_P);
+				setState(784);
+				((Constraint_specificationContext)_localctx).column_identifier = column_identifier();
+				((Constraint_specificationContext)_localctx).column_list.add(((Constraint_specificationContext)_localctx).column_identifier);
+				setState(789);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(785);
+					match(T_COMMA);
+					setState(786);
+					((Constraint_specificationContext)_localctx).column_identifier = column_identifier();
+					((Constraint_specificationContext)_localctx).column_list.add(((Constraint_specificationContext)_localctx).column_identifier);
+					}
+					}
+					setState(791);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(792);
+				match(T_CLOSE_P);
+				setState(793);
+				((Constraint_specificationContext)_localctx).opt_constraint_disable = opt_constraint_disable();
+				setState(794);
+				((Constraint_specificationContext)_localctx).opt_constraint_novalidate = opt_constraint_novalidate();
+				setState(795);
+				((Constraint_specificationContext)_localctx).opt_constraint_rely_no_rely = opt_constraint_rely_no_rely();
+
+				        vector<string> column_str_list;
+				        for(Column_identifierContext* c_ctxt: ((Constraint_specificationContext)_localctx).column_list) {
+				            column_str_list.push_back(c_ctxt->res); }
+				        ((Constraint_specificationContext)_localctx).res =  hql_primary_key_constraint(column_str_list, ((Constraint_specificationContext)_localctx).opt_constraint_disable.res, ((Constraint_specificationContext)_localctx).opt_constraint_novalidate.res, ((Constraint_specificationContext)_localctx).opt_constraint_rely_no_rely.res);
+				    
+				}
+				break;
+			case 2:
+				enterOuterAlt(_localctx, 2);
+				{
+				 vector<Column_identifierContext*> column_list; vector<Column_identifierContext*> ref_column_list; 
+				setState(799);
+				match(T_CONSTRAINT);
+				setState(800);
+				match(IDENTIFIER);
+				setState(801);
+				match(T_FOREIGN);
+				setState(802);
+				match(T_KEY);
+				setState(803);
+				match(T_OPEN_P);
+				setState(804);
+				((Constraint_specificationContext)_localctx).column_identifier = column_identifier();
+				((Constraint_specificationContext)_localctx).column_list.add(((Constraint_specificationContext)_localctx).column_identifier);
+				setState(809);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(805);
+					match(T_COMMA);
+					setState(806);
+					((Constraint_specificationContext)_localctx).column_identifier = column_identifier();
+					((Constraint_specificationContext)_localctx).column_list.add(((Constraint_specificationContext)_localctx).column_identifier);
+					}
+					}
+					setState(811);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(812);
+				match(T_CLOSE_P);
+				setState(813);
+				match(T_REFERENCES);
+				setState(814);
+				((Constraint_specificationContext)_localctx).tab_ident = tab_ident();
+				setState(815);
+				match(T_OPEN_P);
+				setState(816);
+				((Constraint_specificationContext)_localctx).column_identifier = column_identifier();
+				((Constraint_specificationContext)_localctx).ref_column_list.add(((Constraint_specificationContext)_localctx).column_identifier);
+				setState(821);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(817);
+					match(T_COMMA);
+					setState(818);
+					((Constraint_specificationContext)_localctx).column_identifier = column_identifier();
+					((Constraint_specificationContext)_localctx).ref_column_list.add(((Constraint_specificationContext)_localctx).column_identifier);
+					}
+					}
+					setState(823);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(824);
+				match(T_CLOSE_P);
+				setState(825);
+				((Constraint_specificationContext)_localctx).opt_constraint_disable = opt_constraint_disable();
+				setState(826);
+				((Constraint_specificationContext)_localctx).opt_constraint_novalidate = opt_constraint_novalidate();
+
+				        vector<string> column_str_list; vector<string> ref_column_str_list;
+				        for(Column_identifierContext* c_ctxt: ((Constraint_specificationContext)_localctx).column_list) {
+				            column_str_list.push_back(c_ctxt->res); }
+				        for(Column_identifierContext* c_ctxt: ((Constraint_specificationContext)_localctx).ref_column_list) {
+				            ref_column_str_list.push_back(c_ctxt->res); }
+				        ((Constraint_specificationContext)_localctx).res =  hql_foreign_key_constraint(column_str_list, ((Constraint_specificationContext)_localctx).tab_ident.res, ref_column_str_list, ((Constraint_specificationContext)_localctx).opt_constraint_disable.res, ((Constraint_specificationContext)_localctx).opt_constraint_novalidate.res);
+				    
+				}
+				break;
+			case 3:
+				enterOuterAlt(_localctx, 3);
+				{
+				vector<Column_identifierContext*> column_list; 
+				setState(830);
+				match(T_CONSTRAINT);
+				setState(831);
+				match(IDENTIFIER);
+				setState(832);
+				match(T_UNIQUE);
+				setState(833);
+				match(T_OPEN_P);
+				setState(834);
+				((Constraint_specificationContext)_localctx).column_identifier = column_identifier();
+				((Constraint_specificationContext)_localctx).column_list.add(((Constraint_specificationContext)_localctx).column_identifier);
+				setState(839);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				while (_la==T_COMMA) {
+					{
+					{
+					setState(835);
+					match(T_COMMA);
+					setState(836);
+					((Constraint_specificationContext)_localctx).column_identifier = column_identifier();
+					((Constraint_specificationContext)_localctx).column_list.add(((Constraint_specificationContext)_localctx).column_identifier);
+					}
+					}
+					setState(841);
+					_errHandler.sync(this);
+					_la = _input.LA(1);
+				}
+				setState(842);
+				match(T_CLOSE_P);
+				setState(843);
+				((Constraint_specificationContext)_localctx).opt_constraint_disable = opt_constraint_disable();
+				setState(844);
+				((Constraint_specificationContext)_localctx).opt_constraint_novalidate = opt_constraint_novalidate();
+				setState(845);
+				((Constraint_specificationContext)_localctx).opt_constraint_rely_no_rely = opt_constraint_rely_no_rely();
+
+				        vector<string> column_str_list;
+				        for(Column_identifierContext* c_ctxt: ((Constraint_specificationContext)_localctx).column_list) {
+				            column_str_list.push_back(c_ctxt->res); }
+				        ((Constraint_specificationContext)_localctx).res =  hql_unique_constraint(column_str_list, ((Constraint_specificationContext)_localctx).opt_constraint_disable.res, ((Constraint_specificationContext)_localctx).opt_constraint_novalidate.res, ((Constraint_specificationContext)_localctx).opt_constraint_rely_no_rely.res);
+				    
+				}
+				break;
+			case 4:
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(848);
+				match(T_CONSTRAINT);
+				setState(849);
+				match(IDENTIFIER);
+				setState(850);
+				match(T_CHECK);
+				setState(851);
+				((Constraint_specificationContext)_localctx).expr = expr(0);
+				setState(852);
+				((Constraint_specificationContext)_localctx).opt_constraint_enable_disable = opt_constraint_enable_disable();
+				setState(853);
+				((Constraint_specificationContext)_localctx).opt_constraint_novalidate = opt_constraint_novalidate();
+				setState(854);
+				((Constraint_specificationContext)_localctx).opt_constraint_rely_no_rely = opt_constraint_rely_no_rely();
+				 ((Constraint_specificationContext)_localctx).res =  hql_check_constraint(((Constraint_specificationContext)_localctx).expr.res,  ((Constraint_specificationContext)_localctx).opt_constraint_enable_disable.res, ((Constraint_specificationContext)_localctx).opt_constraint_novalidate.res, ((Constraint_specificationContext)_localctx).opt_constraint_rely_no_rely.res); 
+				}
+				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_constraint_enable_disableContext extends ParserRuleContext {
+		public string res;
+		public TerminalNode T_ENABLE() { return getToken(HiveParser.T_ENABLE, 0); }
+		public TerminalNode T_DISABLE() { return getToken(HiveParser.T_DISABLE, 0); }
+		public Opt_constraint_enable_disableContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_constraint_enable_disable; }
+	}
+
+	public final Opt_constraint_enable_disableContext opt_constraint_enable_disable() throws RecognitionException {
+		Opt_constraint_enable_disableContext _localctx = new Opt_constraint_enable_disableContext(_ctx, getState());
+		enterRule(_localctx, 80, RULE_opt_constraint_enable_disable);
+		try {
+			setState(864);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_CLUSTERED:
+			case T_COMMENT:
+			case T_CONSTRAINT:
+			case T_LOCATION:
+			case T_NORELY:
+			case T_NOVALIDATE:
+			case T_PARTITIONED:
+			case T_PRIMARY:
+			case T_RELY:
+			case T_ROW:
+			case T_SKEWED:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_constraint_enable_disableContext)_localctx).res =  "ENABLE"; 
+				}
+				break;
+			case T_ENABLE:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(860);
+				match(T_ENABLE);
+				 ((Opt_constraint_enable_disableContext)_localctx).res =  "ENABLE"; 
+				}
+				break;
+			case T_DISABLE:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(862);
+				match(T_DISABLE);
+				 ((Opt_constraint_enable_disableContext)_localctx).res =  "DISABLE"; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_constraint_enableContext extends ParserRuleContext {
+		public bool res;
+		public TerminalNode T_ENABLE() { return getToken(HiveParser.T_ENABLE, 0); }
+		public Opt_constraint_enableContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_constraint_enable; }
+	}
+
+	public final Opt_constraint_enableContext opt_constraint_enable() throws RecognitionException {
+		Opt_constraint_enableContext _localctx = new Opt_constraint_enableContext(_ctx, getState());
+		enterRule(_localctx, 82, RULE_opt_constraint_enable);
+		try {
+			setState(869);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case EOF:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_constraint_enableContext)_localctx).res =  false; 
+				}
+				break;
+			case T_ENABLE:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(867);
+				match(T_ENABLE);
+				 ((Opt_constraint_enableContext)_localctx).res =  true; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_constraint_disableContext extends ParserRuleContext {
+		public bool res;
+		public TerminalNode T_DISABLE() { return getToken(HiveParser.T_DISABLE, 0); }
+		public Opt_constraint_disableContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_constraint_disable; }
+	}
+
+	public final Opt_constraint_disableContext opt_constraint_disable() throws RecognitionException {
+		Opt_constraint_disableContext _localctx = new Opt_constraint_disableContext(_ctx, getState());
+		enterRule(_localctx, 84, RULE_opt_constraint_disable);
+		try {
+			setState(874);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_CLUSTERED:
+			case T_COMMENT:
+			case T_CONSTRAINT:
+			case T_LOCATION:
+			case T_NORELY:
+			case T_NOVALIDATE:
+			case T_PARTITIONED:
+			case T_PRIMARY:
+			case T_RELY:
+			case T_ROW:
+			case T_SKEWED:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_constraint_disableContext)_localctx).res =  false; 
+				}
+				break;
+			case T_DISABLE:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(872);
+				match(T_DISABLE);
+				 ((Opt_constraint_disableContext)_localctx).res =  true; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_constraint_novalidateContext extends ParserRuleContext {
+		public bool res;
+		public TerminalNode T_NOVALIDATE() { return getToken(HiveParser.T_NOVALIDATE, 0); }
+		public Opt_constraint_novalidateContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_constraint_novalidate; }
+	}
+
+	public final Opt_constraint_novalidateContext opt_constraint_novalidate() throws RecognitionException {
+		Opt_constraint_novalidateContext _localctx = new Opt_constraint_novalidateContext(_ctx, getState());
+		enterRule(_localctx, 86, RULE_opt_constraint_novalidate);
+		try {
+			setState(879);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_CLUSTERED:
+			case T_COMMENT:
+			case T_CONSTRAINT:
+			case T_LOCATION:
+			case T_NORELY:
+			case T_PARTITIONED:
+			case T_PRIMARY:
+			case T_RELY:
+			case T_ROW:
+			case T_SKEWED:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_constraint_novalidateContext)_localctx).res =  false; 
+				}
+				break;
+			case T_NOVALIDATE:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(877);
+				match(T_NOVALIDATE);
+				 ((Opt_constraint_novalidateContext)_localctx).res =  true; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_constraint_rely_no_relyContext extends ParserRuleContext {
+		public string res;
+		public TerminalNode T_RELY() { return getToken(HiveParser.T_RELY, 0); }
+		public TerminalNode T_NORELY() { return getToken(HiveParser.T_NORELY, 0); }
+		public Opt_constraint_rely_no_relyContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_constraint_rely_no_rely; }
+	}
+
+	public final Opt_constraint_rely_no_relyContext opt_constraint_rely_no_rely() throws RecognitionException {
+		Opt_constraint_rely_no_relyContext _localctx = new Opt_constraint_rely_no_relyContext(_ctx, getState());
+		enterRule(_localctx, 88, RULE_opt_constraint_rely_no_rely);
+		try {
+			setState(886);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_AS:
+			case T_CLUSTERED:
+			case T_COMMENT:
+			case T_CONSTRAINT:
+			case T_LOCATION:
+			case T_PARTITIONED:
+			case T_PRIMARY:
+			case T_ROW:
+			case T_SKEWED:
+			case T_STORED:
+			case T_TBLPROPERTIES:
+			case T_SEMICOLON:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_constraint_rely_no_relyContext)_localctx).res =  string(); 
+				}
+				break;
+			case T_RELY:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(882);
+				match(T_RELY);
+				 ((Opt_constraint_rely_no_relyContext)_localctx).res =  "RELY"; 
+				}
+				break;
+			case T_NORELY:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(884);
+				match(T_NORELY);
+				 ((Opt_constraint_rely_no_relyContext)_localctx).res =  "NORELY"; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Opt_if_not_exists_flagContext extends ParserRuleContext {
+		public bool res;
+		public TerminalNode T_IF() { return getToken(HiveParser.T_IF, 0); }
+		public TerminalNode T_NOT() { return getToken(HiveParser.T_NOT, 0); }
+		public TerminalNode T_EXISTS() { return getToken(HiveParser.T_EXISTS, 0); }
+		public Opt_if_not_exists_flagContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_opt_if_not_exists_flag; }
+	}
+
+	public final Opt_if_not_exists_flagContext opt_if_not_exists_flag() throws RecognitionException {
+		Opt_if_not_exists_flagContext _localctx = new Opt_if_not_exists_flagContext(_ctx, getState());
+		enterRule(_localctx, 90, RULE_opt_if_not_exists_flag);
+		try {
+			setState(893);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case IDENTIFIER:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Opt_if_not_exists_flagContext)_localctx).res =  false; 
+				}
+				break;
+			case T_IF:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(889);
+				match(T_IF);
+				setState(890);
+				match(T_NOT);
+				setState(891);
+				match(T_EXISTS);
+				 ((Opt_if_not_exists_flagContext)_localctx).res =  true; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class Table_typeContext extends ParserRuleContext {
+		public string res;
+		public TerminalNode T_EXTERNAL() { return getToken(HiveParser.T_EXTERNAL, 0); }
+		public TerminalNode T_TEMPORARY() { return getToken(HiveParser.T_TEMPORARY, 0); }
+		public Table_typeContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_table_type; }
+	}
+
+	public final Table_typeContext table_type() throws RecognitionException {
+		Table_typeContext _localctx = new Table_typeContext(_ctx, getState());
+		enterRule(_localctx, 92, RULE_table_type);
+		try {
+			setState(900);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case T_TABLE:
+				enterOuterAlt(_localctx, 1);
+				{
+				 ((Table_typeContext)_localctx).res =  "MANAGED"; 
+				}
+				break;
+			case T_EXTERNAL:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(896);
+				match(T_EXTERNAL);
+				 ((Table_typeContext)_localctx).res =  "EXTERNAL"; 
+				}
+				break;
+			case T_TEMPORARY:
+				enterOuterAlt(_localctx, 3);
+				{
+				setState(898);
+				match(T_TEMPORARY);
+				 ((Table_typeContext)_localctx).res =  "TEMPORARY"; 
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -953,11 +4329,11 @@ public class HiveParser extends Parser {
 
 	public final Query_stmtContext query_stmt() throws RecognitionException {
 		Query_stmtContext _localctx = new Query_stmtContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_query_stmt);
+		enterRule(_localctx, 94, RULE_query_stmt);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(215);
+			setState(902);
 			((Query_stmtContext)_localctx).select_stmt = select_stmt();
 			 ((Query_stmtContext)_localctx).res =  ((Query_stmtContext)_localctx).select_stmt.res; 
 			}
@@ -1025,19 +4401,19 @@ public class HiveParser extends Parser {
 
 	public final Select_stmtContext select_stmt() throws RecognitionException {
 		Select_stmtContext _localctx = new Select_stmtContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_select_stmt);
+		enterRule(_localctx, 96, RULE_select_stmt);
 		try {
-			setState(241);
+			setState(928);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,6,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,62,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(218);
+				setState(905);
 				match(T_SELECT);
-				setState(219);
+				setState(906);
 				((Select_stmtContext)_localctx).select_all_distinct = select_all_distinct();
-				setState(220);
+				setState(907);
 				((Select_stmtContext)_localctx).select_expr_list = select_expr_list();
 				 ((Select_stmtContext)_localctx).res =  hql_select_stmt(((Select_stmtContext)_localctx).select_all_distinct.res, ((Select_stmtContext)_localctx).select_expr_list.res); 
 				}
@@ -1045,11 +4421,11 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(223);
+				setState(910);
 				match(T_SELECT);
-				setState(224);
+				setState(911);
 				((Select_stmtContext)_localctx).select_all_distinct = select_all_distinct();
-				setState(225);
+				setState(912);
 				((Select_stmtContext)_localctx).tab_generate_func = tab_generate_func();
 				 ((Select_stmtContext)_localctx).res =  hql_select_stmt(((Select_stmtContext)_localctx).select_all_distinct.res, ((Select_stmtContext)_localctx).tab_generate_func.res); 
 				}
@@ -1057,27 +4433,27 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(228);
+				setState(915);
 				match(T_SELECT);
-				setState(229);
+				setState(916);
 				((Select_stmtContext)_localctx).select_all_distinct = select_all_distinct();
-				setState(230);
+				setState(917);
 				((Select_stmtContext)_localctx).select_expr_list = select_expr_list();
-				setState(231);
+				setState(918);
 				match(T_FROM);
-				setState(232);
+				setState(919);
 				((Select_stmtContext)_localctx).table_reference = table_reference();
-				setState(233);
+				setState(920);
 				((Select_stmtContext)_localctx).opt_lateral_view_expr = opt_lateral_view_expr();
-				setState(234);
+				setState(921);
 				((Select_stmtContext)_localctx).opt_where_expr = opt_where_expr();
-				setState(235);
+				setState(922);
 				((Select_stmtContext)_localctx).opt_group_by_list = opt_group_by_list();
-				setState(236);
+				setState(923);
 				((Select_stmtContext)_localctx).opt_having_expr = opt_having_expr();
-				setState(237);
+				setState(924);
 				((Select_stmtContext)_localctx).opt_order_by_list = opt_order_by_list();
-				setState(238);
+				setState(925);
 				((Select_stmtContext)_localctx).opt_limit = opt_limit();
 				 ((Select_stmtContext)_localctx).res =  hql_select_stmt(((Select_stmtContext)_localctx).select_all_distinct.res, ((Select_stmtContext)_localctx).select_expr_list.res, ((Select_stmtContext)_localctx).table_reference.res, ((Select_stmtContext)_localctx).opt_lateral_view_expr.res, ((Select_stmtContext)_localctx).opt_where_expr.res, ((Select_stmtContext)_localctx).opt_group_by_list.res, ((Select_stmtContext)_localctx).opt_having_expr.res, ((Select_stmtContext)_localctx).opt_order_by_list.res, ((Select_stmtContext)_localctx).opt_limit.res); 
 				}
@@ -1121,10 +4497,10 @@ public class HiveParser extends Parser {
 
 	public final Opt_lateral_view_exprContext opt_lateral_view_expr() throws RecognitionException {
 		Opt_lateral_view_exprContext _localctx = new Opt_lateral_view_exprContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_opt_lateral_view_expr);
+		enterRule(_localctx, 98, RULE_opt_lateral_view_expr);
 		int _la;
 		try {
-			setState(260);
+			setState(947);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_GROUP:
@@ -1143,33 +4519,33 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				 vector<Column_identifierContext*> column_alias_list; 
-				setState(245);
+				setState(932);
 				match(T_LATERAL);
-				setState(246);
+				setState(933);
 				match(T_VIEW);
-				setState(247);
+				setState(934);
 				((Opt_lateral_view_exprContext)_localctx).tab_generate_func = tab_generate_func();
-				setState(248);
+				setState(935);
 				((Opt_lateral_view_exprContext)_localctx).tab_alias = column_identifier();
-				setState(249);
+				setState(936);
 				match(T_AS);
-				setState(250);
+				setState(937);
 				((Opt_lateral_view_exprContext)_localctx).column_identifier = column_identifier();
 				((Opt_lateral_view_exprContext)_localctx).column_alias_list.add(((Opt_lateral_view_exprContext)_localctx).column_identifier);
-				setState(255);
+				setState(942);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(251);
+					setState(938);
 					match(T_COMMA);
-					setState(252);
+					setState(939);
 					((Opt_lateral_view_exprContext)_localctx).column_identifier = column_identifier();
 					((Opt_lateral_view_exprContext)_localctx).column_alias_list.add(((Opt_lateral_view_exprContext)_localctx).column_identifier);
 					}
 					}
-					setState(257);
+					setState(944);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
@@ -1210,11 +4586,11 @@ public class HiveParser extends Parser {
 
 	public final Column_identifierContext column_identifier() throws RecognitionException {
 		Column_identifierContext _localctx = new Column_identifierContext(_ctx, getState());
-		enterRule(_localctx, 16, RULE_column_identifier);
+		enterRule(_localctx, 100, RULE_column_identifier);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(262);
+			setState(949);
 			((Column_identifierContext)_localctx).IDENTIFIER = match(IDENTIFIER);
 			 ((Column_identifierContext)_localctx).res =  (((Column_identifierContext)_localctx).IDENTIFIER!=null?((Column_identifierContext)_localctx).IDENTIFIER.getText():null); 
 			}
@@ -1245,9 +4621,9 @@ public class HiveParser extends Parser {
 
 	public final Opt_where_exprContext opt_where_expr() throws RecognitionException {
 		Opt_where_exprContext _localctx = new Opt_where_exprContext(_ctx, getState());
-		enterRule(_localctx, 18, RULE_opt_where_expr);
+		enterRule(_localctx, 102, RULE_opt_where_expr);
 		try {
-			setState(270);
+			setState(957);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_GROUP:
@@ -1264,9 +4640,9 @@ public class HiveParser extends Parser {
 			case T_WHERE:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(266);
+				setState(953);
 				match(T_WHERE);
-				setState(267);
+				setState(954);
 				((Opt_where_exprContext)_localctx).expr = expr(0);
 				 ((Opt_where_exprContext)_localctx).res =  ((Opt_where_exprContext)_localctx).expr.res; 
 				}
@@ -1306,10 +4682,10 @@ public class HiveParser extends Parser {
 
 	public final Opt_group_by_listContext opt_group_by_list() throws RecognitionException {
 		Opt_group_by_listContext _localctx = new Opt_group_by_listContext(_ctx, getState());
-		enterRule(_localctx, 20, RULE_opt_group_by_list);
+		enterRule(_localctx, 104, RULE_opt_group_by_list);
 		int _la;
 		try {
-			setState(286);
+			setState(973);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_HAVING:
@@ -1326,27 +4702,27 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				 vector<ExprContext*> expr_group_by_list; 
-				setState(274);
+				setState(961);
 				match(T_GROUP);
-				setState(275);
+				setState(962);
 				match(T_BY);
-				setState(276);
+				setState(963);
 				((Opt_group_by_listContext)_localctx).expr = expr(0);
 				((Opt_group_by_listContext)_localctx).expr_group_by_list.add(((Opt_group_by_listContext)_localctx).expr);
-				setState(281);
+				setState(968);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(277);
+					setState(964);
 					match(T_COMMA);
-					setState(278);
+					setState(965);
 					((Opt_group_by_listContext)_localctx).expr = expr(0);
 					((Opt_group_by_listContext)_localctx).expr_group_by_list.add(((Opt_group_by_listContext)_localctx).expr);
 					}
 					}
-					setState(283);
+					setState(970);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
@@ -1390,9 +4766,9 @@ public class HiveParser extends Parser {
 
 	public final Opt_having_exprContext opt_having_expr() throws RecognitionException {
 		Opt_having_exprContext _localctx = new Opt_having_exprContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_opt_having_expr);
+		enterRule(_localctx, 106, RULE_opt_having_expr);
 		try {
-			setState(293);
+			setState(980);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_LIMIT:
@@ -1407,9 +4783,9 @@ public class HiveParser extends Parser {
 			case T_HAVING:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(289);
+				setState(976);
 				match(T_HAVING);
-				setState(290);
+				setState(977);
 				((Opt_having_exprContext)_localctx).expr = expr(0);
 				 ((Opt_having_exprContext)_localctx).res =  ((Opt_having_exprContext)_localctx).expr.res; 
 				}
@@ -1457,10 +4833,10 @@ public class HiveParser extends Parser {
 
 	public final Opt_order_by_listContext opt_order_by_list() throws RecognitionException {
 		Opt_order_by_listContext _localctx = new Opt_order_by_listContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_opt_order_by_list);
+		enterRule(_localctx, 108, RULE_opt_order_by_list);
 		int _la;
 		try {
-			setState(312);
+			setState(999);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_LIMIT:
@@ -1475,33 +4851,33 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				 vector<IdentContext*> order_by_ident_list; vector<Opt_order_by_modeContext*> order_mode_list; 
-				setState(297);
+				setState(984);
 				match(T_ORDER);
-				setState(298);
+				setState(985);
 				match(T_BY);
-				setState(299);
+				setState(986);
 				((Opt_order_by_listContext)_localctx).ident = ident();
 				((Opt_order_by_listContext)_localctx).order_by_ident_list.add(((Opt_order_by_listContext)_localctx).ident);
-				setState(300);
+				setState(987);
 				((Opt_order_by_listContext)_localctx).opt_order_by_mode = opt_order_by_mode();
 				((Opt_order_by_listContext)_localctx).order_mode_list.add(((Opt_order_by_listContext)_localctx).opt_order_by_mode);
-				setState(307);
+				setState(994);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(301);
+					setState(988);
 					match(T_COMMA);
-					setState(302);
+					setState(989);
 					((Opt_order_by_listContext)_localctx).ident = ident();
 					((Opt_order_by_listContext)_localctx).order_by_ident_list.add(((Opt_order_by_listContext)_localctx).ident);
-					setState(303);
+					setState(990);
 					((Opt_order_by_listContext)_localctx).opt_order_by_mode = opt_order_by_mode();
 					((Opt_order_by_listContext)_localctx).order_mode_list.add(((Opt_order_by_listContext)_localctx).opt_order_by_mode);
 					}
 					}
-					setState(309);
+					setState(996);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
@@ -1545,9 +4921,9 @@ public class HiveParser extends Parser {
 
 	public final Opt_order_by_modeContext opt_order_by_mode() throws RecognitionException {
 		Opt_order_by_modeContext _localctx = new Opt_order_by_modeContext(_ctx, getState());
-		enterRule(_localctx, 26, RULE_opt_order_by_mode);
+		enterRule(_localctx, 110, RULE_opt_order_by_mode);
 		try {
-			setState(319);
+			setState(1006);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_LIMIT:
@@ -1562,7 +4938,7 @@ public class HiveParser extends Parser {
 			case T_ASC:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(315);
+				setState(1002);
 				match(T_ASC);
 				 ((Opt_order_by_modeContext)_localctx).res =  "ASC"; 
 				}
@@ -1570,7 +4946,7 @@ public class HiveParser extends Parser {
 			case T_DESC:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(317);
+				setState(1004);
 				match(T_DESC);
 				 ((Opt_order_by_modeContext)_localctx).res =  "DESC"; 
 				}
@@ -1607,11 +4983,11 @@ public class HiveParser extends Parser {
 
 	public final Opt_limitContext opt_limit() throws RecognitionException {
 		Opt_limitContext _localctx = new Opt_limitContext(_ctx, getState());
-		enterRule(_localctx, 28, RULE_opt_limit);
+		enterRule(_localctx, 112, RULE_opt_limit);
 		try {
-			setState(330);
+			setState(1017);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,16,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,72,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
@@ -1621,9 +4997,9 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(322);
+				setState(1009);
 				match(T_LIMIT);
-				setState(323);
+				setState(1010);
 				((Opt_limitContext)_localctx).rows = match(INT_LITERAL);
 				 ((Opt_limitContext)_localctx).res =  hql_select_limit_clause((((Opt_limitContext)_localctx).rows!=null?((Opt_limitContext)_localctx).rows.getText():null)); 
 				}
@@ -1631,13 +5007,13 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(325);
+				setState(1012);
 				match(T_LIMIT);
-				setState(326);
+				setState(1013);
 				((Opt_limitContext)_localctx).offset = match(INT_LITERAL);
-				setState(327);
+				setState(1014);
 				match(T_COMMA);
-				setState(328);
+				setState(1015);
 				((Opt_limitContext)_localctx).rows = match(INT_LITERAL);
 				 ((Opt_limitContext)_localctx).res =  hql_select_limit_clause((((Opt_limitContext)_localctx).rows!=null?((Opt_limitContext)_localctx).rows.getText():null), (((Opt_limitContext)_localctx).offset!=null?((Opt_limitContext)_localctx).offset.getText():null)); 
 				}
@@ -1681,16 +5057,16 @@ public class HiveParser extends Parser {
 
 	public final Table_referenceContext table_reference() throws RecognitionException {
 		Table_referenceContext _localctx = new Table_referenceContext(_ctx, getState());
-		enterRule(_localctx, 30, RULE_table_reference);
+		enterRule(_localctx, 114, RULE_table_reference);
 		int _la;
 		try {
-			setState(354);
+			setState(1041);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,19,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,75,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(332);
+				setState(1019);
 				((Table_referenceContext)_localctx).table_factor = table_factor();
 				 ((Table_referenceContext)_localctx).res =  ((Table_referenceContext)_localctx).table_factor.res; 
 				}
@@ -1699,23 +5075,23 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				vector<Table_factorContext*> table_factor_list; 
-				setState(336);
+				setState(1023);
 				((Table_referenceContext)_localctx).table_factor = table_factor();
 				((Table_referenceContext)_localctx).table_factor_list.add(((Table_referenceContext)_localctx).table_factor);
-				setState(339); 
+				setState(1026); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(337);
+					setState(1024);
 					match(T_COMMA);
-					setState(338);
+					setState(1025);
 					((Table_referenceContext)_localctx).table_factor = table_factor();
 					((Table_referenceContext)_localctx).table_factor_list.add(((Table_referenceContext)_localctx).table_factor);
 					}
 					}
-					setState(341); 
+					setState(1028); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==T_COMMA );
@@ -1736,23 +5112,23 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 3);
 				{
 				vector<Join_tableContext*> join_table_list; 
-				setState(346);
+				setState(1033);
 				((Table_referenceContext)_localctx).table_factor = table_factor();
-				setState(348); 
+				setState(1035); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(347);
+					setState(1034);
 					((Table_referenceContext)_localctx).join_table = join_table();
 					((Table_referenceContext)_localctx).join_table_list.add(((Table_referenceContext)_localctx).join_table);
 					}
 					}
-					setState(350); 
+					setState(1037); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-				} while ( _la==T_CROSS || ((((_la - 161)) & ~0x3f) == 0 && ((1L << (_la - 161)) & ((1L << (T_FULL - 161)) | (1L << (T_INNER - 161)) | (1L << (T_JOIN - 161)) | (1L << (T_LEFT - 161)))) != 0) || _la==T_RIGHT );
+				} while ( _la==T_CROSS || ((((_la - 167)) & ~0x3f) == 0 && ((1L << (_la - 167)) & ((1L << (T_FULL - 167)) | (1L << (T_INNER - 167)) | (1L << (T_JOIN - 167)) | (1L << (T_LEFT - 167)))) != 0) || _la==T_RIGHT );
 
 				        ((Table_referenceContext)_localctx).join_table_list[0]->res["left_table"] = ((Table_referenceContext)_localctx).table_factor.res;
 				        for(int i = 1; i < ((Table_referenceContext)_localctx).join_table_list.size() ; i++)
@@ -1802,28 +5178,28 @@ public class HiveParser extends Parser {
 
 	public final Join_tableContext join_table() throws RecognitionException {
 		Join_tableContext _localctx = new Join_tableContext(_ctx, getState());
-		enterRule(_localctx, 32, RULE_join_table);
+		enterRule(_localctx, 116, RULE_join_table);
 		int _la;
 		try {
-			setState(391);
+			setState(1078);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,23,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,79,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(357);
+				setState(1044);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_INNER) {
 					{
-					setState(356);
+					setState(1043);
 					match(T_INNER);
 					}
 				}
 
-				setState(359);
+				setState(1046);
 				match(T_JOIN);
-				setState(360);
+				setState(1047);
 				((Join_tableContext)_localctx).table_factor = table_factor();
 				 ((Join_tableContext)_localctx).res =  hql_stmt_join_table("INNER", ((Join_tableContext)_localctx).table_factor.res); 
 				}
@@ -1831,21 +5207,21 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(364);
+				setState(1051);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_INNER) {
 					{
-					setState(363);
+					setState(1050);
 					match(T_INNER);
 					}
 				}
 
-				setState(366);
+				setState(1053);
 				match(T_JOIN);
-				setState(367);
+				setState(1054);
 				((Join_tableContext)_localctx).table_factor = table_factor();
-				setState(368);
+				setState(1055);
 				((Join_tableContext)_localctx).join_condition = join_condition();
 				 ((Join_tableContext)_localctx).res =  hql_stmt_join_table("INNER", ((Join_tableContext)_localctx).table_factor.res, ((Join_tableContext)_localctx).join_condition.res); 
 				}
@@ -1853,7 +5229,7 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(371);
+				setState(1058);
 				((Join_tableContext)_localctx).j_type = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(_la==T_FULL || _la==T_LEFT || _la==T_RIGHT) ) {
@@ -1864,21 +5240,21 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(373);
+				setState(1060);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_OUTER) {
 					{
-					setState(372);
+					setState(1059);
 					match(T_OUTER);
 					}
 				}
 
-				setState(375);
+				setState(1062);
 				match(T_JOIN);
-				setState(376);
+				setState(1063);
 				((Join_tableContext)_localctx).table_factor = table_factor();
-				setState(377);
+				setState(1064);
 				((Join_tableContext)_localctx).join_condition = join_condition();
 				 ((Join_tableContext)_localctx).res =  hql_stmt_join_table((((Join_tableContext)_localctx).j_type!=null?((Join_tableContext)_localctx).j_type.getText():null), ((Join_tableContext)_localctx).table_factor.res, ((Join_tableContext)_localctx).join_condition.res); 
 				}
@@ -1886,11 +5262,11 @@ public class HiveParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(380);
+				setState(1067);
 				match(T_CROSS);
-				setState(381);
+				setState(1068);
 				match(T_JOIN);
-				setState(382);
+				setState(1069);
 				((Join_tableContext)_localctx).table_factor = table_factor();
 				 ((Join_tableContext)_localctx).res =  hql_stmt_join_table("CROSS", ((Join_tableContext)_localctx).table_factor.res); 
 				}
@@ -1898,13 +5274,13 @@ public class HiveParser extends Parser {
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(385);
+				setState(1072);
 				match(T_CROSS);
-				setState(386);
+				setState(1073);
 				match(T_JOIN);
-				setState(387);
+				setState(1074);
 				((Join_tableContext)_localctx).table_factor = table_factor();
-				setState(388);
+				setState(1075);
 				((Join_tableContext)_localctx).join_condition = join_condition();
 				 ((Join_tableContext)_localctx).res =  hql_stmt_join_table("CROSS", ((Join_tableContext)_localctx).table_factor.res, ((Join_tableContext)_localctx).join_condition.res); 
 				}
@@ -1937,13 +5313,13 @@ public class HiveParser extends Parser {
 
 	public final Join_conditionContext join_condition() throws RecognitionException {
 		Join_conditionContext _localctx = new Join_conditionContext(_ctx, getState());
-		enterRule(_localctx, 34, RULE_join_condition);
+		enterRule(_localctx, 118, RULE_join_condition);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(393);
+			setState(1080);
 			match(T_ON);
-			setState(394);
+			setState(1081);
 			((Join_conditionContext)_localctx).expr = expr(0);
 			 ((Join_conditionContext)_localctx).res =  ((Join_conditionContext)_localctx).expr.res; 
 			}
@@ -1980,16 +5356,16 @@ public class HiveParser extends Parser {
 
 	public final Table_factorContext table_factor() throws RecognitionException {
 		Table_factorContext _localctx = new Table_factorContext(_ctx, getState());
-		enterRule(_localctx, 36, RULE_table_factor);
+		enterRule(_localctx, 120, RULE_table_factor);
 		int _la;
 		try {
-			setState(416);
+			setState(1103);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,26,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,82,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(397);
+				setState(1084);
 				((Table_factorContext)_localctx).tab_ident = tab_ident();
 				 ((Table_factorContext)_localctx).res = hql_stmt_table_ref(((Table_factorContext)_localctx).tab_ident.res, "DEFAULT"); 
 				}
@@ -1997,19 +5373,19 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(400);
+				setState(1087);
 				((Table_factorContext)_localctx).tab_ident = tab_ident();
-				setState(402);
+				setState(1089);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_AS) {
 					{
-					setState(401);
+					setState(1088);
 					match(T_AS);
 					}
 				}
 
-				setState(404);
+				setState(1091);
 				((Table_factorContext)_localctx).IDENTIFIER = match(IDENTIFIER);
 				 ((Table_factorContext)_localctx).res = hql_stmt_table_ref(((Table_factorContext)_localctx).tab_ident.res, (((Table_factorContext)_localctx).IDENTIFIER!=null?((Table_factorContext)_localctx).IDENTIFIER.getText():null)); 
 				}
@@ -2017,23 +5393,23 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(407);
+				setState(1094);
 				match(T_OPEN_P);
-				setState(408);
+				setState(1095);
 				((Table_factorContext)_localctx).select_stmt = select_stmt();
-				setState(409);
+				setState(1096);
 				match(T_CLOSE_P);
-				setState(411);
+				setState(1098);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_AS) {
 					{
-					setState(410);
+					setState(1097);
 					match(T_AS);
 					}
 				}
 
-				setState(413);
+				setState(1100);
 				((Table_factorContext)_localctx).IDENTIFIER = match(IDENTIFIER);
 				 ((Table_factorContext)_localctx).res = hql_stmt_table_ref(((Table_factorContext)_localctx).select_stmt.res, (((Table_factorContext)_localctx).IDENTIFIER!=null?((Table_factorContext)_localctx).IDENTIFIER.getText():null)); 
 				}
@@ -2063,9 +5439,9 @@ public class HiveParser extends Parser {
 
 	public final Select_all_distinctContext select_all_distinct() throws RecognitionException {
 		Select_all_distinctContext _localctx = new Select_all_distinctContext(_ctx, getState());
-		enterRule(_localctx, 38, RULE_select_all_distinct);
+		enterRule(_localctx, 122, RULE_select_all_distinct);
 		try {
-			setState(423);
+			setState(1110);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__7:
@@ -2273,7 +5649,7 @@ public class HiveParser extends Parser {
 			case T_ALL:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(419);
+				setState(1106);
 				match(T_ALL);
 				 ((Select_all_distinctContext)_localctx).res =  "ALL"; 
 				}
@@ -2281,7 +5657,7 @@ public class HiveParser extends Parser {
 			case T_DISTINCT:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(421);
+				setState(1108);
 				match(T_DISTINCT);
 				 ((Select_all_distinctContext)_localctx).res =  "DISTINCT"; 
 				}
@@ -2319,29 +5695,29 @@ public class HiveParser extends Parser {
 
 	public final Select_expr_listContext select_expr_list() throws RecognitionException {
 		Select_expr_listContext _localctx = new Select_expr_listContext(_ctx, getState());
-		enterRule(_localctx, 40, RULE_select_expr_list);
+		enterRule(_localctx, 124, RULE_select_expr_list);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			 vector<Select_exprContext*> exprs; 
-			setState(426);
+			setState(1113);
 			((Select_expr_listContext)_localctx).select_expr = select_expr();
 			((Select_expr_listContext)_localctx).exprs.add(((Select_expr_listContext)_localctx).select_expr);
-			setState(431);
+			setState(1118);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T_COMMA) {
 				{
 				{
-				setState(427);
+				setState(1114);
 				match(T_COMMA);
-				setState(428);
+				setState(1115);
 				((Select_expr_listContext)_localctx).select_expr = select_expr();
 				((Select_expr_listContext)_localctx).exprs.add(((Select_expr_listContext)_localctx).select_expr);
 				}
 				}
-				setState(433);
+				setState(1120);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -2384,28 +5760,28 @@ public class HiveParser extends Parser {
 
 	public final Select_exprContext select_expr() throws RecognitionException {
 		Select_exprContext _localctx = new Select_exprContext(_ctx, getState());
-		enterRule(_localctx, 42, RULE_select_expr);
+		enterRule(_localctx, 126, RULE_select_expr);
 		int _la;
 		try {
-			setState(472);
+			setState(1159);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,32,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,88,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(436);
+				setState(1123);
 				((Select_exprContext)_localctx).expr = expr(0);
-				setState(438);
+				setState(1125);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_AS) {
 					{
-					setState(437);
+					setState(1124);
 					match(T_AS);
 					}
 				}
 
-				setState(440);
+				setState(1127);
 				((Select_exprContext)_localctx).IDENTIFIER = match(IDENTIFIER);
 				 ((Select_exprContext)_localctx).res =  hql_select_expr(((Select_exprContext)_localctx).expr.res, (((Select_exprContext)_localctx).IDENTIFIER!=null?((Select_exprContext)_localctx).IDENTIFIER.getText():null)); 
 				}
@@ -2413,7 +5789,7 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(443);
+				setState(1130);
 				((Select_exprContext)_localctx).expr = expr(0);
 				 ((Select_exprContext)_localctx).res =  hql_select_expr(((Select_exprContext)_localctx).expr.res); 
 				}
@@ -2421,19 +5797,19 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(446);
+				setState(1133);
 				((Select_exprContext)_localctx).expr = expr(0);
-				setState(448);
+				setState(1135);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_AS) {
 					{
-					setState(447);
+					setState(1134);
 					match(T_AS);
 					}
 				}
 
-				setState(450);
+				setState(1137);
 				((Select_exprContext)_localctx).IDENTIFIER = match(IDENTIFIER);
 				 ((Select_exprContext)_localctx).res =  hql_select_expr(((Select_exprContext)_localctx).expr.res, (((Select_exprContext)_localctx).IDENTIFIER!=null?((Select_exprContext)_localctx).IDENTIFIER.getText():null)); 
 				}
@@ -2441,7 +5817,7 @@ public class HiveParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(453);
+				setState(1140);
 				((Select_exprContext)_localctx).expr = expr(0);
 				 ((Select_exprContext)_localctx).res =  hql_select_expr(((Select_exprContext)_localctx).expr.res); 
 				}
@@ -2449,7 +5825,7 @@ public class HiveParser extends Parser {
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(456);
+				setState(1143);
 				match(T_MUL);
 				 ((Select_exprContext)_localctx).res =  hql_select_all_expr(); 
 				}
@@ -2457,11 +5833,11 @@ public class HiveParser extends Parser {
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(458);
+				setState(1145);
 				((Select_exprContext)_localctx).IDENTIFIER = match(IDENTIFIER);
-				setState(459);
-				match(T__1);
-				setState(460);
+				setState(1146);
+				match(T__0);
+				setState(1147);
 				match(T_MUL);
 				 ((Select_exprContext)_localctx).res =  hql_select_all_expr((((Select_exprContext)_localctx).IDENTIFIER!=null?((Select_exprContext)_localctx).IDENTIFIER.getText():null)); 
 				}
@@ -2469,7 +5845,7 @@ public class HiveParser extends Parser {
 			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(462);
+				setState(1149);
 				((Select_exprContext)_localctx).over_clause = over_clause();
 				 ((Select_exprContext)_localctx).res =  hql_select_expr(((Select_exprContext)_localctx).over_clause.res, "DEFAULT"); 
 				}
@@ -2477,19 +5853,19 @@ public class HiveParser extends Parser {
 			case 8:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(465);
+				setState(1152);
 				((Select_exprContext)_localctx).over_clause = over_clause();
-				setState(467);
+				setState(1154);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_AS) {
 					{
-					setState(466);
+					setState(1153);
 					match(T_AS);
 					}
 				}
 
-				setState(469);
+				setState(1156);
 				((Select_exprContext)_localctx).IDENTIFIER = match(IDENTIFIER);
 				 ((Select_exprContext)_localctx).res =  hql_select_expr(((Select_exprContext)_localctx).over_clause.res, (((Select_exprContext)_localctx).IDENTIFIER!=null?((Select_exprContext)_localctx).IDENTIFIER.getText():null)); 
 				}
@@ -2540,47 +5916,47 @@ public class HiveParser extends Parser {
 
 	public final Over_clauseContext over_clause() throws RecognitionException {
 		Over_clauseContext _localctx = new Over_clauseContext(_ctx, getState());
-		enterRule(_localctx, 44, RULE_over_clause);
+		enterRule(_localctx, 128, RULE_over_clause);
 		int _la;
 		try {
-			setState(535);
+			setState(1222);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,37,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,93,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
 				 vector<IdentContext*> ident_cntxt_list; 
-				setState(475);
+				setState(1162);
 				((Over_clauseContext)_localctx).over_func = over_func();
-				setState(476);
+				setState(1163);
 				match(T_OVER);
-				setState(477);
+				setState(1164);
 				match(T_OPEN_P);
-				setState(478);
+				setState(1165);
 				match(T_PARTITION);
-				setState(479);
+				setState(1166);
 				match(T_BY);
-				setState(480);
+				setState(1167);
 				((Over_clauseContext)_localctx).ident = ident();
 				((Over_clauseContext)_localctx).ident_cntxt_list.add(((Over_clauseContext)_localctx).ident);
-				setState(485);
+				setState(1172);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(481);
+					setState(1168);
 					match(T_COMMA);
-					setState(482);
+					setState(1169);
 					((Over_clauseContext)_localctx).ident = ident();
 					((Over_clauseContext)_localctx).ident_cntxt_list.add(((Over_clauseContext)_localctx).ident);
 					}
 					}
-					setState(487);
+					setState(1174);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(488);
+				setState(1175);
 				match(T_CLOSE_P);
 
 				        vector<json> ident_json_list;
@@ -2596,37 +5972,37 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				 vector<IdentContext*> ident_cntxt_list; 
-				setState(492);
+				setState(1179);
 				((Over_clauseContext)_localctx).over_func = over_func();
-				setState(493);
+				setState(1180);
 				match(T_OVER);
-				setState(494);
+				setState(1181);
 				match(T_OPEN_P);
-				setState(495);
+				setState(1182);
 				match(T_ORDER);
-				setState(496);
+				setState(1183);
 				match(T_BY);
-				setState(497);
+				setState(1184);
 				((Over_clauseContext)_localctx).ident = ident();
 				((Over_clauseContext)_localctx).ident_cntxt_list.add(((Over_clauseContext)_localctx).ident);
-				setState(502);
+				setState(1189);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(498);
+					setState(1185);
 					match(T_COMMA);
-					setState(499);
+					setState(1186);
 					((Over_clauseContext)_localctx).ident = ident();
 					((Over_clauseContext)_localctx).ident_cntxt_list.add(((Over_clauseContext)_localctx).ident);
 					}
 					}
-					setState(504);
+					setState(1191);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(505);
+				setState(1192);
 				match(T_CLOSE_P);
 
 				        vector<json> ident_json_list;
@@ -2642,61 +6018,61 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 3);
 				{
 				 vector<IdentContext*> partition_cntxt_list; vector<IdentContext*> order_cntxt_list; 
-				setState(509);
+				setState(1196);
 				((Over_clauseContext)_localctx).over_func = over_func();
-				setState(510);
+				setState(1197);
 				match(T_OVER);
-				setState(511);
+				setState(1198);
 				match(T_OPEN_P);
-				setState(512);
+				setState(1199);
 				match(T_PARTITION);
-				setState(513);
+				setState(1200);
 				match(T_BY);
-				setState(514);
+				setState(1201);
 				((Over_clauseContext)_localctx).ident = ident();
 				((Over_clauseContext)_localctx).partition_cntxt_list.add(((Over_clauseContext)_localctx).ident);
-				setState(519);
+				setState(1206);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(515);
+					setState(1202);
 					match(T_COMMA);
-					setState(516);
+					setState(1203);
 					((Over_clauseContext)_localctx).ident = ident();
 					((Over_clauseContext)_localctx).partition_cntxt_list.add(((Over_clauseContext)_localctx).ident);
 					}
 					}
-					setState(521);
+					setState(1208);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(522);
+				setState(1209);
 				match(T_ORDER);
-				setState(523);
+				setState(1210);
 				match(T_BY);
-				setState(524);
+				setState(1211);
 				((Over_clauseContext)_localctx).ident = ident();
 				((Over_clauseContext)_localctx).order_cntxt_list.add(((Over_clauseContext)_localctx).ident);
-				setState(529);
+				setState(1216);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(525);
+					setState(1212);
 					match(T_COMMA);
-					setState(526);
+					setState(1213);
 					((Over_clauseContext)_localctx).ident = ident();
 					((Over_clauseContext)_localctx).order_cntxt_list.add(((Over_clauseContext)_localctx).ident);
 					}
 					}
-					setState(531);
+					setState(1218);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(532);
+				setState(1219);
 				match(T_CLOSE_P);
 
 				        vector<json> partition_json_list; vector<json> order_json_list;
@@ -2743,9 +6119,9 @@ public class HiveParser extends Parser {
 
 	public final Over_funcContext over_func() throws RecognitionException {
 		Over_funcContext _localctx = new Over_funcContext(_ctx, getState());
-		enterRule(_localctx, 46, RULE_over_func);
+		enterRule(_localctx, 130, RULE_over_func);
 		try {
-			setState(543);
+			setState(1230);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_AVG:
@@ -2755,7 +6131,7 @@ public class HiveParser extends Parser {
 			case T_SUM:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(537);
+				setState(1224);
 				((Over_funcContext)_localctx).basic_aggr_func = basic_aggr_func();
 				 ((Over_funcContext)_localctx).res =  ((Over_funcContext)_localctx).basic_aggr_func.res; 
 				}
@@ -2767,7 +6143,7 @@ public class HiveParser extends Parser {
 			case T_ROW_NUMBER:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(540);
+				setState(1227);
 				((Over_funcContext)_localctx).analytic_func = analytic_func();
 				 ((Over_funcContext)_localctx).res =  ((Over_funcContext)_localctx).analytic_func.res; 
 				}
@@ -2805,15 +6181,15 @@ public class HiveParser extends Parser {
 
 	public final Analytic_funcContext analytic_func() throws RecognitionException {
 		Analytic_funcContext _localctx = new Analytic_funcContext(_ctx, getState());
-		enterRule(_localctx, 48, RULE_analytic_func);
+		enterRule(_localctx, 132, RULE_analytic_func);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(545);
+			setState(1232);
 			((Analytic_funcContext)_localctx).func_name = _input.LT(1);
 			_la = _input.LA(1);
-			if ( !(_la==T_PERCENT_RANK || ((((_la - 465)) & ~0x3f) == 0 && ((1L << (_la - 465)) & ((1L << (T_CUME_DIST - 465)) | (1L << (T_DENSE_RANK - 465)) | (1L << (T_RANK - 465)) | (1L << (T_ROW_NUMBER - 465)))) != 0)) ) {
+			if ( !(_la==T_PERCENT_RANK || ((((_la - 488)) & ~0x3f) == 0 && ((1L << (_la - 488)) & ((1L << (T_CUME_DIST - 488)) | (1L << (T_DENSE_RANK - 488)) | (1L << (T_RANK - 488)) | (1L << (T_ROW_NUMBER - 488)))) != 0)) ) {
 				((Analytic_funcContext)_localctx).func_name = (Token)_errHandler.recoverInline(this);
 			}
 			else {
@@ -2821,9 +6197,9 @@ public class HiveParser extends Parser {
 				_errHandler.reportMatch(this);
 				consume();
 			}
-			setState(546);
+			setState(1233);
 			match(T_OPEN_P);
-			setState(547);
+			setState(1234);
 			match(T_CLOSE_P);
 			 ((Analytic_funcContext)_localctx).res =  hql_fixed_func((((Analytic_funcContext)_localctx).func_name!=null?((Analytic_funcContext)_localctx).func_name.getText():null)); 
 			}
@@ -2859,35 +6235,35 @@ public class HiveParser extends Parser {
 
 	public final Expr_listContext expr_list() throws RecognitionException {
 		Expr_listContext _localctx = new Expr_listContext(_ctx, getState());
-		enterRule(_localctx, 50, RULE_expr_list);
+		enterRule(_localctx, 134, RULE_expr_list);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			 vector<ExprContext*> exprs; 
-			setState(551);
+			setState(1238);
 			match(T_OPEN_P);
-			setState(552);
+			setState(1239);
 			((Expr_listContext)_localctx).expr = expr(0);
 			((Expr_listContext)_localctx).exprs.add(((Expr_listContext)_localctx).expr);
-			setState(557);
+			setState(1244);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T_COMMA) {
 				{
 				{
-				setState(553);
+				setState(1240);
 				match(T_COMMA);
-				setState(554);
+				setState(1241);
 				((Expr_listContext)_localctx).expr = expr(0);
 				((Expr_listContext)_localctx).exprs.add(((Expr_listContext)_localctx).expr);
 				}
 				}
-				setState(559);
+				setState(1246);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(560);
+			setState(1247);
 			match(T_CLOSE_P);
 
 			        vector<json> expr_list_json;
@@ -3018,138 +6394,138 @@ public class HiveParser extends Parser {
 		int _parentState = getState();
 		ExprContext _localctx = new ExprContext(_ctx, _parentState);
 		ExprContext _prevctx = _localctx;
-		int _startState = 52;
-		enterRecursionRule(_localctx, 52, RULE_expr, _p);
+		int _startState = 136;
+		enterRecursionRule(_localctx, 136, RULE_expr, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(606);
+			setState(1293);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,40,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,96,_ctx) ) {
 			case 1:
 				{
-				setState(564);
+				setState(1251);
 				((ExprContext)_localctx).literal_values = literal_values();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).literal_values.res; 
 				}
 				break;
 			case 2:
 				{
-				setState(567);
+				setState(1254);
 				((ExprContext)_localctx).ident = ident();
 				 ((ExprContext)_localctx).res =   ((ExprContext)_localctx).ident.res; 
 				}
 				break;
 			case 3:
 				{
-				setState(570);
+				setState(1257);
 				((ExprContext)_localctx).unary_operator = unary_operator();
-				setState(571);
+				setState(1258);
 				((ExprContext)_localctx).expr = expr(11);
 				 ((ExprContext)_localctx).res =  hql_unary_operator((((ExprContext)_localctx).unary_operator!=null?_input.getText(((ExprContext)_localctx).unary_operator.start,((ExprContext)_localctx).unary_operator.stop):null), ((ExprContext)_localctx).expr.res); 
 				}
 				break;
 			case 4:
 				{
-				setState(574);
+				setState(1261);
 				match(T_OPEN_P);
-				setState(575);
+				setState(1262);
 				((ExprContext)_localctx).expr = expr(0);
-				setState(576);
+				setState(1263);
 				match(T_CLOSE_P);
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).expr.res; 
 				}
 				break;
 			case 5:
 				{
-				setState(579);
+				setState(1266);
 				((ExprContext)_localctx).dat_convrt_func = dat_convrt_func();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).dat_convrt_func.res; 
 				}
 				break;
 			case 6:
 				{
-				setState(582);
+				setState(1269);
 				((ExprContext)_localctx).math_func = math_func();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).math_func.res; 
 				}
 				break;
 			case 7:
 				{
-				setState(585);
+				setState(1272);
 				((ExprContext)_localctx).date_func = date_func();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).date_func.res; 
 				}
 				break;
 			case 8:
 				{
-				setState(588);
+				setState(1275);
 				((ExprContext)_localctx).cond_func = cond_func();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).cond_func.res; 
 				}
 				break;
 			case 9:
 				{
-				setState(591);
+				setState(1278);
 				((ExprContext)_localctx).str_func = str_func();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).str_func.res; 
 				}
 				break;
 			case 10:
 				{
-				setState(594);
+				setState(1281);
 				((ExprContext)_localctx).expr_concat = expr_concat();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).expr_concat.res; 
 				}
 				break;
 			case 11:
 				{
-				setState(597);
+				setState(1284);
 				((ExprContext)_localctx).misc_func = misc_func();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).misc_func.res; 
 				}
 				break;
 			case 12:
 				{
-				setState(600);
+				setState(1287);
 				((ExprContext)_localctx).aggr_func = aggr_func();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).aggr_func.res; 
 				}
 				break;
 			case 13:
 				{
-				setState(603);
+				setState(1290);
 				((ExprContext)_localctx).complex_types = complex_types();
 				 ((ExprContext)_localctx).res =  ((ExprContext)_localctx).complex_types.res; 
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(694);
+			setState(1381);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,42,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,98,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(692);
+					setState(1379);
 					_errHandler.sync(this);
-					switch ( getInterpreter().adaptivePredict(_input,41,_ctx) ) {
+					switch ( getInterpreter().adaptivePredict(_input,97,_ctx) ) {
 					case 1:
 						{
 						_localctx = new ExprContext(_parentctx, _parentState);
 						_localctx.l_expr = _prevctx;
 						_localctx.l_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(608);
+						setState(1295);
 						if (!(precpred(_ctx, 28))) throw new FailedPredicateException(this, "precpred(_ctx, 28)");
-						setState(609);
+						setState(1296);
 						((ExprContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
-						if ( !(_la==T__0 || _la==T_DIV || _la==T_MUL) ) {
+						if ( !(_la==T__1 || _la==T_DIV || _la==T_MUL) ) {
 							((ExprContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 						}
 						else {
@@ -3157,7 +6533,7 @@ public class HiveParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(610);
+						setState(1297);
 						((ExprContext)_localctx).r_expr = ((ExprContext)_localctx).expr = expr(29);
 						 ((ExprContext)_localctx).res =  hql_math_operator((((ExprContext)_localctx).op!=null?((ExprContext)_localctx).op.getText():null), ((ExprContext)_localctx).l_expr.res, ((ExprContext)_localctx).r_expr.res); 
 						}
@@ -3168,9 +6544,9 @@ public class HiveParser extends Parser {
 						_localctx.l_expr = _prevctx;
 						_localctx.l_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(613);
+						setState(1300);
 						if (!(precpred(_ctx, 27))) throw new FailedPredicateException(this, "precpred(_ctx, 27)");
-						setState(614);
+						setState(1301);
 						((ExprContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==T_ADD || _la==T_SUB) ) {
@@ -3181,7 +6557,7 @@ public class HiveParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(615);
+						setState(1302);
 						((ExprContext)_localctx).r_expr = ((ExprContext)_localctx).expr = expr(28);
 						 ((ExprContext)_localctx).res =  hql_math_operator((((ExprContext)_localctx).op!=null?((ExprContext)_localctx).op.getText():null), ((ExprContext)_localctx).l_expr.res, ((ExprContext)_localctx).r_expr.res); 
 						}
@@ -3192,9 +6568,9 @@ public class HiveParser extends Parser {
 						_localctx.l_expr = _prevctx;
 						_localctx.l_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(618);
+						setState(1305);
 						if (!(precpred(_ctx, 26))) throw new FailedPredicateException(this, "precpred(_ctx, 26)");
-						setState(619);
+						setState(1306);
 						((ExprContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << T__3) | (1L << T__4) | (1L << T__5))) != 0)) ) {
@@ -3205,7 +6581,7 @@ public class HiveParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(620);
+						setState(1307);
 						((ExprContext)_localctx).r_expr = ((ExprContext)_localctx).expr = expr(27);
 						 ((ExprContext)_localctx).res =  hql_bool_operator((((ExprContext)_localctx).op!=null?((ExprContext)_localctx).op.getText():null), ((ExprContext)_localctx).l_expr.res, ((ExprContext)_localctx).r_expr.res); 
 						}
@@ -3216,12 +6592,12 @@ public class HiveParser extends Parser {
 						_localctx.l_expr = _prevctx;
 						_localctx.l_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(623);
+						setState(1310);
 						if (!(precpred(_ctx, 25))) throw new FailedPredicateException(this, "precpred(_ctx, 25)");
-						setState(624);
+						setState(1311);
 						((ExprContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
-						if ( !(((((_la - 500)) & ~0x3f) == 0 && ((1L << (_la - 500)) & ((1L << (T_GREATER - 500)) | (1L << (T_GREATEREQUAL - 500)) | (1L << (T_LESS - 500)) | (1L << (T_LESSEQUAL - 500)))) != 0)) ) {
+						if ( !(((((_la - 523)) & ~0x3f) == 0 && ((1L << (_la - 523)) & ((1L << (T_GREATER - 523)) | (1L << (T_GREATEREQUAL - 523)) | (1L << (T_LESS - 523)) | (1L << (T_LESSEQUAL - 523)))) != 0)) ) {
 							((ExprContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 						}
 						else {
@@ -3229,7 +6605,7 @@ public class HiveParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(625);
+						setState(1312);
 						((ExprContext)_localctx).r_expr = ((ExprContext)_localctx).expr = expr(26);
 						 ((ExprContext)_localctx).res =  hql_bool_operator((((ExprContext)_localctx).op!=null?((ExprContext)_localctx).op.getText():null), ((ExprContext)_localctx).l_expr.res, ((ExprContext)_localctx).r_expr.res); 
 						}
@@ -3240,12 +6616,12 @@ public class HiveParser extends Parser {
 						_localctx.l_expr = _prevctx;
 						_localctx.l_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(628);
+						setState(1315);
 						if (!(precpred(_ctx, 24))) throw new FailedPredicateException(this, "precpred(_ctx, 24)");
-						setState(629);
+						setState(1316);
 						((ExprContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
-						if ( !(_la==T__6 || ((((_la - 496)) & ~0x3f) == 0 && ((1L << (_la - 496)) & ((1L << (T_EQUAL - 496)) | (1L << (T_EQUAL2 - 496)) | (1L << (T_NOTEQUAL - 496)) | (1L << (T_NOTEQUAL2 - 496)))) != 0)) ) {
+						if ( !(_la==T__6 || ((((_la - 519)) & ~0x3f) == 0 && ((1L << (_la - 519)) & ((1L << (T_EQUAL - 519)) | (1L << (T_EQUAL2 - 519)) | (1L << (T_NOTEQUAL - 519)) | (1L << (T_NOTEQUAL2 - 519)))) != 0)) ) {
 							((ExprContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 						}
 						else {
@@ -3253,7 +6629,7 @@ public class HiveParser extends Parser {
 							_errHandler.reportMatch(this);
 							consume();
 						}
-						setState(630);
+						setState(1317);
 						((ExprContext)_localctx).r_expr = ((ExprContext)_localctx).expr = expr(25);
 						 ((ExprContext)_localctx).res =  hql_bool_operator((((ExprContext)_localctx).op!=null?((ExprContext)_localctx).op.getText():null), ((ExprContext)_localctx).l_expr.res, ((ExprContext)_localctx).r_expr.res); 
 						}
@@ -3264,11 +6640,11 @@ public class HiveParser extends Parser {
 						_localctx.l_expr = _prevctx;
 						_localctx.l_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(633);
+						setState(1320);
 						if (!(precpred(_ctx, 23))) throw new FailedPredicateException(this, "precpred(_ctx, 23)");
-						setState(634);
+						setState(1321);
 						((ExprContext)_localctx).op = match(T_AND);
-						setState(635);
+						setState(1322);
 						((ExprContext)_localctx).r_expr = ((ExprContext)_localctx).expr = expr(24);
 						 ((ExprContext)_localctx).res =  hql_bool_operator((((ExprContext)_localctx).op!=null?((ExprContext)_localctx).op.getText():null), ((ExprContext)_localctx).l_expr.res, ((ExprContext)_localctx).r_expr.res); 
 						}
@@ -3279,11 +6655,11 @@ public class HiveParser extends Parser {
 						_localctx.l_expr = _prevctx;
 						_localctx.l_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(638);
+						setState(1325);
 						if (!(precpred(_ctx, 22))) throw new FailedPredicateException(this, "precpred(_ctx, 22)");
-						setState(639);
+						setState(1326);
 						((ExprContext)_localctx).op = match(T_OR);
-						setState(640);
+						setState(1327);
 						((ExprContext)_localctx).r_expr = ((ExprContext)_localctx).expr = expr(23);
 						 ((ExprContext)_localctx).res =  hql_bool_operator((((ExprContext)_localctx).op!=null?((ExprContext)_localctx).op.getText():null), ((ExprContext)_localctx).l_expr.res, ((ExprContext)_localctx).r_expr.res); 
 						}
@@ -3294,15 +6670,15 @@ public class HiveParser extends Parser {
 						_localctx.eval_expr = _prevctx;
 						_localctx.eval_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(643);
+						setState(1330);
 						if (!(precpred(_ctx, 19))) throw new FailedPredicateException(this, "precpred(_ctx, 19)");
-						setState(644);
+						setState(1331);
 						match(T_BETWEEN);
-						setState(645);
+						setState(1332);
 						((ExprContext)_localctx).start_interval = ((ExprContext)_localctx).expr = expr(0);
-						setState(646);
+						setState(1333);
 						match(T_AND);
-						setState(647);
+						setState(1334);
 						((ExprContext)_localctx).end_interval = ((ExprContext)_localctx).expr = expr(20);
 						 ((ExprContext)_localctx).res =  hql_between_expr(((ExprContext)_localctx).eval_expr.res, ((ExprContext)_localctx).start_interval.res, ((ExprContext)_localctx).end_interval.res, false); 
 						}
@@ -3313,17 +6689,17 @@ public class HiveParser extends Parser {
 						_localctx.eval_expr = _prevctx;
 						_localctx.eval_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(650);
+						setState(1337);
 						if (!(precpred(_ctx, 18))) throw new FailedPredicateException(this, "precpred(_ctx, 18)");
-						setState(651);
+						setState(1338);
 						match(T_NOT);
-						setState(652);
+						setState(1339);
 						match(T_BETWEEN);
-						setState(653);
+						setState(1340);
 						((ExprContext)_localctx).start_interval = ((ExprContext)_localctx).expr = expr(0);
-						setState(654);
+						setState(1341);
 						match(T_AND);
-						setState(655);
+						setState(1342);
 						((ExprContext)_localctx).end_interval = ((ExprContext)_localctx).expr = expr(19);
 						 ((ExprContext)_localctx).res =  hql_between_expr(((ExprContext)_localctx).eval_expr.res, ((ExprContext)_localctx).start_interval.res, ((ExprContext)_localctx).end_interval.res, true); 
 						}
@@ -3334,11 +6710,11 @@ public class HiveParser extends Parser {
 						_localctx.eval_expr = _prevctx;
 						_localctx.eval_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(658);
+						setState(1345);
 						if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
-						setState(659);
+						setState(1346);
 						((ExprContext)_localctx).set_operators_like = set_operators_like();
-						setState(660);
+						setState(1347);
 						((ExprContext)_localctx).r_expr = ((ExprContext)_localctx).expr = expr(15);
 						 ((ExprContext)_localctx).res =  hql_bool_operator(((ExprContext)_localctx).set_operators_like.res, ((ExprContext)_localctx).eval_expr.res, ((ExprContext)_localctx).r_expr.res); 
 						}
@@ -3349,11 +6725,11 @@ public class HiveParser extends Parser {
 						_localctx.l_expr = _prevctx;
 						_localctx.l_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(663);
+						setState(1350);
 						if (!(precpred(_ctx, 21))) throw new FailedPredicateException(this, "precpred(_ctx, 21)");
-						setState(664);
+						setState(1351);
 						((ExprContext)_localctx).set_operators_is = set_operators_is();
-						setState(665);
+						setState(1352);
 						((ExprContext)_localctx).BOOL_LITERAL = match(BOOL_LITERAL);
 						 ((ExprContext)_localctx).res =  hql_bool_operator(((ExprContext)_localctx).set_operators_is.res, ((ExprContext)_localctx).l_expr.res, hql_boolean_type((((ExprContext)_localctx).BOOL_LITERAL!=null?((ExprContext)_localctx).BOOL_LITERAL.getText():null))); 
 						}
@@ -3364,11 +6740,11 @@ public class HiveParser extends Parser {
 						_localctx.l_expr = _prevctx;
 						_localctx.l_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(668);
+						setState(1355);
 						if (!(precpred(_ctx, 20))) throw new FailedPredicateException(this, "precpred(_ctx, 20)");
-						setState(669);
+						setState(1356);
 						((ExprContext)_localctx).set_operators_is = set_operators_is();
-						setState(670);
+						setState(1357);
 						match(NULL_CONST);
 						 ((ExprContext)_localctx).res =  hql_bool_operator(((ExprContext)_localctx).set_operators_is.res, ((ExprContext)_localctx).l_expr.res, hql_null_constant()); 
 						}
@@ -3379,11 +6755,11 @@ public class HiveParser extends Parser {
 						_localctx.eval_expr = _prevctx;
 						_localctx.eval_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(673);
+						setState(1360);
 						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
-						setState(674);
+						setState(1361);
 						((ExprContext)_localctx).set_operators_in = set_operators_in();
-						setState(675);
+						setState(1362);
 						((ExprContext)_localctx).expr_list = expr_list();
 						 ((ExprContext)_localctx).res =  hql_set_operators_in(((ExprContext)_localctx).set_operators_in.res, ((ExprContext)_localctx).expr.res, ((ExprContext)_localctx).expr_list.res);  
 						}
@@ -3394,15 +6770,15 @@ public class HiveParser extends Parser {
 						_localctx.eval_expr = _prevctx;
 						_localctx.eval_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(678);
+						setState(1365);
 						if (!(precpred(_ctx, 16))) throw new FailedPredicateException(this, "precpred(_ctx, 16)");
-						setState(679);
+						setState(1366);
 						((ExprContext)_localctx).set_operators_in = set_operators_in();
-						setState(680);
+						setState(1367);
 						match(T_OPEN_P);
-						setState(681);
+						setState(1368);
 						((ExprContext)_localctx).select_stmt = select_stmt();
-						setState(682);
+						setState(1369);
 						match(T_CLOSE_P);
 						 ((ExprContext)_localctx).res =  hql_set_operators_in(((ExprContext)_localctx).set_operators_in.res, ((ExprContext)_localctx).expr.res, ((ExprContext)_localctx).select_stmt.res); 
 						}
@@ -3413,15 +6789,15 @@ public class HiveParser extends Parser {
 						_localctx.eval_expr = _prevctx;
 						_localctx.eval_expr = _prevctx;
 						pushNewRecursionContext(_localctx, _startState, RULE_expr);
-						setState(685);
+						setState(1372);
 						if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
-						setState(686);
+						setState(1373);
 						((ExprContext)_localctx).set_operators_exists = set_operators_exists();
-						setState(687);
+						setState(1374);
 						match(T_OPEN_P);
-						setState(688);
+						setState(1375);
 						((ExprContext)_localctx).select_stmt = select_stmt();
-						setState(689);
+						setState(1376);
 						match(T_CLOSE_P);
 						 ((ExprContext)_localctx).res =  hql_set_operators_in(((ExprContext)_localctx).set_operators_exists.res, ((ExprContext)_localctx).expr.res, ((ExprContext)_localctx).select_stmt.res); 
 						}
@@ -3429,9 +6805,9 @@ public class HiveParser extends Parser {
 					}
 					} 
 				}
-				setState(696);
+				setState(1383);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,42,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,98,_ctx);
 			}
 			}
 		}
@@ -3480,15 +6856,15 @@ public class HiveParser extends Parser {
 
 	public final Complex_typesContext complex_types() throws RecognitionException {
 		Complex_typesContext _localctx = new Complex_typesContext(_ctx, getState());
-		enterRule(_localctx, 54, RULE_complex_types);
+		enterRule(_localctx, 138, RULE_complex_types);
 		try {
-			setState(737);
+			setState(1424);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,43,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,99,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(697);
+				setState(1384);
 				((Complex_typesContext)_localctx).array_def = array_def();
 				 ((Complex_typesContext)_localctx).res =  ((Complex_typesContext)_localctx).array_def.res; 
 				}
@@ -3496,7 +6872,7 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(700);
+				setState(1387);
 				((Complex_typesContext)_localctx).map_def = map_def();
 				 ((Complex_typesContext)_localctx).res =  ((Complex_typesContext)_localctx).map_def.res; 
 				}
@@ -3504,7 +6880,7 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(703);
+				setState(1390);
 				((Complex_typesContext)_localctx).struct_def = struct_def();
 				 ((Complex_typesContext)_localctx).res =  ((Complex_typesContext)_localctx).struct_def.res; 
 				}
@@ -3512,7 +6888,7 @@ public class HiveParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(706);
+				setState(1393);
 				((Complex_typesContext)_localctx).named_struct_def = named_struct_def();
 				 ((Complex_typesContext)_localctx).res =  ((Complex_typesContext)_localctx).named_struct_def.res; 
 				}
@@ -3520,13 +6896,13 @@ public class HiveParser extends Parser {
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(709);
+				setState(1396);
 				((Complex_typesContext)_localctx).ident = ident();
-				setState(710);
+				setState(1397);
 				match(T_OPEN_SB);
-				setState(711);
+				setState(1398);
 				((Complex_typesContext)_localctx).expr = expr(0);
-				setState(712);
+				setState(1399);
 				match(T_CLOSE_SB);
 				 ((Complex_typesContext)_localctx).res =  hql_complex_type_access(((Complex_typesContext)_localctx).ident.res, ((Complex_typesContext)_localctx).expr.res); 
 				}
@@ -3534,13 +6910,13 @@ public class HiveParser extends Parser {
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(715);
+				setState(1402);
 				((Complex_typesContext)_localctx).array_def = array_def();
-				setState(716);
+				setState(1403);
 				match(T_OPEN_SB);
-				setState(717);
+				setState(1404);
 				((Complex_typesContext)_localctx).expr = expr(0);
-				setState(718);
+				setState(1405);
 				match(T_CLOSE_SB);
 				 ((Complex_typesContext)_localctx).res =  hql_complex_type_access(((Complex_typesContext)_localctx).array_def.res, ((Complex_typesContext)_localctx).expr.res); 
 				}
@@ -3548,13 +6924,13 @@ public class HiveParser extends Parser {
 			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(721);
+				setState(1408);
 				((Complex_typesContext)_localctx).map_def = map_def();
-				setState(722);
+				setState(1409);
 				match(T_OPEN_SB);
-				setState(723);
+				setState(1410);
 				((Complex_typesContext)_localctx).expr = expr(0);
-				setState(724);
+				setState(1411);
 				match(T_CLOSE_SB);
 				 ((Complex_typesContext)_localctx).res =  hql_complex_type_access(((Complex_typesContext)_localctx).map_def.res, ((Complex_typesContext)_localctx).expr.res); 
 				}
@@ -3562,11 +6938,11 @@ public class HiveParser extends Parser {
 			case 8:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(727);
+				setState(1414);
 				((Complex_typesContext)_localctx).ident = ident();
-				setState(728);
-				match(T__1);
-				setState(729);
+				setState(1415);
+				match(T__0);
+				setState(1416);
 				((Complex_typesContext)_localctx).expr = expr(0);
 				 ((Complex_typesContext)_localctx).res =  hql_complex_type_access(((Complex_typesContext)_localctx).ident.res, ((Complex_typesContext)_localctx).expr.res); 
 				}
@@ -3574,11 +6950,11 @@ public class HiveParser extends Parser {
 			case 9:
 				enterOuterAlt(_localctx, 9);
 				{
-				setState(732);
+				setState(1419);
 				((Complex_typesContext)_localctx).struct_def = struct_def();
-				setState(733);
-				match(T__1);
-				setState(734);
+				setState(1420);
+				match(T__0);
+				setState(1421);
 				((Complex_typesContext)_localctx).expr = expr(0);
 				 ((Complex_typesContext)_localctx).res =  hql_complex_type_access(((Complex_typesContext)_localctx).struct_def.res, ((Complex_typesContext)_localctx).expr.res); 
 				}
@@ -3617,37 +6993,37 @@ public class HiveParser extends Parser {
 
 	public final Array_defContext array_def() throws RecognitionException {
 		Array_defContext _localctx = new Array_defContext(_ctx, getState());
-		enterRule(_localctx, 56, RULE_array_def);
+		enterRule(_localctx, 140, RULE_array_def);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			 vector<ExprContext*> exprs; 
-			setState(740);
+			setState(1427);
 			match(T_ARRAY);
-			setState(741);
+			setState(1428);
 			match(T_OPEN_P);
-			setState(742);
+			setState(1429);
 			((Array_defContext)_localctx).expr = expr(0);
 			((Array_defContext)_localctx).exprs.add(((Array_defContext)_localctx).expr);
-			setState(747);
+			setState(1434);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T_COMMA) {
 				{
 				{
-				setState(743);
+				setState(1430);
 				match(T_COMMA);
-				setState(744);
+				setState(1431);
 				((Array_defContext)_localctx).expr = expr(0);
 				((Array_defContext)_localctx).exprs.add(((Array_defContext)_localctx).expr);
 				}
 				}
-				setState(749);
+				setState(1436);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(750);
+			setState(1437);
 			match(T_CLOSE_P);
 
 			        vector<json> expr_list_json;
@@ -3689,47 +7065,47 @@ public class HiveParser extends Parser {
 
 	public final Map_defContext map_def() throws RecognitionException {
 		Map_defContext _localctx = new Map_defContext(_ctx, getState());
-		enterRule(_localctx, 58, RULE_map_def);
+		enterRule(_localctx, 142, RULE_map_def);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			 vector<ExprContext*> key_exprs; vector<ExprContext*> val_exprs; 
-			setState(754);
+			setState(1441);
 			match(T_MAP);
-			setState(755);
+			setState(1442);
 			match(T_OPEN_P);
-			setState(756);
+			setState(1443);
 			((Map_defContext)_localctx).expr = expr(0);
 			((Map_defContext)_localctx).key_exprs.add(((Map_defContext)_localctx).expr);
-			setState(757);
+			setState(1444);
 			match(T_COMMA);
-			setState(758);
+			setState(1445);
 			((Map_defContext)_localctx).expr = expr(0);
 			((Map_defContext)_localctx).val_exprs.add(((Map_defContext)_localctx).expr);
-			setState(766);
+			setState(1453);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T_COMMA) {
 				{
 				{
-				setState(759);
+				setState(1446);
 				match(T_COMMA);
-				setState(760);
+				setState(1447);
 				((Map_defContext)_localctx).expr = expr(0);
 				((Map_defContext)_localctx).key_exprs.add(((Map_defContext)_localctx).expr);
-				setState(761);
+				setState(1448);
 				match(T_COMMA);
-				setState(762);
+				setState(1449);
 				((Map_defContext)_localctx).expr = expr(0);
 				((Map_defContext)_localctx).val_exprs.add(((Map_defContext)_localctx).expr);
 				}
 				}
-				setState(768);
+				setState(1455);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(769);
+			setState(1456);
 			match(T_CLOSE_P);
 
 			        vector<json> key_exprs_json; vector<json> val_exprs_json;
@@ -3774,37 +7150,37 @@ public class HiveParser extends Parser {
 
 	public final Struct_defContext struct_def() throws RecognitionException {
 		Struct_defContext _localctx = new Struct_defContext(_ctx, getState());
-		enterRule(_localctx, 60, RULE_struct_def);
+		enterRule(_localctx, 144, RULE_struct_def);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			 vector<ExprContext*> val_exprs; 
-			setState(773);
+			setState(1460);
 			match(T_STRUCT);
-			setState(774);
+			setState(1461);
 			match(T_OPEN_P);
-			setState(775);
+			setState(1462);
 			((Struct_defContext)_localctx).expr = expr(0);
 			((Struct_defContext)_localctx).val_exprs.add(((Struct_defContext)_localctx).expr);
-			setState(780);
+			setState(1467);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T_COMMA) {
 				{
 				{
-				setState(776);
+				setState(1463);
 				match(T_COMMA);
-				setState(777);
+				setState(1464);
 				((Struct_defContext)_localctx).expr = expr(0);
 				((Struct_defContext)_localctx).val_exprs.add(((Struct_defContext)_localctx).expr);
 				}
 				}
-				setState(782);
+				setState(1469);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(783);
+			setState(1470);
 			match(T_CLOSE_P);
 
 			        vector<json> col_exprs_json; vector<json> val_exprs_json;
@@ -3850,47 +7226,47 @@ public class HiveParser extends Parser {
 
 	public final Named_struct_defContext named_struct_def() throws RecognitionException {
 		Named_struct_defContext _localctx = new Named_struct_defContext(_ctx, getState());
-		enterRule(_localctx, 62, RULE_named_struct_def);
+		enterRule(_localctx, 146, RULE_named_struct_def);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
 			 vector<ExprContext*> col_exprs; vector<ExprContext*> val_exprs; 
-			setState(787);
+			setState(1474);
 			match(T_NAMED_STRUCT);
-			setState(788);
+			setState(1475);
 			match(T_OPEN_P);
-			setState(789);
+			setState(1476);
 			((Named_struct_defContext)_localctx).expr = expr(0);
 			((Named_struct_defContext)_localctx).col_exprs.add(((Named_struct_defContext)_localctx).expr);
-			setState(790);
+			setState(1477);
 			match(T_COMMA);
-			setState(791);
+			setState(1478);
 			((Named_struct_defContext)_localctx).expr = expr(0);
 			((Named_struct_defContext)_localctx).val_exprs.add(((Named_struct_defContext)_localctx).expr);
-			setState(799);
+			setState(1486);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T_COMMA) {
 				{
 				{
-				setState(792);
+				setState(1479);
 				match(T_COMMA);
-				setState(793);
+				setState(1480);
 				((Named_struct_defContext)_localctx).expr = expr(0);
 				((Named_struct_defContext)_localctx).col_exprs.add(((Named_struct_defContext)_localctx).expr);
-				setState(794);
+				setState(1481);
 				match(T_COMMA);
-				setState(795);
+				setState(1482);
 				((Named_struct_defContext)_localctx).expr = expr(0);
 				((Named_struct_defContext)_localctx).val_exprs.add(((Named_struct_defContext)_localctx).expr);
 				}
 				}
-				setState(801);
+				setState(1488);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(802);
+			setState(1489);
 			match(T_CLOSE_P);
 
 			        vector<json> col_exprs_json; vector<json> val_exprs_json;
@@ -4033,22 +7409,22 @@ public class HiveParser extends Parser {
 
 	public final Str_funcContext str_func() throws RecognitionException {
 		Str_funcContext _localctx = new Str_funcContext(_ctx, getState());
-		enterRule(_localctx, 64, RULE_str_func);
+		enterRule(_localctx, 148, RULE_str_func);
 		int _la;
 		try {
-			setState(1318);
+			setState(2005);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,53,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,109,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(805);
+				setState(1492);
 				match(T_ASCII);
-				setState(806);
+				setState(1493);
 				match(T_OPEN_P);
-				setState(807);
+				setState(1494);
 				((Str_funcContext)_localctx).expr = expr(0);
-				setState(808);
+				setState(1495);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("ASCII", "expr", ((Str_funcContext)_localctx).expr.res); 
 				}
@@ -4056,13 +7432,13 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(811);
+				setState(1498);
 				match(T_BASE64);
-				setState(812);
+				setState(1499);
 				match(T_OPEN_P);
-				setState(813);
+				setState(1500);
 				((Str_funcContext)_localctx).expr = expr(0);
-				setState(814);
+				setState(1501);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("BASE64", "expr", ((Str_funcContext)_localctx).expr.res); 
 				}
@@ -4070,13 +7446,13 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(817);
+				setState(1504);
 				match(T_CHARACTER_LENGTH);
-				setState(818);
+				setState(1505);
 				match(T_OPEN_P);
-				setState(819);
+				setState(1506);
 				((Str_funcContext)_localctx).expr = expr(0);
-				setState(820);
+				setState(1507);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("CHARACTER_LENGTH", "expr", ((Str_funcContext)_localctx).expr.res); 
 				}
@@ -4084,13 +7460,13 @@ public class HiveParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(823);
+				setState(1510);
 				match(T_CHR);
-				setState(824);
+				setState(1511);
 				match(T_OPEN_P);
-				setState(825);
+				setState(1512);
 				((Str_funcContext)_localctx).expr = expr(0);
-				setState(826);
+				setState(1513);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("CHR", "expr", ((Str_funcContext)_localctx).expr.res); 
 				}
@@ -4099,31 +7475,31 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 5);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(830);
+				setState(1517);
 				match(T_CONCAT);
-				setState(831);
+				setState(1518);
 				match(T_OPEN_P);
-				setState(832);
+				setState(1519);
 				((Str_funcContext)_localctx).expr = expr(0);
 				((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
-				setState(835); 
+				setState(1522); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(833);
+					setState(1520);
 					match(T_COMMA);
-					setState(834);
+					setState(1521);
 					((Str_funcContext)_localctx).expr = expr(0);
 					((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
 					}
 					}
-					setState(837); 
+					setState(1524); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==T_COMMA );
-				setState(839);
+				setState(1526);
 				match(T_CLOSE_P);
 
 				        vector<json> expr_list_json;
@@ -4136,35 +7512,35 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 6);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(843);
+				setState(1530);
 				match(T_CONCAT_WS);
-				setState(844);
+				setState(1531);
 				match(T_OPEN_P);
-				setState(845);
+				setState(1532);
 				((Str_funcContext)_localctx).sep = expr(0);
-				setState(846);
+				setState(1533);
 				match(T_COMMA);
-				setState(847);
+				setState(1534);
 				((Str_funcContext)_localctx).expr = expr(0);
 				((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
-				setState(850); 
+				setState(1537); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(848);
+					setState(1535);
 					match(T_COMMA);
-					setState(849);
+					setState(1536);
 					((Str_funcContext)_localctx).expr = expr(0);
 					((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
 					}
 					}
-					setState(852); 
+					setState(1539); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==T_COMMA );
-				setState(854);
+				setState(1541);
 				match(T_CLOSE_P);
 
 				        vector<json> expr_list_json;
@@ -4176,17 +7552,17 @@ public class HiveParser extends Parser {
 			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(857);
+				setState(1544);
 				match(T_DECODE);
-				setState(858);
+				setState(1545);
 				match(T_OPEN_P);
-				setState(859);
+				setState(1546);
 				((Str_funcContext)_localctx).expr_bin = expr(0);
-				setState(860);
+				setState(1547);
 				match(T_COMMA);
-				setState(861);
+				setState(1548);
 				((Str_funcContext)_localctx).expr_charset = expr(0);
-				setState(862);
+				setState(1549);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("DECODE", "binary_value", ((Str_funcContext)_localctx).expr_bin.res, "charset", ((Str_funcContext)_localctx).expr_charset.res); 
 				}
@@ -4195,35 +7571,35 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 8);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(866);
+				setState(1553);
 				match(T_ELT);
-				setState(867);
+				setState(1554);
 				match(T_OPEN_P);
-				setState(868);
+				setState(1555);
 				((Str_funcContext)_localctx).index_num = expr(0);
-				setState(869);
+				setState(1556);
 				match(T_COMMA);
-				setState(870);
+				setState(1557);
 				((Str_funcContext)_localctx).expr = expr(0);
 				((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
-				setState(875);
+				setState(1562);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(871);
+					setState(1558);
 					match(T_COMMA);
-					setState(872);
+					setState(1559);
 					((Str_funcContext)_localctx).expr = expr(0);
 					((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
 					}
 					}
-					setState(877);
+					setState(1564);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(878);
+				setState(1565);
 				match(T_CLOSE_P);
 
 				        vector<json> expr_list_json;
@@ -4235,17 +7611,17 @@ public class HiveParser extends Parser {
 			case 9:
 				enterOuterAlt(_localctx, 9);
 				{
-				setState(881);
+				setState(1568);
 				match(T_ENCODE);
-				setState(882);
+				setState(1569);
 				match(T_OPEN_P);
-				setState(883);
+				setState(1570);
 				((Str_funcContext)_localctx).expr_str = expr(0);
-				setState(884);
+				setState(1571);
 				match(T_COMMA);
-				setState(885);
+				setState(1572);
 				((Str_funcContext)_localctx).expr_charset = expr(0);
-				setState(886);
+				setState(1573);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("ENCODE", "str_value", ((Str_funcContext)_localctx).expr_str.res, "charset", ((Str_funcContext)_localctx).expr_charset.res); 
 				}
@@ -4254,35 +7630,35 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 10);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(890);
+				setState(1577);
 				match(T_FIELD);
-				setState(891);
+				setState(1578);
 				match(T_OPEN_P);
-				setState(892);
+				setState(1579);
 				((Str_funcContext)_localctx).expr_val = expr(0);
-				setState(893);
+				setState(1580);
 				match(T_COMMA);
-				setState(894);
+				setState(1581);
 				((Str_funcContext)_localctx).expr = expr(0);
 				((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
-				setState(899);
+				setState(1586);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(895);
+					setState(1582);
 					match(T_COMMA);
-					setState(896);
+					setState(1583);
 					((Str_funcContext)_localctx).expr = expr(0);
 					((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
 					}
 					}
-					setState(901);
+					setState(1588);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(902);
+				setState(1589);
 				match(T_CLOSE_P);
 
 				        vector<json> expr_list_json;
@@ -4294,17 +7670,17 @@ public class HiveParser extends Parser {
 			case 11:
 				enterOuterAlt(_localctx, 11);
 				{
-				setState(905);
+				setState(1592);
 				match(T_FIELD_IN_SET);
-				setState(906);
+				setState(1593);
 				match(T_OPEN_P);
-				setState(907);
+				setState(1594);
 				((Str_funcContext)_localctx).expr_str = expr(0);
-				setState(908);
+				setState(1595);
 				match(T_COMMA);
-				setState(909);
+				setState(1596);
 				((Str_funcContext)_localctx).expr_str_list = expr(0);
-				setState(910);
+				setState(1597);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("FIELD_IN_SET", "str_value", ((Str_funcContext)_localctx).expr_str.res, "str_list", ((Str_funcContext)_localctx).expr_str_list.res); 
 				}
@@ -4312,17 +7688,17 @@ public class HiveParser extends Parser {
 			case 12:
 				enterOuterAlt(_localctx, 12);
 				{
-				setState(913);
+				setState(1600);
 				match(T_FORMAT_NUMBER);
-				setState(914);
+				setState(1601);
 				match(T_OPEN_P);
-				setState(915);
+				setState(1602);
 				((Str_funcContext)_localctx).number_expr = expr(0);
-				setState(916);
+				setState(1603);
 				match(T_COMMA);
-				setState(917);
+				setState(1604);
 				((Str_funcContext)_localctx).int_expr = expr(0);
-				setState(918);
+				setState(1605);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("FORMAT_NUMBER", "number", ((Str_funcContext)_localctx).number_expr.res, "decimal_places", ((Str_funcContext)_localctx).int_expr.res); 
 				}
@@ -4330,17 +7706,17 @@ public class HiveParser extends Parser {
 			case 13:
 				enterOuterAlt(_localctx, 13);
 				{
-				setState(921);
+				setState(1608);
 				match(T_GET_JSON_OBJECTS);
-				setState(922);
+				setState(1609);
 				match(T_OPEN_P);
-				setState(923);
+				setState(1610);
 				((Str_funcContext)_localctx).json_string = expr(0);
-				setState(924);
+				setState(1611);
 				match(T_COMMA);
-				setState(925);
+				setState(1612);
 				((Str_funcContext)_localctx).path_expr = expr(0);
-				setState(926);
+				setState(1613);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("GET_JSON_OBJECTS", "json_string", ((Str_funcContext)_localctx).json_string.res, "path", ((Str_funcContext)_localctx).path_expr.res); 
 				}
@@ -4348,17 +7724,17 @@ public class HiveParser extends Parser {
 			case 14:
 				enterOuterAlt(_localctx, 14);
 				{
-				setState(929);
+				setState(1616);
 				match(T_IN_FILE);
-				setState(930);
+				setState(1617);
 				match(T_OPEN_P);
-				setState(931);
+				setState(1618);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(932);
+				setState(1619);
 				match(T_COMMA);
-				setState(933);
+				setState(1620);
 				((Str_funcContext)_localctx).filename = expr(0);
-				setState(934);
+				setState(1621);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("IN_FILE", "string", ((Str_funcContext)_localctx).str_expr.res, "filename", ((Str_funcContext)_localctx).filename.res); 
 				}
@@ -4366,17 +7742,17 @@ public class HiveParser extends Parser {
 			case 15:
 				enterOuterAlt(_localctx, 15);
 				{
-				setState(937);
+				setState(1624);
 				match(T_IN_STR);
-				setState(938);
+				setState(1625);
 				match(T_OPEN_P);
-				setState(939);
+				setState(1626);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(940);
+				setState(1627);
 				match(T_COMMA);
-				setState(941);
+				setState(1628);
 				((Str_funcContext)_localctx).substr_expr = expr(0);
-				setState(942);
+				setState(1629);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("IN_STR", "string", ((Str_funcContext)_localctx).str_expr.res, "substring", ((Str_funcContext)_localctx).substr_expr.res); 
 				}
@@ -4384,13 +7760,13 @@ public class HiveParser extends Parser {
 			case 16:
 				enterOuterAlt(_localctx, 16);
 				{
-				setState(945);
+				setState(1632);
 				match(T_LENGTH);
-				setState(946);
+				setState(1633);
 				match(T_OPEN_P);
-				setState(947);
+				setState(1634);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(948);
+				setState(1635);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("LENGTH", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4398,17 +7774,17 @@ public class HiveParser extends Parser {
 			case 17:
 				enterOuterAlt(_localctx, 17);
 				{
-				setState(951);
+				setState(1638);
 				match(T_LOCATE);
-				setState(952);
+				setState(1639);
 				match(T_OPEN_P);
-				setState(953);
+				setState(1640);
 				((Str_funcContext)_localctx).substr_expr = expr(0);
-				setState(954);
+				setState(1641);
 				match(T_COMMA);
-				setState(955);
+				setState(1642);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(956);
+				setState(1643);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("LOCATE", "substring", ((Str_funcContext)_localctx).substr_expr.res, "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4416,21 +7792,21 @@ public class HiveParser extends Parser {
 			case 18:
 				enterOuterAlt(_localctx, 18);
 				{
-				setState(959);
+				setState(1646);
 				match(T_LOCATE);
-				setState(960);
+				setState(1647);
 				match(T_OPEN_P);
-				setState(961);
+				setState(1648);
 				((Str_funcContext)_localctx).substr_expr = expr(0);
-				setState(962);
+				setState(1649);
 				match(T_COMMA);
-				setState(963);
+				setState(1650);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(964);
+				setState(1651);
 				match(T_COMMA);
-				setState(965);
+				setState(1652);
 				((Str_funcContext)_localctx).pos = expr(0);
-				setState(966);
+				setState(1653);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("LOCATE", "substring", ((Str_funcContext)_localctx).substr_expr.res, "string", ((Str_funcContext)_localctx).str_expr.res,"position", ((Str_funcContext)_localctx).pos.res); 
 				}
@@ -4438,7 +7814,7 @@ public class HiveParser extends Parser {
 			case 19:
 				enterOuterAlt(_localctx, 19);
 				{
-				setState(969);
+				setState(1656);
 				_la = _input.LA(1);
 				if ( !(_la==T_LCASE || _la==T_LOWER) ) {
 				_errHandler.recoverInline(this);
@@ -4448,11 +7824,11 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(970);
+				setState(1657);
 				match(T_OPEN_P);
-				setState(971);
+				setState(1658);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(972);
+				setState(1659);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("LOWER_CASE", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4460,21 +7836,21 @@ public class HiveParser extends Parser {
 			case 20:
 				enterOuterAlt(_localctx, 20);
 				{
-				setState(975);
+				setState(1662);
 				match(T_LPAD);
-				setState(976);
+				setState(1663);
 				match(T_OPEN_P);
-				setState(977);
+				setState(1664);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(978);
+				setState(1665);
 				match(T_COMMA);
-				setState(979);
+				setState(1666);
 				((Str_funcContext)_localctx).len = expr(0);
-				setState(980);
+				setState(1667);
 				match(T_COMMA);
-				setState(981);
+				setState(1668);
 				((Str_funcContext)_localctx).pad = expr(0);
-				setState(982);
+				setState(1669);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("LPAD", "string", ((Str_funcContext)_localctx).str_expr.res, "length", ((Str_funcContext)_localctx).len.res,"pad", ((Str_funcContext)_localctx).pad.res); 
 				}
@@ -4482,13 +7858,13 @@ public class HiveParser extends Parser {
 			case 21:
 				enterOuterAlt(_localctx, 21);
 				{
-				setState(985);
+				setState(1672);
 				match(T_LTRIM);
-				setState(986);
+				setState(1673);
 				match(T_OPEN_P);
-				setState(987);
+				setState(1674);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(988);
+				setState(1675);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("LTRIM", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4496,13 +7872,13 @@ public class HiveParser extends Parser {
 			case 22:
 				enterOuterAlt(_localctx, 22);
 				{
-				setState(991);
+				setState(1678);
 				match(T_OCTET_LENGTH);
-				setState(992);
+				setState(1679);
 				match(T_OPEN_P);
-				setState(993);
+				setState(1680);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(994);
+				setState(1681);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("OCTET_LENGTH", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4510,17 +7886,17 @@ public class HiveParser extends Parser {
 			case 23:
 				enterOuterAlt(_localctx, 23);
 				{
-				setState(997);
+				setState(1684);
 				match(T_PARSE_URL);
-				setState(998);
+				setState(1685);
 				match(T_OPEN_P);
-				setState(999);
+				setState(1686);
 				((Str_funcContext)_localctx).url_str = expr(0);
-				setState(1000);
+				setState(1687);
 				match(T_COMMA);
-				setState(1001);
+				setState(1688);
 				((Str_funcContext)_localctx).part_to_extract = expr(0);
-				setState(1002);
+				setState(1689);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("PARSE_URL", "url_str", ((Str_funcContext)_localctx).url_str.res, "part_to_extract", ((Str_funcContext)_localctx).part_to_extract.res); 
 				}
@@ -4528,21 +7904,21 @@ public class HiveParser extends Parser {
 			case 24:
 				enterOuterAlt(_localctx, 24);
 				{
-				setState(1005);
+				setState(1692);
 				match(T_PARSE_URL);
-				setState(1006);
+				setState(1693);
 				match(T_OPEN_P);
-				setState(1007);
+				setState(1694);
 				((Str_funcContext)_localctx).url_str = expr(0);
-				setState(1008);
+				setState(1695);
 				match(T_COMMA);
-				setState(1009);
+				setState(1696);
 				((Str_funcContext)_localctx).part_to_extract = expr(0);
-				setState(1010);
+				setState(1697);
 				match(T_COMMA);
-				setState(1011);
+				setState(1698);
 				((Str_funcContext)_localctx).key_to_extract = expr(0);
-				setState(1012);
+				setState(1699);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("PARSE_URL", "url_str", ((Str_funcContext)_localctx).url_str.res, "part_to_extract", ((Str_funcContext)_localctx).part_to_extract.res, "key_to_extract", ((Str_funcContext)_localctx).key_to_extract.res); 
 				}
@@ -4551,35 +7927,35 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 25);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(1016);
+				setState(1703);
 				match(T_PRINTF);
-				setState(1017);
+				setState(1704);
 				match(T_OPEN_P);
-				setState(1018);
+				setState(1705);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1019);
+				setState(1706);
 				match(T_COMMA);
-				setState(1020);
+				setState(1707);
 				((Str_funcContext)_localctx).expr = expr(0);
 				((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
-				setState(1023); 
+				setState(1710); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(1021);
+					setState(1708);
 					match(T_COMMA);
-					setState(1022);
+					setState(1709);
 					((Str_funcContext)_localctx).expr = expr(0);
 					((Str_funcContext)_localctx).exprs.add(((Str_funcContext)_localctx).expr);
 					}
 					}
-					setState(1025); 
+					setState(1712); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==T_COMMA );
-				setState(1027);
+				setState(1714);
 				match(T_CLOSE_P);
 
 				        vector<json> expr_list_json;
@@ -4591,13 +7967,13 @@ public class HiveParser extends Parser {
 			case 26:
 				enterOuterAlt(_localctx, 26);
 				{
-				setState(1030);
+				setState(1717);
 				match(T_QUOTE);
-				setState(1031);
+				setState(1718);
 				match(T_OPEN_P);
-				setState(1032);
+				setState(1719);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1033);
+				setState(1720);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("QUOTE", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4605,21 +7981,21 @@ public class HiveParser extends Parser {
 			case 27:
 				enterOuterAlt(_localctx, 27);
 				{
-				setState(1036);
+				setState(1723);
 				match(T_REGEXP_EXTRACT);
-				setState(1037);
+				setState(1724);
 				match(T_OPEN_P);
-				setState(1038);
+				setState(1725);
 				((Str_funcContext)_localctx).subject = expr(0);
-				setState(1039);
+				setState(1726);
 				match(T_COMMA);
-				setState(1040);
+				setState(1727);
 				((Str_funcContext)_localctx).pattern = expr(0);
-				setState(1041);
+				setState(1728);
 				match(T_COMMA);
-				setState(1042);
+				setState(1729);
 				((Str_funcContext)_localctx).index = expr(0);
-				setState(1043);
+				setState(1730);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("REGEXP_EXTRACT", "subject", ((Str_funcContext)_localctx).subject.res, "pattern", ((Str_funcContext)_localctx).pattern.res,"index", ((Str_funcContext)_localctx).index.res); 
 				}
@@ -4627,21 +8003,21 @@ public class HiveParser extends Parser {
 			case 28:
 				enterOuterAlt(_localctx, 28);
 				{
-				setState(1046);
+				setState(1733);
 				match(T_REGEXP_REPLACE);
-				setState(1047);
+				setState(1734);
 				match(T_OPEN_P);
-				setState(1048);
+				setState(1735);
 				((Str_funcContext)_localctx).initial_string = expr(0);
-				setState(1049);
+				setState(1736);
 				match(T_COMMA);
-				setState(1050);
+				setState(1737);
 				((Str_funcContext)_localctx).pattern = expr(0);
-				setState(1051);
+				setState(1738);
 				match(T_COMMA);
-				setState(1052);
+				setState(1739);
 				((Str_funcContext)_localctx).replacement = expr(0);
-				setState(1053);
+				setState(1740);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("REGEXP_REPLACE", "initial_string", ((Str_funcContext)_localctx).initial_string.res, "pattern", ((Str_funcContext)_localctx).pattern.res,"replacement", ((Str_funcContext)_localctx).replacement.res); 
 				}
@@ -4649,17 +8025,17 @@ public class HiveParser extends Parser {
 			case 29:
 				enterOuterAlt(_localctx, 29);
 				{
-				setState(1056);
+				setState(1743);
 				match(T_REPEAT);
-				setState(1057);
+				setState(1744);
 				match(T_OPEN_P);
-				setState(1058);
+				setState(1745);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1059);
+				setState(1746);
 				match(T_COMMA);
-				setState(1060);
+				setState(1747);
 				((Str_funcContext)_localctx).n_times_expr = expr(0);
-				setState(1061);
+				setState(1748);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("REPEAT", "string", ((Str_funcContext)_localctx).str_expr.res, "n", ((Str_funcContext)_localctx).n_times_expr.res); 
 				}
@@ -4667,21 +8043,21 @@ public class HiveParser extends Parser {
 			case 30:
 				enterOuterAlt(_localctx, 30);
 				{
-				setState(1064);
+				setState(1751);
 				match(T_REPLACE);
-				setState(1065);
+				setState(1752);
 				match(T_OPEN_P);
-				setState(1066);
+				setState(1753);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1067);
+				setState(1754);
 				match(T_COMMA);
-				setState(1068);
+				setState(1755);
 				((Str_funcContext)_localctx).old = expr(0);
-				setState(1069);
+				setState(1756);
 				match(T_COMMA);
-				setState(1070);
+				setState(1757);
 				((Str_funcContext)_localctx).new_expr = expr(0);
-				setState(1071);
+				setState(1758);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("REPLACE", "string", ((Str_funcContext)_localctx).str_expr.res, "old", ((Str_funcContext)_localctx).old.res,"new", ((Str_funcContext)_localctx).new_expr.res); 
 				}
@@ -4689,13 +8065,13 @@ public class HiveParser extends Parser {
 			case 31:
 				enterOuterAlt(_localctx, 31);
 				{
-				setState(1074);
+				setState(1761);
 				match(T_REVERSE);
-				setState(1075);
+				setState(1762);
 				match(T_OPEN_P);
-				setState(1076);
+				setState(1763);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1077);
+				setState(1764);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("REVERSE", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4703,21 +8079,21 @@ public class HiveParser extends Parser {
 			case 32:
 				enterOuterAlt(_localctx, 32);
 				{
-				setState(1080);
+				setState(1767);
 				match(T_RPAD);
-				setState(1081);
+				setState(1768);
 				match(T_OPEN_P);
-				setState(1082);
+				setState(1769);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1083);
+				setState(1770);
 				match(T_COMMA);
-				setState(1084);
+				setState(1771);
 				((Str_funcContext)_localctx).len = expr(0);
-				setState(1085);
+				setState(1772);
 				match(T_COMMA);
-				setState(1086);
+				setState(1773);
 				((Str_funcContext)_localctx).pad = expr(0);
-				setState(1087);
+				setState(1774);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("RPAD", "string", ((Str_funcContext)_localctx).str_expr.res, "length", ((Str_funcContext)_localctx).len.res,"pad", ((Str_funcContext)_localctx).pad.res); 
 				}
@@ -4725,13 +8101,13 @@ public class HiveParser extends Parser {
 			case 33:
 				enterOuterAlt(_localctx, 33);
 				{
-				setState(1090);
+				setState(1777);
 				match(T_RTRIM);
-				setState(1091);
+				setState(1778);
 				match(T_OPEN_P);
-				setState(1092);
+				setState(1779);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1093);
+				setState(1780);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("RTRIM", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4739,21 +8115,21 @@ public class HiveParser extends Parser {
 			case 34:
 				enterOuterAlt(_localctx, 34);
 				{
-				setState(1096);
+				setState(1783);
 				match(T_SENTENCES);
-				setState(1097);
+				setState(1784);
 				match(T_OPEN_P);
-				setState(1098);
+				setState(1785);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1099);
+				setState(1786);
 				match(T_COMMA);
-				setState(1100);
+				setState(1787);
 				((Str_funcContext)_localctx).lang_expr = expr(0);
-				setState(1101);
+				setState(1788);
 				match(T_COMMA);
-				setState(1102);
+				setState(1789);
 				((Str_funcContext)_localctx).locale_expr = expr(0);
-				setState(1103);
+				setState(1790);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("SENTENCES", "string", ((Str_funcContext)_localctx).str_expr.res, "lang", ((Str_funcContext)_localctx).lang_expr.res, "locale", ((Str_funcContext)_localctx).locale_expr.res); 
 				}
@@ -4761,13 +8137,13 @@ public class HiveParser extends Parser {
 			case 35:
 				enterOuterAlt(_localctx, 35);
 				{
-				setState(1106);
+				setState(1793);
 				match(T_SPACE);
-				setState(1107);
+				setState(1794);
 				match(T_OPEN_P);
-				setState(1108);
+				setState(1795);
 				((Str_funcContext)_localctx).size_expr = expr(0);
-				setState(1109);
+				setState(1796);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("SPACE", "size", ((Str_funcContext)_localctx).size_expr.res); 
 				}
@@ -4775,17 +8151,17 @@ public class HiveParser extends Parser {
 			case 36:
 				enterOuterAlt(_localctx, 36);
 				{
-				setState(1112);
+				setState(1799);
 				match(T_SPLIT);
-				setState(1113);
+				setState(1800);
 				match(T_OPEN_P);
-				setState(1114);
+				setState(1801);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1115);
+				setState(1802);
 				match(T_COMMA);
-				setState(1116);
+				setState(1803);
 				((Str_funcContext)_localctx).pattern = expr(0);
-				setState(1117);
+				setState(1804);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("SPLIT", "string", ((Str_funcContext)_localctx).str_expr.res, "pattern", ((Str_funcContext)_localctx).pattern.res); 
 				}
@@ -4793,13 +8169,13 @@ public class HiveParser extends Parser {
 			case 37:
 				enterOuterAlt(_localctx, 37);
 				{
-				setState(1120);
+				setState(1807);
 				match(T_STR_TO_MAP);
-				setState(1121);
+				setState(1808);
 				match(T_OPEN_P);
-				setState(1122);
+				setState(1809);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1123);
+				setState(1810);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("STR_TO_MAP", "string", ((Str_funcContext)_localctx).str_expr.res, "delimiter1", hql_string_type(";"), "delimiter2", hql_string_type(":")); 
 				}
@@ -4807,17 +8183,17 @@ public class HiveParser extends Parser {
 			case 38:
 				enterOuterAlt(_localctx, 38);
 				{
-				setState(1126);
+				setState(1813);
 				match(T_STR_TO_MAP);
-				setState(1127);
+				setState(1814);
 				match(T_OPEN_P);
-				setState(1128);
+				setState(1815);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1129);
+				setState(1816);
 				match(T_COMMA);
-				setState(1130);
+				setState(1817);
 				((Str_funcContext)_localctx).delimiter1 = expr(0);
-				setState(1131);
+				setState(1818);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("STR_TO_MAP", "string", ((Str_funcContext)_localctx).str_expr.res, "delimiter1", ((Str_funcContext)_localctx).delimiter1.res, "delimiter2", hql_string_type(":")); 
 				}
@@ -4825,21 +8201,21 @@ public class HiveParser extends Parser {
 			case 39:
 				enterOuterAlt(_localctx, 39);
 				{
-				setState(1134);
+				setState(1821);
 				match(T_STR_TO_MAP);
-				setState(1135);
+				setState(1822);
 				match(T_OPEN_P);
-				setState(1136);
+				setState(1823);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1137);
+				setState(1824);
 				match(T_COMMA);
-				setState(1138);
+				setState(1825);
 				((Str_funcContext)_localctx).delimiter1 = expr(0);
-				setState(1139);
+				setState(1826);
 				match(T_COMMA);
-				setState(1140);
+				setState(1827);
 				((Str_funcContext)_localctx).delimiter2 = expr(0);
-				setState(1141);
+				setState(1828);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("STR_TO_MAP", "string", ((Str_funcContext)_localctx).str_expr.res, "delimiter1", ((Str_funcContext)_localctx).delimiter1.res, "delimiter2",((Str_funcContext)_localctx).delimiter2.res); 
 				}
@@ -4847,7 +8223,7 @@ public class HiveParser extends Parser {
 			case 40:
 				enterOuterAlt(_localctx, 40);
 				{
-				setState(1144);
+				setState(1831);
 				_la = _input.LA(1);
 				if ( !(_la==T_SUBSTR || _la==T_SUBSTRING) ) {
 				_errHandler.recoverInline(this);
@@ -4857,15 +8233,15 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1145);
+				setState(1832);
 				match(T_OPEN_P);
-				setState(1146);
+				setState(1833);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1147);
+				setState(1834);
 				match(T_COMMA);
-				setState(1148);
+				setState(1835);
 				((Str_funcContext)_localctx).start_indx = expr(0);
-				setState(1149);
+				setState(1836);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("SUBSTRING", "string", ((Str_funcContext)_localctx).str_expr.res, "start", ((Str_funcContext)_localctx).start_indx.res); 
 				}
@@ -4873,7 +8249,7 @@ public class HiveParser extends Parser {
 			case 41:
 				enterOuterAlt(_localctx, 41);
 				{
-				setState(1152);
+				setState(1839);
 				_la = _input.LA(1);
 				if ( !(_la==T_SUBSTR || _la==T_SUBSTRING) ) {
 				_errHandler.recoverInline(this);
@@ -4883,19 +8259,19 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1153);
+				setState(1840);
 				match(T_OPEN_P);
-				setState(1154);
+				setState(1841);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1155);
+				setState(1842);
 				match(T_COMMA);
-				setState(1156);
+				setState(1843);
 				((Str_funcContext)_localctx).start_indx = expr(0);
-				setState(1157);
+				setState(1844);
 				match(T_COMMA);
-				setState(1158);
+				setState(1845);
 				((Str_funcContext)_localctx).lenght_expr = expr(0);
-				setState(1159);
+				setState(1846);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("SUBSTRING", "string", ((Str_funcContext)_localctx).str_expr.res, "start", ((Str_funcContext)_localctx).start_indx.res, "length", ((Str_funcContext)_localctx).lenght_expr.res); 
 				}
@@ -4903,21 +8279,21 @@ public class HiveParser extends Parser {
 			case 42:
 				enterOuterAlt(_localctx, 42);
 				{
-				setState(1162);
+				setState(1849);
 				match(T_SUBSTRING_INDEX);
-				setState(1163);
+				setState(1850);
 				match(T_OPEN_P);
-				setState(1164);
+				setState(1851);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1165);
+				setState(1852);
 				match(T_COMMA);
-				setState(1166);
+				setState(1853);
 				((Str_funcContext)_localctx).delimiter = expr(0);
-				setState(1167);
+				setState(1854);
 				match(T_COMMA);
-				setState(1168);
+				setState(1855);
 				((Str_funcContext)_localctx).count = expr(0);
-				setState(1169);
+				setState(1856);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("SUBSTRING_INDEX", "string", ((Str_funcContext)_localctx).str_expr.res, "delimiter", ((Str_funcContext)_localctx).delimiter.res, "count", ((Str_funcContext)_localctx).count.res); 
 				}
@@ -4925,21 +8301,21 @@ public class HiveParser extends Parser {
 			case 43:
 				enterOuterAlt(_localctx, 43);
 				{
-				setState(1172);
+				setState(1859);
 				match(T_TRANSLATE);
-				setState(1173);
+				setState(1860);
 				match(T_OPEN_P);
-				setState(1174);
+				setState(1861);
 				((Str_funcContext)_localctx).input_expr = expr(0);
-				setState(1175);
+				setState(1862);
 				match(T_COMMA);
-				setState(1176);
+				setState(1863);
 				((Str_funcContext)_localctx).from_expr = expr(0);
-				setState(1177);
+				setState(1864);
 				match(T_COMMA);
-				setState(1178);
+				setState(1865);
 				((Str_funcContext)_localctx).to_expr = expr(0);
-				setState(1179);
+				setState(1866);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("TRANSLATE", "input", ((Str_funcContext)_localctx).input_expr.res, "from", ((Str_funcContext)_localctx).from_expr.res, "to", ((Str_funcContext)_localctx).to_expr.res); 
 				}
@@ -4947,13 +8323,13 @@ public class HiveParser extends Parser {
 			case 44:
 				enterOuterAlt(_localctx, 44);
 				{
-				setState(1182);
+				setState(1869);
 				match(T_TRIM);
-				setState(1183);
+				setState(1870);
 				match(T_OPEN_P);
-				setState(1184);
+				setState(1871);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1185);
+				setState(1872);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("TRIM", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4961,13 +8337,13 @@ public class HiveParser extends Parser {
 			case 45:
 				enterOuterAlt(_localctx, 45);
 				{
-				setState(1188);
+				setState(1875);
 				match(T_UNBASE64);
-				setState(1189);
+				setState(1876);
 				match(T_OPEN_P);
-				setState(1190);
+				setState(1877);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1191);
+				setState(1878);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("UNBASE64", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4975,7 +8351,7 @@ public class HiveParser extends Parser {
 			case 46:
 				enterOuterAlt(_localctx, 46);
 				{
-				setState(1194);
+				setState(1881);
 				_la = _input.LA(1);
 				if ( !(_la==T_UCASE || _la==T_UPPER) ) {
 				_errHandler.recoverInline(this);
@@ -4985,11 +8361,11 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1195);
+				setState(1882);
 				match(T_OPEN_P);
-				setState(1196);
+				setState(1883);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1197);
+				setState(1884);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("UPPERCASE", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -4997,13 +8373,13 @@ public class HiveParser extends Parser {
 			case 47:
 				enterOuterAlt(_localctx, 47);
 				{
-				setState(1200);
+				setState(1887);
 				match(T_INITCAP);
-				setState(1201);
+				setState(1888);
 				match(T_OPEN_P);
-				setState(1202);
+				setState(1889);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1203);
+				setState(1890);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("INITCAP", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -5011,17 +8387,17 @@ public class HiveParser extends Parser {
 			case 48:
 				enterOuterAlt(_localctx, 48);
 				{
-				setState(1206);
+				setState(1893);
 				match(T_LEVENSHTEIN);
-				setState(1207);
+				setState(1894);
 				match(T_OPEN_P);
-				setState(1208);
+				setState(1895);
 				((Str_funcContext)_localctx).strA_expr = expr(0);
-				setState(1209);
+				setState(1896);
 				match(T_COMMA);
-				setState(1210);
+				setState(1897);
 				((Str_funcContext)_localctx).strB_expr = expr(0);
-				setState(1211);
+				setState(1898);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("LEVENSHTEIN", "string_A", ((Str_funcContext)_localctx).strA_expr.res, "string_B", ((Str_funcContext)_localctx).strB_expr.res); 
 				}
@@ -5029,13 +8405,13 @@ public class HiveParser extends Parser {
 			case 49:
 				enterOuterAlt(_localctx, 49);
 				{
-				setState(1214);
+				setState(1901);
 				match(T_SOUNDEX);
-				setState(1215);
+				setState(1902);
 				match(T_OPEN_P);
-				setState(1216);
+				setState(1903);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1217);
+				setState(1904);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("SOUNDEX", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -5043,13 +8419,13 @@ public class HiveParser extends Parser {
 			case 50:
 				enterOuterAlt(_localctx, 50);
 				{
-				setState(1220);
+				setState(1907);
 				match(T_MASK);
-				setState(1221);
+				setState(1908);
 				match(T_OPEN_P);
-				setState(1222);
+				setState(1909);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1223);
+				setState(1910);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("MASK", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -5057,17 +8433,17 @@ public class HiveParser extends Parser {
 			case 51:
 				enterOuterAlt(_localctx, 51);
 				{
-				setState(1226);
+				setState(1913);
 				match(T_MASK);
-				setState(1227);
+				setState(1914);
 				match(T_OPEN_P);
-				setState(1228);
+				setState(1915);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1229);
+				setState(1916);
 				match(T_COMMA);
-				setState(1230);
+				setState(1917);
 				((Str_funcContext)_localctx).str_upper_expr = expr(0);
-				setState(1231);
+				setState(1918);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("MASK", "string", ((Str_funcContext)_localctx).str_expr.res, "upper", ((Str_funcContext)_localctx).str_upper_expr.res); 
 				}
@@ -5075,21 +8451,21 @@ public class HiveParser extends Parser {
 			case 52:
 				enterOuterAlt(_localctx, 52);
 				{
-				setState(1234);
+				setState(1921);
 				match(T_MASK);
-				setState(1235);
+				setState(1922);
 				match(T_OPEN_P);
-				setState(1236);
+				setState(1923);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1237);
+				setState(1924);
 				match(T_COMMA);
-				setState(1238);
+				setState(1925);
 				((Str_funcContext)_localctx).str_upper_expr = expr(0);
-				setState(1239);
+				setState(1926);
 				match(T_COMMA);
-				setState(1240);
+				setState(1927);
 				((Str_funcContext)_localctx).str_lower_expr = expr(0);
-				setState(1241);
+				setState(1928);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_three_param_func("MASK", "string", ((Str_funcContext)_localctx).str_expr.res, "upper", ((Str_funcContext)_localctx).str_upper_expr.res, "lower", ((Str_funcContext)_localctx).str_lower_expr.res); 
 				}
@@ -5097,25 +8473,25 @@ public class HiveParser extends Parser {
 			case 53:
 				enterOuterAlt(_localctx, 53);
 				{
-				setState(1244);
+				setState(1931);
 				match(T_MASK);
-				setState(1245);
+				setState(1932);
 				match(T_OPEN_P);
-				setState(1246);
+				setState(1933);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1247);
+				setState(1934);
 				match(T_COMMA);
-				setState(1248);
+				setState(1935);
 				((Str_funcContext)_localctx).str_upper_expr = expr(0);
-				setState(1249);
+				setState(1936);
 				match(T_COMMA);
-				setState(1250);
+				setState(1937);
 				((Str_funcContext)_localctx).str_lower_expr = expr(0);
-				setState(1251);
+				setState(1938);
 				match(T_COMMA);
-				setState(1252);
+				setState(1939);
 				((Str_funcContext)_localctx).str_number_expr = expr(0);
-				setState(1253);
+				setState(1940);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_four_param_func("MASK", "string", ((Str_funcContext)_localctx).str_expr.res, "upper", ((Str_funcContext)_localctx).str_upper_expr.res, "lower", ((Str_funcContext)_localctx).str_lower_expr.res, "number", ((Str_funcContext)_localctx).str_number_expr.res); 
 				}
@@ -5123,13 +8499,13 @@ public class HiveParser extends Parser {
 			case 54:
 				enterOuterAlt(_localctx, 54);
 				{
-				setState(1256);
+				setState(1943);
 				match(T_MASK_FIRST_N);
-				setState(1257);
+				setState(1944);
 				match(T_OPEN_P);
-				setState(1258);
+				setState(1945);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1259);
+				setState(1946);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("MASK_FIRST_N", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -5137,17 +8513,17 @@ public class HiveParser extends Parser {
 			case 55:
 				enterOuterAlt(_localctx, 55);
 				{
-				setState(1262);
+				setState(1949);
 				match(T_MASK_FIRST_N);
-				setState(1263);
+				setState(1950);
 				match(T_OPEN_P);
-				setState(1264);
+				setState(1951);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1265);
+				setState(1952);
 				match(T_COMMA);
-				setState(1266);
+				setState(1953);
 				((Str_funcContext)_localctx).n_expr = expr(0);
-				setState(1267);
+				setState(1954);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("MASK_FIRST_N", "string", ((Str_funcContext)_localctx).str_expr.res, "n", ((Str_funcContext)_localctx).n_expr.res); 
 				}
@@ -5155,13 +8531,13 @@ public class HiveParser extends Parser {
 			case 56:
 				enterOuterAlt(_localctx, 56);
 				{
-				setState(1270);
+				setState(1957);
 				match(T_MASK_LAST_N);
-				setState(1271);
+				setState(1958);
 				match(T_OPEN_P);
-				setState(1272);
+				setState(1959);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1273);
+				setState(1960);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("MASK_LAST_N", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -5169,17 +8545,17 @@ public class HiveParser extends Parser {
 			case 57:
 				enterOuterAlt(_localctx, 57);
 				{
-				setState(1276);
+				setState(1963);
 				match(T_MASK_LAST_N);
-				setState(1277);
+				setState(1964);
 				match(T_OPEN_P);
-				setState(1278);
+				setState(1965);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1279);
+				setState(1966);
 				match(T_COMMA);
-				setState(1280);
+				setState(1967);
 				((Str_funcContext)_localctx).n_expr = expr(0);
-				setState(1281);
+				setState(1968);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("MASK_LAST_N", "string", ((Str_funcContext)_localctx).str_expr.res, "n", ((Str_funcContext)_localctx).n_expr.res); 
 				}
@@ -5187,13 +8563,13 @@ public class HiveParser extends Parser {
 			case 58:
 				enterOuterAlt(_localctx, 58);
 				{
-				setState(1284);
+				setState(1971);
 				match(T_MASK_SHOW_FIRST_N);
-				setState(1285);
+				setState(1972);
 				match(T_OPEN_P);
-				setState(1286);
+				setState(1973);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1287);
+				setState(1974);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("MASK_SHOW_FIRST_N", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -5201,17 +8577,17 @@ public class HiveParser extends Parser {
 			case 59:
 				enterOuterAlt(_localctx, 59);
 				{
-				setState(1290);
+				setState(1977);
 				match(T_MASK_SHOW_FIRST_N);
-				setState(1291);
+				setState(1978);
 				match(T_OPEN_P);
-				setState(1292);
+				setState(1979);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1293);
+				setState(1980);
 				match(T_COMMA);
-				setState(1294);
+				setState(1981);
 				((Str_funcContext)_localctx).n_expr = expr(0);
-				setState(1295);
+				setState(1982);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("MASK_SHOW_FIRST_N", "string", ((Str_funcContext)_localctx).str_expr.res, "n", ((Str_funcContext)_localctx).n_expr.res); 
 				}
@@ -5219,13 +8595,13 @@ public class HiveParser extends Parser {
 			case 60:
 				enterOuterAlt(_localctx, 60);
 				{
-				setState(1298);
+				setState(1985);
 				match(T_MASK_SHOW_LAST_N);
-				setState(1299);
+				setState(1986);
 				match(T_OPEN_P);
-				setState(1300);
+				setState(1987);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1301);
+				setState(1988);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("MASK_SHOW_LAST_N", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -5233,17 +8609,17 @@ public class HiveParser extends Parser {
 			case 61:
 				enterOuterAlt(_localctx, 61);
 				{
-				setState(1304);
+				setState(1991);
 				match(T_MASK_SHOW_LAST_N);
-				setState(1305);
+				setState(1992);
 				match(T_OPEN_P);
-				setState(1306);
+				setState(1993);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1307);
+				setState(1994);
 				match(T_COMMA);
-				setState(1308);
+				setState(1995);
 				((Str_funcContext)_localctx).n_expr = expr(0);
-				setState(1309);
+				setState(1996);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_double_param_func("MASK_SHOW_LAST_N", "string", ((Str_funcContext)_localctx).str_expr.res, "n", ((Str_funcContext)_localctx).n_expr.res); 
 				}
@@ -5251,13 +8627,13 @@ public class HiveParser extends Parser {
 			case 62:
 				enterOuterAlt(_localctx, 62);
 				{
-				setState(1312);
+				setState(1999);
 				match(T_MASK_HASH);
-				setState(1313);
+				setState(2000);
 				match(T_OPEN_P);
-				setState(1314);
+				setState(2001);
 				((Str_funcContext)_localctx).str_expr = expr(0);
-				setState(1315);
+				setState(2002);
 				match(T_CLOSE_P);
 				 ((Str_funcContext)_localctx).res =  hql_single_param_func("MASK_HASH", "string", ((Str_funcContext)_localctx).str_expr.res); 
 				}
@@ -5325,44 +8701,44 @@ public class HiveParser extends Parser {
 
 	public final Misc_funcContext misc_func() throws RecognitionException {
 		Misc_funcContext _localctx = new Misc_funcContext(_ctx, getState());
-		enterRule(_localctx, 66, RULE_misc_func);
+		enterRule(_localctx, 150, RULE_misc_func);
 		int _la;
 		try {
-			setState(1420);
+			setState(2107);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_JAVA_METHOD:
 				enterOuterAlt(_localctx, 1);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(1321);
+				setState(2008);
 				match(T_JAVA_METHOD);
-				setState(1322);
+				setState(2009);
 				match(T_OPEN_P);
-				setState(1323);
+				setState(2010);
 				((Misc_funcContext)_localctx).class_name_expr = expr(0);
-				setState(1324);
+				setState(2011);
 				match(T_COMMA);
-				setState(1325);
+				setState(2012);
 				((Misc_funcContext)_localctx).method_name_expr = expr(0);
-				setState(1330);
+				setState(2017);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(1326);
+					setState(2013);
 					match(T_COMMA);
-					setState(1327);
+					setState(2014);
 					((Misc_funcContext)_localctx).expr = expr(0);
 					((Misc_funcContext)_localctx).exprs.add(((Misc_funcContext)_localctx).expr);
 					}
 					}
-					setState(1332);
+					setState(2019);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(1333);
+				setState(2020);
 				match(T_CLOSE_P);
 
 				        vector<json> expr_list_json;
@@ -5375,34 +8751,34 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(1337);
+				setState(2024);
 				match(T_REFLECT);
-				setState(1338);
+				setState(2025);
 				match(T_OPEN_P);
-				setState(1339);
+				setState(2026);
 				((Misc_funcContext)_localctx).class_name_expr = expr(0);
-				setState(1340);
+				setState(2027);
 				match(T_COMMA);
-				setState(1341);
+				setState(2028);
 				((Misc_funcContext)_localctx).method_name_expr = expr(0);
-				setState(1346);
+				setState(2033);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(1342);
+					setState(2029);
 					match(T_COMMA);
-					setState(1343);
+					setState(2030);
 					((Misc_funcContext)_localctx).expr = expr(0);
 					((Misc_funcContext)_localctx).exprs.add(((Misc_funcContext)_localctx).expr);
 					}
 					}
-					setState(1348);
+					setState(2035);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(1349);
+				setState(2036);
 				match(T_CLOSE_P);
 
 				        vector<json> expr_list_json;
@@ -5415,31 +8791,31 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 3);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(1353);
+				setState(2040);
 				match(T_HASH);
-				setState(1354);
+				setState(2041);
 				match(T_OPEN_P);
-				setState(1355);
+				setState(2042);
 				((Misc_funcContext)_localctx).expr = expr(0);
 				((Misc_funcContext)_localctx).exprs.add(((Misc_funcContext)_localctx).expr);
-				setState(1360);
+				setState(2047);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(1356);
+					setState(2043);
 					match(T_COMMA);
-					setState(1357);
+					setState(2044);
 					((Misc_funcContext)_localctx).expr = expr(0);
 					((Misc_funcContext)_localctx).exprs.add(((Misc_funcContext)_localctx).expr);
 					}
 					}
-					setState(1362);
+					setState(2049);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(1363);
+				setState(2050);
 				match(T_CLOSE_P);
 
 				        vector<json> expr_list_json;
@@ -5451,11 +8827,11 @@ public class HiveParser extends Parser {
 			case T_CURRENT_USER:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(1366);
+				setState(2053);
 				match(T_CURRENT_USER);
-				setState(1367);
+				setState(2054);
 				match(T_OPEN_P);
-				setState(1368);
+				setState(2055);
 				match(T_CLOSE_P);
 				 ((Misc_funcContext)_localctx).res =  hql_fixed_func("CURRENT_USER"); 
 				}
@@ -5463,11 +8839,11 @@ public class HiveParser extends Parser {
 			case T_LOGGED_IN_USER:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(1370);
+				setState(2057);
 				match(T_LOGGED_IN_USER);
-				setState(1371);
+				setState(2058);
 				match(T_OPEN_P);
-				setState(1372);
+				setState(2059);
 				match(T_CLOSE_P);
 				 ((Misc_funcContext)_localctx).res =  hql_fixed_func("LOGGED_IN_USER"); 
 				}
@@ -5475,11 +8851,11 @@ public class HiveParser extends Parser {
 			case T_CURRENT_DATABASE:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(1374);
+				setState(2061);
 				match(T_CURRENT_DATABASE);
-				setState(1375);
+				setState(2062);
 				match(T_OPEN_P);
-				setState(1376);
+				setState(2063);
 				match(T_CLOSE_P);
 				 ((Misc_funcContext)_localctx).res =  hql_fixed_func("CURRENT_USER"); 
 				}
@@ -5490,7 +8866,7 @@ public class HiveParser extends Parser {
 			case T_SHA1:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(1378);
+				setState(2065);
 				((Misc_funcContext)_localctx).f_name = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(_la==T_CRC32 || _la==T_MD5 || _la==T_SHA || _la==T_SHA1) ) {
@@ -5501,11 +8877,11 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1379);
+				setState(2066);
 				match(T_OPEN_P);
-				setState(1380);
+				setState(2067);
 				((Misc_funcContext)_localctx).str_expr = expr(0);
-				setState(1381);
+				setState(2068);
 				match(T_CLOSE_P);
 				 ((Misc_funcContext)_localctx).res =  hql_single_param_func((((Misc_funcContext)_localctx).f_name!=null?((Misc_funcContext)_localctx).f_name.getText():null), "string", ((Misc_funcContext)_localctx).str_expr.res); 
 				}
@@ -5513,17 +8889,17 @@ public class HiveParser extends Parser {
 			case T_SHA2:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(1384);
+				setState(2071);
 				match(T_SHA2);
-				setState(1385);
+				setState(2072);
 				match(T_OPEN_P);
-				setState(1386);
+				setState(2073);
 				((Misc_funcContext)_localctx).str_expr = expr(0);
-				setState(1387);
+				setState(2074);
 				match(T_COMMA);
-				setState(1388);
+				setState(2075);
 				((Misc_funcContext)_localctx).n_expr = expr(0);
-				setState(1389);
+				setState(2076);
 				match(T_CLOSE_P);
 				 ((Misc_funcContext)_localctx).res =  hql_double_param_func("SHA2", "string", ((Misc_funcContext)_localctx).str_expr.res, "hash_size", ((Misc_funcContext)_localctx).n_expr.res); 
 				}
@@ -5531,17 +8907,17 @@ public class HiveParser extends Parser {
 			case T_AES_ENCRYPT:
 				enterOuterAlt(_localctx, 9);
 				{
-				setState(1392);
+				setState(2079);
 				match(T_AES_ENCRYPT);
-				setState(1393);
+				setState(2080);
 				match(T_OPEN_P);
-				setState(1394);
+				setState(2081);
 				((Misc_funcContext)_localctx).str_expr = expr(0);
-				setState(1395);
+				setState(2082);
 				match(T_COMMA);
-				setState(1396);
+				setState(2083);
 				((Misc_funcContext)_localctx).n_expr = expr(0);
-				setState(1397);
+				setState(2084);
 				match(T_CLOSE_P);
 				 ((Misc_funcContext)_localctx).res =  hql_double_param_func("SHA2", "input", ((Misc_funcContext)_localctx).str_expr.res, "key", ((Misc_funcContext)_localctx).n_expr.res); 
 				}
@@ -5549,17 +8925,17 @@ public class HiveParser extends Parser {
 			case T_AES_DECRYPT:
 				enterOuterAlt(_localctx, 10);
 				{
-				setState(1400);
+				setState(2087);
 				match(T_AES_DECRYPT);
-				setState(1401);
+				setState(2088);
 				match(T_OPEN_P);
-				setState(1402);
+				setState(2089);
 				((Misc_funcContext)_localctx).str_expr = expr(0);
-				setState(1403);
+				setState(2090);
 				match(T_COMMA);
-				setState(1404);
+				setState(2091);
 				((Misc_funcContext)_localctx).n_expr = expr(0);
-				setState(1405);
+				setState(2092);
 				match(T_CLOSE_P);
 				 ((Misc_funcContext)_localctx).res =  hql_double_param_func("SHA2", "input", ((Misc_funcContext)_localctx).str_expr.res, "key", ((Misc_funcContext)_localctx).n_expr.res); 
 				}
@@ -5567,11 +8943,11 @@ public class HiveParser extends Parser {
 			case T_VERSION:
 				enterOuterAlt(_localctx, 11);
 				{
-				setState(1408);
+				setState(2095);
 				match(T_VERSION);
-				setState(1409);
+				setState(2096);
 				match(T_OPEN_P);
-				setState(1410);
+				setState(2097);
 				match(T_CLOSE_P);
 				 ((Misc_funcContext)_localctx).res =  hql_fixed_func("VERSION"); 
 				}
@@ -5587,10 +8963,10 @@ public class HiveParser extends Parser {
 			case T_XPATH_STRING:
 				enterOuterAlt(_localctx, 12);
 				{
-				setState(1412);
+				setState(2099);
 				((Misc_funcContext)_localctx).f_name = _input.LT(1);
 				_la = _input.LA(1);
-				if ( !(((((_la - 453)) & ~0x3f) == 0 && ((1L << (_la - 453)) & ((1L << (T_XPATH - 453)) | (1L << (T_XPATH_BOOLEAN - 453)) | (1L << (T_XPATH_DOUBLE - 453)) | (1L << (T_XPATH_FLOAT - 453)) | (1L << (T_XPATH_INT - 453)) | (1L << (T_XPATH_LONG - 453)) | (1L << (T_XPATH_NUMBER - 453)) | (1L << (T_XPATH_SHORT - 453)) | (1L << (T_XPATH_STRING - 453)))) != 0)) ) {
+				if ( !(((((_la - 476)) & ~0x3f) == 0 && ((1L << (_la - 476)) & ((1L << (T_XPATH - 476)) | (1L << (T_XPATH_BOOLEAN - 476)) | (1L << (T_XPATH_DOUBLE - 476)) | (1L << (T_XPATH_FLOAT - 476)) | (1L << (T_XPATH_INT - 476)) | (1L << (T_XPATH_LONG - 476)) | (1L << (T_XPATH_NUMBER - 476)) | (1L << (T_XPATH_SHORT - 476)) | (1L << (T_XPATH_STRING - 476)))) != 0)) ) {
 					((Misc_funcContext)_localctx).f_name = (Token)_errHandler.recoverInline(this);
 				}
 				else {
@@ -5598,15 +8974,15 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1413);
+				setState(2100);
 				match(T_OPEN_P);
-				setState(1414);
+				setState(2101);
 				((Misc_funcContext)_localctx).xml_str_expr = expr(0);
-				setState(1415);
+				setState(2102);
 				match(T_COMMA);
-				setState(1416);
+				setState(2103);
 				((Misc_funcContext)_localctx).xpath_expr_str = expr(0);
-				setState(1417);
+				setState(2104);
 				match(T_CLOSE_P);
 				 ((Misc_funcContext)_localctx).res =  hql_double_param_func((((Misc_funcContext)_localctx).f_name!=null?((Misc_funcContext)_localctx).f_name.getText():null), "xml_string", ((Misc_funcContext)_localctx).xml_str_expr.res, "xpath_expression_string", ((Misc_funcContext)_localctx).xpath_expr_str.res); 
 				}
@@ -5644,16 +9020,16 @@ public class HiveParser extends Parser {
 
 	public final Expr_concatContext expr_concat() throws RecognitionException {
 		Expr_concatContext _localctx = new Expr_concatContext(_ctx, getState());
-		enterRule(_localctx, 68, RULE_expr_concat);
+		enterRule(_localctx, 152, RULE_expr_concat);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
 			 vector<Expr_concat_itemContext*> exprs; 
-			setState(1423);
+			setState(2110);
 			((Expr_concatContext)_localctx).expr_concat_item = expr_concat_item();
 			((Expr_concatContext)_localctx).expr_concat_items.add(((Expr_concatContext)_localctx).expr_concat_item);
-			setState(1426); 
+			setState(2113); 
 			_errHandler.sync(this);
 			_alt = 1;
 			do {
@@ -5661,9 +9037,9 @@ public class HiveParser extends Parser {
 				case 1:
 					{
 					{
-					setState(1424);
+					setState(2111);
 					match(T_PIPE);
-					setState(1425);
+					setState(2112);
 					((Expr_concatContext)_localctx).expr_concat_item = expr_concat_item();
 					((Expr_concatContext)_localctx).expr_concat_items.add(((Expr_concatContext)_localctx).expr_concat_item);
 					}
@@ -5672,9 +9048,9 @@ public class HiveParser extends Parser {
 				default:
 					throw new NoViableAltException(this);
 				}
-				setState(1428); 
+				setState(2115); 
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,58,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,114,_ctx);
 			} while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER );
 
 			        vector<json> expr_list_json;
@@ -5746,9 +9122,9 @@ public class HiveParser extends Parser {
 
 	public final Expr_concat_itemContext expr_concat_item() throws RecognitionException {
 		Expr_concat_itemContext _localctx = new Expr_concat_itemContext(_ctx, getState());
-		enterRule(_localctx, 70, RULE_expr_concat_item);
+		enterRule(_localctx, 154, RULE_expr_concat_item);
 		try {
-			setState(1464);
+			setState(2151);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case NULL_CONST:
@@ -5760,7 +9136,7 @@ public class HiveParser extends Parser {
 			case STRING_LITERAL:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(1432);
+				setState(2119);
 				((Expr_concat_itemContext)_localctx).literal_values = literal_values();
 				 ((Expr_concat_itemContext)_localctx).res =  ((Expr_concat_itemContext)_localctx).literal_values.res; 
 				}
@@ -5768,7 +9144,7 @@ public class HiveParser extends Parser {
 			case IDENTIFIER:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(1435);
+				setState(2122);
 				((Expr_concat_itemContext)_localctx).ident = ident();
 				 ((Expr_concat_itemContext)_localctx).res =   ((Expr_concat_itemContext)_localctx).ident.res; 
 				}
@@ -5776,11 +9152,11 @@ public class HiveParser extends Parser {
 			case T_OPEN_P:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(1438);
+				setState(2125);
 				match(T_OPEN_P);
-				setState(1439);
+				setState(2126);
 				((Expr_concat_itemContext)_localctx).expr = expr(0);
-				setState(1440);
+				setState(2127);
 				match(T_CLOSE_P);
 				 ((Expr_concat_itemContext)_localctx).res =  ((Expr_concat_itemContext)_localctx).expr.res; 
 				}
@@ -5789,7 +9165,7 @@ public class HiveParser extends Parser {
 			case T_CAST:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(1443);
+				setState(2130);
 				((Expr_concat_itemContext)_localctx).dat_convrt_func = dat_convrt_func();
 				 ((Expr_concat_itemContext)_localctx).res =  ((Expr_concat_itemContext)_localctx).dat_convrt_func.res; 
 				}
@@ -5830,7 +9206,7 @@ public class HiveParser extends Parser {
 			case T_UNHEX:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(1446);
+				setState(2133);
 				((Expr_concat_itemContext)_localctx).math_func = math_func();
 				 ((Expr_concat_itemContext)_localctx).res =  ((Expr_concat_itemContext)_localctx).math_func.res; 
 				}
@@ -5860,7 +9236,7 @@ public class HiveParser extends Parser {
 			case T_SYSDATE:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(1449);
+				setState(2136);
 				((Expr_concat_itemContext)_localctx).date_func = date_func();
 				 ((Expr_concat_itemContext)_localctx).res =  ((Expr_concat_itemContext)_localctx).date_func.res; 
 				}
@@ -5875,7 +9251,7 @@ public class HiveParser extends Parser {
 			case T_NULLIF:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(1452);
+				setState(2139);
 				((Expr_concat_itemContext)_localctx).cond_func = cond_func();
 				 ((Expr_concat_itemContext)_localctx).res =  ((Expr_concat_itemContext)_localctx).cond_func.res; 
 				}
@@ -5935,7 +9311,7 @@ public class HiveParser extends Parser {
 			case T_UPPER:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(1455);
+				setState(2142);
 				((Expr_concat_itemContext)_localctx).str_func = str_func();
 				 ((Expr_concat_itemContext)_localctx).res =  ((Expr_concat_itemContext)_localctx).str_func.res; 
 				}
@@ -5965,7 +9341,7 @@ public class HiveParser extends Parser {
 			case T_CURRENT_USER:
 				enterOuterAlt(_localctx, 9);
 				{
-				setState(1458);
+				setState(2145);
 				((Expr_concat_itemContext)_localctx).misc_func = misc_func();
 				 ((Expr_concat_itemContext)_localctx).res =  ((Expr_concat_itemContext)_localctx).misc_func.res; 
 				}
@@ -6000,7 +9376,7 @@ public class HiveParser extends Parser {
 			case T_VAR_SAMP:
 				enterOuterAlt(_localctx, 10);
 				{
-				setState(1461);
+				setState(2148);
 				((Expr_concat_itemContext)_localctx).aggr_func = aggr_func();
 				 ((Expr_concat_itemContext)_localctx).res =  ((Expr_concat_itemContext)_localctx).aggr_func.res; 
 				}
@@ -6069,30 +9445,30 @@ public class HiveParser extends Parser {
 
 	public final Cond_funcContext cond_func() throws RecognitionException {
 		Cond_funcContext _localctx = new Cond_funcContext(_ctx, getState());
-		enterRule(_localctx, 72, RULE_cond_func);
+		enterRule(_localctx, 156, RULE_cond_func);
 		int _la;
 		try {
-			setState(1589);
+			setState(2276);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,65,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,121,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(1466);
+				setState(2153);
 				match(T_IF);
-				setState(1467);
+				setState(2154);
 				match(T_OPEN_P);
-				setState(1468);
+				setState(2155);
 				((Cond_funcContext)_localctx).test_cond = expr(0);
-				setState(1469);
+				setState(2156);
 				match(T_COMMA);
-				setState(1470);
+				setState(2157);
 				((Cond_funcContext)_localctx).valueTrue = expr(0);
-				setState(1471);
+				setState(2158);
 				match(T_COMMA);
-				setState(1472);
+				setState(2159);
 				((Cond_funcContext)_localctx).valueFalse = expr(0);
-				setState(1473);
+				setState(2160);
 				match(T_CLOSE_P);
 				 ((Cond_funcContext)_localctx).res =  hql_three_param_func("IF", "test_cond", ((Cond_funcContext)_localctx).test_cond.res, "value_true", ((Cond_funcContext)_localctx).valueTrue.res, "value_false", ((Cond_funcContext)_localctx).valueFalse.res); 
 				}
@@ -6100,13 +9476,13 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(1476);
+				setState(2163);
 				match(T_ISNULL);
-				setState(1477);
+				setState(2164);
 				match(T_OPEN_P);
-				setState(1478);
+				setState(2165);
 				((Cond_funcContext)_localctx).expr = expr(0);
-				setState(1479);
+				setState(2166);
 				match(T_CLOSE_P);
 				 ((Cond_funcContext)_localctx).res =  hql_single_param_func("ISNULL", "expr", ((Cond_funcContext)_localctx).expr.res); 
 				}
@@ -6114,13 +9490,13 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(1482);
+				setState(2169);
 				match(T_ISNOTNULL);
-				setState(1483);
+				setState(2170);
 				match(T_OPEN_P);
-				setState(1484);
+				setState(2171);
 				((Cond_funcContext)_localctx).expr = expr(0);
-				setState(1485);
+				setState(2172);
 				match(T_CLOSE_P);
 				 ((Cond_funcContext)_localctx).res =  hql_single_param_func("ISNOTNULL", "expr", ((Cond_funcContext)_localctx).expr.res); 
 				}
@@ -6128,17 +9504,17 @@ public class HiveParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(1488);
+				setState(2175);
 				match(T_NVL);
-				setState(1489);
+				setState(2176);
 				match(T_OPEN_P);
-				setState(1490);
+				setState(2177);
 				((Cond_funcContext)_localctx).expr_val = expr(0);
-				setState(1491);
+				setState(2178);
 				match(T_COMMA);
-				setState(1492);
+				setState(2179);
 				((Cond_funcContext)_localctx).default_val = expr(0);
-				setState(1493);
+				setState(2180);
 				match(T_CLOSE_P);
 				 ((Cond_funcContext)_localctx).res =  hql_double_param_func("NVL", "expr_val", ((Cond_funcContext)_localctx).expr_val.res, "default_val", ((Cond_funcContext)_localctx).default_val.res); 
 				}
@@ -6147,40 +9523,40 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 5);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(1497);
+				setState(2184);
 				match(T_COALESCE);
-				setState(1498);
+				setState(2185);
 				match(T_OPEN_P);
 				{
-				setState(1499);
+				setState(2186);
 				((Cond_funcContext)_localctx).expr = expr(0);
 				((Cond_funcContext)_localctx).exprs.add(((Cond_funcContext)_localctx).expr);
 				}
 				{
-				setState(1500);
+				setState(2187);
 				match(T_COMMA);
-				setState(1501);
+				setState(2188);
 				((Cond_funcContext)_localctx).expr = expr(0);
 				((Cond_funcContext)_localctx).exprs.add(((Cond_funcContext)_localctx).expr);
 				}
-				setState(1507);
+				setState(2194);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(1503);
+					setState(2190);
 					match(T_COMMA);
-					setState(1504);
+					setState(2191);
 					((Cond_funcContext)_localctx).expr = expr(0);
 					((Cond_funcContext)_localctx).exprs.add(((Cond_funcContext)_localctx).expr);
 					}
 					}
-					setState(1509);
+					setState(2196);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(1510);
+				setState(2197);
 				match(T_CLOSE_P);
 				 
 				        vector<json> expr_list_json;
@@ -6193,33 +9569,33 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 6);
 				{
 				 vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; 
-				setState(1514);
+				setState(2201);
 				match(T_CASE);
-				setState(1515);
+				setState(2202);
 				((Cond_funcContext)_localctx).case_expr = expr(0);
-				setState(1521); 
+				setState(2208); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(1516);
+					setState(2203);
 					match(T_WHEN);
-					setState(1517);
+					setState(2204);
 					((Cond_funcContext)_localctx).expr = expr(0);
 					((Cond_funcContext)_localctx).when_exprs.add(((Cond_funcContext)_localctx).expr);
-					setState(1518);
+					setState(2205);
 					match(T_THEN);
-					setState(1519);
+					setState(2206);
 					((Cond_funcContext)_localctx).expr = expr(0);
 					((Cond_funcContext)_localctx).then_exprs.add(((Cond_funcContext)_localctx).expr);
 					}
 					}
-					setState(1523); 
+					setState(2210); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==T_WHEN );
-				setState(1525);
+				setState(2212);
 				match(T_END);
 				 
 				        vector<json> when_expr_list_json; vector<json> then_expr_list_json;
@@ -6236,37 +9612,37 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 7);
 				{
 				 vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; 
-				setState(1529);
+				setState(2216);
 				match(T_CASE);
-				setState(1530);
+				setState(2217);
 				((Cond_funcContext)_localctx).case_expr = expr(0);
-				setState(1536); 
+				setState(2223); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(1531);
+					setState(2218);
 					match(T_WHEN);
-					setState(1532);
+					setState(2219);
 					((Cond_funcContext)_localctx).expr = expr(0);
 					((Cond_funcContext)_localctx).when_exprs.add(((Cond_funcContext)_localctx).expr);
-					setState(1533);
+					setState(2220);
 					match(T_THEN);
-					setState(1534);
+					setState(2221);
 					((Cond_funcContext)_localctx).expr = expr(0);
 					((Cond_funcContext)_localctx).then_exprs.add(((Cond_funcContext)_localctx).expr);
 					}
 					}
-					setState(1538); 
+					setState(2225); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==T_WHEN );
-				setState(1540);
+				setState(2227);
 				match(T_ELSE);
-				setState(1541);
+				setState(2228);
 				((Cond_funcContext)_localctx).els_expr = expr(0);
-				setState(1542);
+				setState(2229);
 				match(T_END);
 				 
 				        vector<json> when_expr_list_json; vector<json> then_expr_list_json;
@@ -6283,31 +9659,31 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 8);
 				{
 				 vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; 
-				setState(1546);
+				setState(2233);
 				match(T_CASE);
-				setState(1552); 
+				setState(2239); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(1547);
+					setState(2234);
 					match(T_WHEN);
-					setState(1548);
+					setState(2235);
 					((Cond_funcContext)_localctx).expr = expr(0);
 					((Cond_funcContext)_localctx).when_exprs.add(((Cond_funcContext)_localctx).expr);
-					setState(1549);
+					setState(2236);
 					match(T_THEN);
-					setState(1550);
+					setState(2237);
 					((Cond_funcContext)_localctx).expr = expr(0);
 					((Cond_funcContext)_localctx).then_exprs.add(((Cond_funcContext)_localctx).expr);
 					}
 					}
-					setState(1554); 
+					setState(2241); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==T_WHEN );
-				setState(1556);
+				setState(2243);
 				match(T_END);
 				 
 				        vector<json> when_expr_list_json; vector<json> then_expr_list_json;
@@ -6324,35 +9700,35 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 9);
 				{
 				 vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; 
-				setState(1560);
+				setState(2247);
 				match(T_CASE);
-				setState(1566); 
+				setState(2253); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				do {
 					{
 					{
-					setState(1561);
+					setState(2248);
 					match(T_WHEN);
-					setState(1562);
+					setState(2249);
 					((Cond_funcContext)_localctx).expr = expr(0);
 					((Cond_funcContext)_localctx).when_exprs.add(((Cond_funcContext)_localctx).expr);
-					setState(1563);
+					setState(2250);
 					match(T_THEN);
-					setState(1564);
+					setState(2251);
 					((Cond_funcContext)_localctx).expr = expr(0);
 					((Cond_funcContext)_localctx).then_exprs.add(((Cond_funcContext)_localctx).expr);
 					}
 					}
-					setState(1568); 
+					setState(2255); 
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				} while ( _la==T_WHEN );
-				setState(1570);
+				setState(2257);
 				match(T_ELSE);
-				setState(1571);
+				setState(2258);
 				((Cond_funcContext)_localctx).els_expr = expr(0);
-				setState(1572);
+				setState(2259);
 				match(T_END);
 				 
 				        vector<json> when_expr_list_json; vector<json> then_expr_list_json;
@@ -6368,17 +9744,17 @@ public class HiveParser extends Parser {
 			case 10:
 				enterOuterAlt(_localctx, 10);
 				{
-				setState(1575);
+				setState(2262);
 				match(T_NULLIF);
-				setState(1576);
+				setState(2263);
 				match(T_OPEN_P);
-				setState(1577);
+				setState(2264);
 				((Cond_funcContext)_localctx).a_expr = expr(0);
-				setState(1578);
+				setState(2265);
 				match(T_COMMA);
-				setState(1579);
+				setState(2266);
 				((Cond_funcContext)_localctx).b_expr = expr(0);
-				setState(1580);
+				setState(2267);
 				match(T_CLOSE_P);
 				 ((Cond_funcContext)_localctx).res =  hql_double_param_func("NULLIF", "a_expr", ((Cond_funcContext)_localctx).a_expr.res, "b_expr", ((Cond_funcContext)_localctx).b_expr.res); 
 				}
@@ -6386,13 +9762,13 @@ public class HiveParser extends Parser {
 			case 11:
 				enterOuterAlt(_localctx, 11);
 				{
-				setState(1583);
+				setState(2270);
 				match(T_ASSERT_TRUE);
-				setState(1584);
+				setState(2271);
 				match(T_OPEN_P);
-				setState(1585);
+				setState(2272);
 				((Cond_funcContext)_localctx).expr = expr(0);
-				setState(1586);
+				setState(2273);
 				match(T_CLOSE_P);
 				 ((Cond_funcContext)_localctx).res =  hql_single_param_func("ASSERT_TRUE", "expr", ((Cond_funcContext)_localctx).expr.res); 
 				}
@@ -6465,19 +9841,19 @@ public class HiveParser extends Parser {
 
 	public final Date_funcContext date_func() throws RecognitionException {
 		Date_funcContext _localctx = new Date_funcContext(_ctx, getState());
-		enterRule(_localctx, 74, RULE_date_func);
+		enterRule(_localctx, 158, RULE_date_func);
 		try {
-			setState(1767);
+			setState(2454);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,68,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,124,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(1591);
+				setState(2278);
 				match(T_UNIX_TIMESTAMP);
-				setState(1592);
+				setState(2279);
 				match(T_OPEN_P);
-				setState(1593);
+				setState(2280);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_fixed_func("UNIX_TIMESTAMP"); 
 				}
@@ -6485,13 +9861,13 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(1595);
+				setState(2282);
 				match(T_UNIX_TIMESTAMP);
-				setState(1596);
+				setState(2283);
 				match(T_OPEN_P);
-				setState(1597);
+				setState(2284);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1598);
+				setState(2285);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("UNIX_TIMESTAMP", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6499,17 +9875,17 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(1601);
+				setState(2288);
 				match(T_UNIX_TIMESTAMP);
-				setState(1602);
+				setState(2289);
 				match(T_OPEN_P);
-				setState(1603);
+				setState(2290);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1604);
+				setState(2291);
 				match(T_COMMA);
-				setState(1605);
+				setState(2292);
 				((Date_funcContext)_localctx).pattern_expr = expr(0);
-				setState(1606);
+				setState(2293);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("UNIX_TIMESTAMP", "date", ((Date_funcContext)_localctx).date_expr.res, "pattern", ((Date_funcContext)_localctx).pattern_expr.res); 
 				}
@@ -6517,13 +9893,13 @@ public class HiveParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(1609);
+				setState(2296);
 				match(T_YEAR);
-				setState(1610);
+				setState(2297);
 				match(T_OPEN_P);
-				setState(1611);
+				setState(2298);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1612);
+				setState(2299);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("YEAR", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6531,13 +9907,13 @@ public class HiveParser extends Parser {
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(1615);
+				setState(2302);
 				match(T_QUARTER);
-				setState(1616);
+				setState(2303);
 				match(T_OPEN_P);
-				setState(1617);
+				setState(2304);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1618);
+				setState(2305);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("QUARTER", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6545,13 +9921,13 @@ public class HiveParser extends Parser {
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(1621);
+				setState(2308);
 				match(T_MONTH);
-				setState(1622);
+				setState(2309);
 				match(T_OPEN_P);
-				setState(1623);
+				setState(2310);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1624);
+				setState(2311);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("MONTH", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6559,13 +9935,13 @@ public class HiveParser extends Parser {
 			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(1627);
+				setState(2314);
 				match(T_DAY);
-				setState(1628);
+				setState(2315);
 				match(T_OPEN_P);
-				setState(1629);
+				setState(2316);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1630);
+				setState(2317);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("DAY", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6573,13 +9949,13 @@ public class HiveParser extends Parser {
 			case 8:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(1633);
+				setState(2320);
 				match(T_HOUR);
-				setState(1634);
+				setState(2321);
 				match(T_OPEN_P);
-				setState(1635);
+				setState(2322);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1636);
+				setState(2323);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("HOUR", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6587,13 +9963,13 @@ public class HiveParser extends Parser {
 			case 9:
 				enterOuterAlt(_localctx, 9);
 				{
-				setState(1639);
+				setState(2326);
 				match(T_MINUTE);
-				setState(1640);
+				setState(2327);
 				match(T_OPEN_P);
-				setState(1641);
+				setState(2328);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1642);
+				setState(2329);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("MINUTE", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6601,13 +9977,13 @@ public class HiveParser extends Parser {
 			case 10:
 				enterOuterAlt(_localctx, 10);
 				{
-				setState(1645);
+				setState(2332);
 				match(T_SECOND);
-				setState(1646);
+				setState(2333);
 				match(T_OPEN_P);
-				setState(1647);
+				setState(2334);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1648);
+				setState(2335);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("SECOND", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6615,13 +9991,13 @@ public class HiveParser extends Parser {
 			case 11:
 				enterOuterAlt(_localctx, 11);
 				{
-				setState(1651);
+				setState(2338);
 				match(T_WEEKOFYEAR);
-				setState(1652);
+				setState(2339);
 				match(T_OPEN_P);
-				setState(1653);
+				setState(2340);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1654);
+				setState(2341);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("WEEKOFYEAR", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6629,17 +10005,17 @@ public class HiveParser extends Parser {
 			case 12:
 				enterOuterAlt(_localctx, 12);
 				{
-				setState(1657);
+				setState(2344);
 				match(T_DATEDIFF);
-				setState(1658);
+				setState(2345);
 				match(T_OPEN_P);
-				setState(1659);
+				setState(2346);
 				((Date_funcContext)_localctx).enddate = expr(0);
-				setState(1660);
+				setState(2347);
 				match(T_COMMA);
-				setState(1661);
+				setState(2348);
 				((Date_funcContext)_localctx).startdate = expr(0);
-				setState(1662);
+				setState(2349);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("DATEDIFF", "enddate", ((Date_funcContext)_localctx).enddate.res, "startdate", ((Date_funcContext)_localctx).startdate.res); 
 				}
@@ -6647,17 +10023,17 @@ public class HiveParser extends Parser {
 			case 13:
 				enterOuterAlt(_localctx, 13);
 				{
-				setState(1665);
+				setState(2352);
 				match(T_DATEADD);
-				setState(1666);
+				setState(2353);
 				match(T_OPEN_P);
-				setState(1667);
+				setState(2354);
 				((Date_funcContext)_localctx).startdate = expr(0);
-				setState(1668);
+				setState(2355);
 				match(T_COMMA);
-				setState(1669);
+				setState(2356);
 				((Date_funcContext)_localctx).days = expr(0);
-				setState(1670);
+				setState(2357);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("DATEDIFF", "startdate", ((Date_funcContext)_localctx).startdate.res, "days", ((Date_funcContext)_localctx).days.res); 
 				}
@@ -6665,17 +10041,17 @@ public class HiveParser extends Parser {
 			case 14:
 				enterOuterAlt(_localctx, 14);
 				{
-				setState(1673);
+				setState(2360);
 				match(T_DATESUB);
-				setState(1674);
+				setState(2361);
 				match(T_OPEN_P);
-				setState(1675);
+				setState(2362);
 				((Date_funcContext)_localctx).startdate = expr(0);
-				setState(1676);
+				setState(2363);
 				match(T_COMMA);
-				setState(1677);
+				setState(2364);
 				((Date_funcContext)_localctx).days = expr(0);
-				setState(1678);
+				setState(2365);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("DATEDIFF", "startdate", ((Date_funcContext)_localctx).startdate.res, "days", ((Date_funcContext)_localctx).days.res); 
 				}
@@ -6683,17 +10059,17 @@ public class HiveParser extends Parser {
 			case 15:
 				enterOuterAlt(_localctx, 15);
 				{
-				setState(1681);
+				setState(2368);
 				match(T_TOUTCTIMESTAMP);
-				setState(1682);
+				setState(2369);
 				match(T_OPEN_P);
-				setState(1683);
+				setState(2370);
 				((Date_funcContext)_localctx).ts = expr(0);
-				setState(1684);
+				setState(2371);
 				match(T_COMMA);
-				setState(1685);
+				setState(2372);
 				((Date_funcContext)_localctx).timezone = expr(0);
-				setState(1686);
+				setState(2373);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("TO_UTC_TIMESTAMP", "ts", ((Date_funcContext)_localctx).ts.res, "timezone", ((Date_funcContext)_localctx).timezone.res); 
 				}
@@ -6701,17 +10077,17 @@ public class HiveParser extends Parser {
 			case 16:
 				enterOuterAlt(_localctx, 16);
 				{
-				setState(1689);
+				setState(2376);
 				match(T_FROMUTCTIMESTAMP);
-				setState(1690);
+				setState(2377);
 				match(T_OPEN_P);
-				setState(1691);
+				setState(2378);
 				((Date_funcContext)_localctx).ts = expr(0);
-				setState(1692);
+				setState(2379);
 				match(T_COMMA);
-				setState(1693);
+				setState(2380);
 				((Date_funcContext)_localctx).timezone = expr(0);
-				setState(1694);
+				setState(2381);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("FROM_UTC_TIMESTAMP", "ts", ((Date_funcContext)_localctx).ts.res, "timezone", ((Date_funcContext)_localctx).timezone.res); 
 				}
@@ -6719,16 +10095,16 @@ public class HiveParser extends Parser {
 			case 17:
 				enterOuterAlt(_localctx, 17);
 				{
-				setState(1697);
+				setState(2384);
 				match(T_CURRENT_DATE);
-				setState(1700);
+				setState(2387);
 				_errHandler.sync(this);
-				switch ( getInterpreter().adaptivePredict(_input,66,_ctx) ) {
+				switch ( getInterpreter().adaptivePredict(_input,122,_ctx) ) {
 				case 1:
 					{
-					setState(1698);
+					setState(2385);
 					match(T_OPEN_P);
-					setState(1699);
+					setState(2386);
 					match(T_CLOSE_P);
 					}
 					break;
@@ -6739,16 +10115,16 @@ public class HiveParser extends Parser {
 			case 18:
 				enterOuterAlt(_localctx, 18);
 				{
-				setState(1703);
+				setState(2390);
 				match(T_CURRENT_TIMESTAMP);
-				setState(1706);
+				setState(2393);
 				_errHandler.sync(this);
-				switch ( getInterpreter().adaptivePredict(_input,67,_ctx) ) {
+				switch ( getInterpreter().adaptivePredict(_input,123,_ctx) ) {
 				case 1:
 					{
-					setState(1704);
+					setState(2391);
 					match(T_OPEN_P);
-					setState(1705);
+					setState(2392);
 					match(T_CLOSE_P);
 					}
 					break;
@@ -6759,17 +10135,17 @@ public class HiveParser extends Parser {
 			case 19:
 				enterOuterAlt(_localctx, 19);
 				{
-				setState(1709);
+				setState(2396);
 				match(T_ADD_MONTHS);
-				setState(1710);
+				setState(2397);
 				match(T_OPEN_P);
-				setState(1711);
+				setState(2398);
 				((Date_funcContext)_localctx).startdate = expr(0);
-				setState(1712);
+				setState(2399);
 				match(T_COMMA);
-				setState(1713);
+				setState(2400);
 				((Date_funcContext)_localctx).num_months = expr(0);
-				setState(1714);
+				setState(2401);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("ADD_MONTHS", "startdate", ((Date_funcContext)_localctx).startdate.res, "num_months", ((Date_funcContext)_localctx).num_months.res); 
 				}
@@ -6777,21 +10153,21 @@ public class HiveParser extends Parser {
 			case 20:
 				enterOuterAlt(_localctx, 20);
 				{
-				setState(1717);
+				setState(2404);
 				match(T_ADD_MONTHS);
-				setState(1718);
+				setState(2405);
 				match(T_OPEN_P);
-				setState(1719);
+				setState(2406);
 				((Date_funcContext)_localctx).startdate = expr(0);
-				setState(1720);
+				setState(2407);
 				match(T_COMMA);
-				setState(1721);
+				setState(2408);
 				((Date_funcContext)_localctx).num_months = expr(0);
-				setState(1722);
+				setState(2409);
 				match(T_COMMA);
-				setState(1723);
+				setState(2410);
 				((Date_funcContext)_localctx).out_date_format = expr(0);
-				setState(1724);
+				setState(2411);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_three_param_func("ADD_MONTHS", "startdate", ((Date_funcContext)_localctx).startdate.res, "num_months", ((Date_funcContext)_localctx).num_months.res, "out_date_format", ((Date_funcContext)_localctx).out_date_format.res); 
 				}
@@ -6799,13 +10175,13 @@ public class HiveParser extends Parser {
 			case 21:
 				enterOuterAlt(_localctx, 21);
 				{
-				setState(1727);
+				setState(2414);
 				match(T_LASTDAY);
-				setState(1728);
+				setState(2415);
 				match(T_OPEN_P);
-				setState(1729);
+				setState(2416);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1730);
+				setState(2417);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_single_param_func("LAST_DAY", "date", ((Date_funcContext)_localctx).date_expr.res); 
 				}
@@ -6813,17 +10189,17 @@ public class HiveParser extends Parser {
 			case 22:
 				enterOuterAlt(_localctx, 22);
 				{
-				setState(1733);
+				setState(2420);
 				match(T_NEXT_DAY);
-				setState(1734);
+				setState(2421);
 				match(T_OPEN_P);
-				setState(1735);
+				setState(2422);
 				((Date_funcContext)_localctx).startdate = expr(0);
-				setState(1736);
+				setState(2423);
 				match(T_COMMA);
-				setState(1737);
+				setState(2424);
 				((Date_funcContext)_localctx).day_of_week = expr(0);
-				setState(1738);
+				setState(2425);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("NEXT_DAY", "startdate", ((Date_funcContext)_localctx).startdate.res, "day_of_week", ((Date_funcContext)_localctx).day_of_week.res); 
 				}
@@ -6831,17 +10207,17 @@ public class HiveParser extends Parser {
 			case 23:
 				enterOuterAlt(_localctx, 23);
 				{
-				setState(1741);
+				setState(2428);
 				match(T_TRUNC);
-				setState(1742);
+				setState(2429);
 				match(T_OPEN_P);
-				setState(1743);
+				setState(2430);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1744);
+				setState(2431);
 				match(T_COMMA);
-				setState(1745);
+				setState(2432);
 				((Date_funcContext)_localctx).format = expr(0);
-				setState(1746);
+				setState(2433);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("TRUNC", "date", ((Date_funcContext)_localctx).date_expr.res, "format", ((Date_funcContext)_localctx).format.res); 
 				}
@@ -6849,17 +10225,17 @@ public class HiveParser extends Parser {
 			case 24:
 				enterOuterAlt(_localctx, 24);
 				{
-				setState(1749);
+				setState(2436);
 				match(T_MONTHS_BETWEEN);
-				setState(1750);
+				setState(2437);
 				match(T_OPEN_P);
-				setState(1751);
+				setState(2438);
 				((Date_funcContext)_localctx).date1 = expr(0);
-				setState(1752);
+				setState(2439);
 				match(T_COMMA);
-				setState(1753);
+				setState(2440);
 				((Date_funcContext)_localctx).date2 = expr(0);
-				setState(1754);
+				setState(2441);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("MONTHS_BETWEEN", "date1", ((Date_funcContext)_localctx).date1.res, "date2", ((Date_funcContext)_localctx).date2.res); 
 				}
@@ -6867,17 +10243,17 @@ public class HiveParser extends Parser {
 			case 25:
 				enterOuterAlt(_localctx, 25);
 				{
-				setState(1757);
+				setState(2444);
 				match(T_DATE_FORMAT);
-				setState(1758);
+				setState(2445);
 				match(T_OPEN_P);
-				setState(1759);
+				setState(2446);
 				((Date_funcContext)_localctx).date_expr = expr(0);
-				setState(1760);
+				setState(2447);
 				match(T_COMMA);
-				setState(1761);
+				setState(2448);
 				((Date_funcContext)_localctx).format = expr(0);
-				setState(1762);
+				setState(2449);
 				match(T_CLOSE_P);
 				 ((Date_funcContext)_localctx).res =  hql_double_param_func("DATE_FORMAT", "date", ((Date_funcContext)_localctx).date_expr.res, "format", ((Date_funcContext)_localctx).format.res); 
 				}
@@ -6885,7 +10261,7 @@ public class HiveParser extends Parser {
 			case 26:
 				enterOuterAlt(_localctx, 26);
 				{
-				setState(1765);
+				setState(2452);
 				((Date_funcContext)_localctx).T_SYSDATE = match(T_SYSDATE);
 				 ((Date_funcContext)_localctx).res =  hql_fixed_func((((Date_funcContext)_localctx).T_SYSDATE!=null?((Date_funcContext)_localctx).T_SYSDATE.getText():null)); 
 				}
@@ -6906,15 +10282,15 @@ public class HiveParser extends Parser {
 	public static class Dat_convrt_funcContext extends ParserRuleContext {
 		public json res;
 		public ExprContext expr;
-		public DtypeContext dtype;
+		public Primitive_typeContext primitive_type;
 		public TerminalNode T_CAST() { return getToken(HiveParser.T_CAST, 0); }
 		public TerminalNode T_OPEN_P() { return getToken(HiveParser.T_OPEN_P, 0); }
 		public ExprContext expr() {
 			return getRuleContext(ExprContext.class,0);
 		}
 		public TerminalNode T_AS() { return getToken(HiveParser.T_AS, 0); }
-		public DtypeContext dtype() {
-			return getRuleContext(DtypeContext.class,0);
+		public Primitive_typeContext primitive_type() {
+			return getRuleContext(Primitive_typeContext.class,0);
 		}
 		public TerminalNode T_CLOSE_P() { return getToken(HiveParser.T_CLOSE_P, 0); }
 		public Dtype_lenContext dtype_len() {
@@ -6929,50 +10305,50 @@ public class HiveParser extends Parser {
 
 	public final Dat_convrt_funcContext dat_convrt_func() throws RecognitionException {
 		Dat_convrt_funcContext _localctx = new Dat_convrt_funcContext(_ctx, getState());
-		enterRule(_localctx, 76, RULE_dat_convrt_func);
+		enterRule(_localctx, 160, RULE_dat_convrt_func);
 		int _la;
 		try {
-			setState(1786);
+			setState(2473);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_CAST:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(1769);
+				setState(2456);
 				match(T_CAST);
-				setState(1770);
+				setState(2457);
 				match(T_OPEN_P);
-				setState(1771);
+				setState(2458);
 				((Dat_convrt_funcContext)_localctx).expr = expr(0);
-				setState(1772);
+				setState(2459);
 				match(T_AS);
-				setState(1773);
-				((Dat_convrt_funcContext)_localctx).dtype = dtype();
-				setState(1775);
+				setState(2460);
+				((Dat_convrt_funcContext)_localctx).primitive_type = primitive_type();
+				setState(2462);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if (_la==T_OPEN_P) {
 					{
-					setState(1774);
+					setState(2461);
 					dtype_len();
 					}
 				}
 
-				setState(1777);
+				setState(2464);
 				match(T_CLOSE_P);
-				 ((Dat_convrt_funcContext)_localctx).res =  hql_cast_func(((Dat_convrt_funcContext)_localctx).expr.res, ((Dat_convrt_funcContext)_localctx).dtype.res); 
+				 ((Dat_convrt_funcContext)_localctx).res =  hql_cast_func(((Dat_convrt_funcContext)_localctx).expr.res, ((Dat_convrt_funcContext)_localctx).primitive_type.res); 
 				}
 				break;
 			case T_BINARY:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(1780);
+				setState(2467);
 				match(T_BINARY);
-				setState(1781);
+				setState(2468);
 				match(T_OPEN_P);
-				setState(1782);
+				setState(2469);
 				((Dat_convrt_funcContext)_localctx).expr = expr(0);
-				setState(1783);
+				setState(2470);
 				match(T_CLOSE_P);
 				 ((Dat_convrt_funcContext)_localctx).res =  hql_single_param_func("BINARY", "expr", ((Dat_convrt_funcContext)_localctx).expr.res); 
 				}
@@ -7020,22 +10396,22 @@ public class HiveParser extends Parser {
 
 	public final Basic_aggr_funcContext basic_aggr_func() throws RecognitionException {
 		Basic_aggr_funcContext _localctx = new Basic_aggr_funcContext(_ctx, getState());
-		enterRule(_localctx, 78, RULE_basic_aggr_func);
+		enterRule(_localctx, 162, RULE_basic_aggr_func);
 		int _la;
 		try {
-			setState(1846);
+			setState(2533);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,72,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,128,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(1788);
+				setState(2475);
 				match(T_COUNT);
-				setState(1789);
+				setState(2476);
 				match(T_OPEN_P);
-				setState(1790);
+				setState(2477);
 				((Basic_aggr_funcContext)_localctx).r = expr(0);
-				setState(1791);
+				setState(2478);
 				match(T_CLOSE_P);
 				 ((Basic_aggr_funcContext)_localctx).res =  hql_count_func(((Basic_aggr_funcContext)_localctx).r.res); 
 				}
@@ -7044,33 +10420,33 @@ public class HiveParser extends Parser {
 				enterOuterAlt(_localctx, 2);
 				{
 				 vector<ExprContext*> exprs; 
-				setState(1795);
+				setState(2482);
 				match(T_COUNT);
-				setState(1796);
+				setState(2483);
 				match(T_OPEN_P);
-				setState(1797);
+				setState(2484);
 				match(T_DISTINCT);
-				setState(1798);
+				setState(2485);
 				((Basic_aggr_funcContext)_localctx).expr = expr(0);
 				((Basic_aggr_funcContext)_localctx).exprs.add(((Basic_aggr_funcContext)_localctx).expr);
-				setState(1803);
+				setState(2490);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while (_la==T_COMMA) {
 					{
 					{
-					setState(1799);
+					setState(2486);
 					match(T_COMMA);
-					setState(1800);
+					setState(2487);
 					((Basic_aggr_funcContext)_localctx).expr = expr(0);
 					((Basic_aggr_funcContext)_localctx).exprs.add(((Basic_aggr_funcContext)_localctx).expr);
 					}
 					}
-					setState(1805);
+					setState(2492);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(1806);
+				setState(2493);
 				match(T_CLOSE_P);
 
 				        vector<json> expr_list_json;
@@ -7082,13 +10458,13 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(1809);
+				setState(2496);
 				match(T_COUNT);
-				setState(1810);
+				setState(2497);
 				match(T_OPEN_P);
-				setState(1811);
+				setState(2498);
 				match(T_MUL);
-				setState(1812);
+				setState(2499);
 				match(T_CLOSE_P);
 				 ((Basic_aggr_funcContext)_localctx).res =  hql_count_all_func(); 
 				}
@@ -7096,13 +10472,13 @@ public class HiveParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(1814);
+				setState(2501);
 				match(T_SUM);
-				setState(1815);
+				setState(2502);
 				match(T_OPEN_P);
-				setState(1816);
+				setState(2503);
 				((Basic_aggr_funcContext)_localctx).expr = expr(0);
-				setState(1817);
+				setState(2504);
 				match(T_CLOSE_P);
 				 ((Basic_aggr_funcContext)_localctx).res =  hql_double_param_func("SUM", "flag_distinct", false, "col", ((Basic_aggr_funcContext)_localctx).expr.res); 
 				}
@@ -7110,15 +10486,15 @@ public class HiveParser extends Parser {
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(1820);
+				setState(2507);
 				match(T_SUM);
-				setState(1821);
+				setState(2508);
 				match(T_OPEN_P);
-				setState(1822);
+				setState(2509);
 				match(T_DISTINCT);
-				setState(1823);
+				setState(2510);
 				((Basic_aggr_funcContext)_localctx).expr = expr(0);
-				setState(1824);
+				setState(2511);
 				match(T_CLOSE_P);
 				 ((Basic_aggr_funcContext)_localctx).res =  hql_double_param_func("SUM", "flag_distinct", true, "col", ((Basic_aggr_funcContext)_localctx).expr.res); 
 				}
@@ -7126,13 +10502,13 @@ public class HiveParser extends Parser {
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(1827);
+				setState(2514);
 				match(T_AVG);
-				setState(1828);
+				setState(2515);
 				match(T_OPEN_P);
-				setState(1829);
+				setState(2516);
 				((Basic_aggr_funcContext)_localctx).expr = expr(0);
-				setState(1830);
+				setState(2517);
 				match(T_CLOSE_P);
 				 ((Basic_aggr_funcContext)_localctx).res =  hql_double_param_func("AVG", "flag_distinct", false, "col", ((Basic_aggr_funcContext)_localctx).expr.res); 
 				}
@@ -7140,15 +10516,15 @@ public class HiveParser extends Parser {
 			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(1833);
+				setState(2520);
 				match(T_AVG);
-				setState(1834);
+				setState(2521);
 				match(T_OPEN_P);
-				setState(1835);
+				setState(2522);
 				match(T_DISTINCT);
-				setState(1836);
+				setState(2523);
 				((Basic_aggr_funcContext)_localctx).expr = expr(0);
-				setState(1837);
+				setState(2524);
 				match(T_CLOSE_P);
 				 ((Basic_aggr_funcContext)_localctx).res =  hql_double_param_func("AVG", "flag_distinct", true, "col", ((Basic_aggr_funcContext)_localctx).expr.res); 
 				}
@@ -7156,7 +10532,7 @@ public class HiveParser extends Parser {
 			case 8:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(1840);
+				setState(2527);
 				((Basic_aggr_funcContext)_localctx).fun_name = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(_la==T_MAX || _la==T_MIN) ) {
@@ -7167,11 +10543,11 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1841);
+				setState(2528);
 				match(T_OPEN_P);
-				setState(1842);
+				setState(2529);
 				((Basic_aggr_funcContext)_localctx).expr = expr(0);
-				setState(1843);
+				setState(2530);
 				match(T_CLOSE_P);
 				 ((Basic_aggr_funcContext)_localctx).res =  hql_single_param_func((((Basic_aggr_funcContext)_localctx).fun_name!=null?((Basic_aggr_funcContext)_localctx).fun_name.getText():null), "col", ((Basic_aggr_funcContext)_localctx).expr.res); 
 				}
@@ -7244,16 +10620,16 @@ public class HiveParser extends Parser {
 
 	public final Aggr_funcContext aggr_func() throws RecognitionException {
 		Aggr_funcContext _localctx = new Aggr_funcContext(_ctx, getState());
-		enterRule(_localctx, 80, RULE_aggr_func);
+		enterRule(_localctx, 164, RULE_aggr_func);
 		int _la;
 		try {
-			setState(1919);
+			setState(2606);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,73,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,129,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(1848);
+				setState(2535);
 				((Aggr_funcContext)_localctx).basic_aggr_func = basic_aggr_func();
 				 ((Aggr_funcContext)_localctx).res =  ((Aggr_funcContext)_localctx).basic_aggr_func.res; 
 				}
@@ -7261,10 +10637,10 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(1851);
+				setState(2538);
 				((Aggr_funcContext)_localctx).fun_name = _input.LT(1);
 				_la = _input.LA(1);
-				if ( !(_la==T_STDDEV_POP || _la==T_STDDEV_SAMP || ((((_la - 486)) & ~0x3f) == 0 && ((1L << (_la - 486)) & ((1L << (T_VARIANCE - 486)) | (1L << (T_VAR_POP - 486)) | (1L << (T_VAR_SAMP - 486)))) != 0)) ) {
+				if ( !(_la==T_STDDEV_POP || _la==T_STDDEV_SAMP || ((((_la - 509)) & ~0x3f) == 0 && ((1L << (_la - 509)) & ((1L << (T_VARIANCE - 509)) | (1L << (T_VAR_POP - 509)) | (1L << (T_VAR_SAMP - 509)))) != 0)) ) {
 					((Aggr_funcContext)_localctx).fun_name = (Token)_errHandler.recoverInline(this);
 				}
 				else {
@@ -7272,11 +10648,11 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1852);
+				setState(2539);
 				match(T_OPEN_P);
-				setState(1853);
+				setState(2540);
 				((Aggr_funcContext)_localctx).expr = expr(0);
-				setState(1854);
+				setState(2541);
 				match(T_CLOSE_P);
 				 ((Aggr_funcContext)_localctx).res =  hql_single_param_func((((Aggr_funcContext)_localctx).fun_name!=null?((Aggr_funcContext)_localctx).fun_name.getText():null), "col", ((Aggr_funcContext)_localctx).expr.res); 
 				}
@@ -7284,10 +10660,10 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(1857);
+				setState(2544);
 				((Aggr_funcContext)_localctx).fun_name = _input.LT(1);
 				_la = _input.LA(1);
-				if ( !(((((_la - 76)) & ~0x3f) == 0 && ((1L << (_la - 76)) & ((1L << (T_CORR - 76)) | (1L << (T_COVAR_POP - 76)) | (1L << (T_COVAR_SAMP - 76)))) != 0)) ) {
+				if ( !(((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & ((1L << (T_CORR - 80)) | (1L << (T_COVAR_POP - 80)) | (1L << (T_COVAR_SAMP - 80)))) != 0)) ) {
 					((Aggr_funcContext)_localctx).fun_name = (Token)_errHandler.recoverInline(this);
 				}
 				else {
@@ -7295,15 +10671,15 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1858);
+				setState(2545);
 				match(T_OPEN_P);
-				setState(1859);
+				setState(2546);
 				((Aggr_funcContext)_localctx).col1 = expr(0);
-				setState(1860);
+				setState(2547);
 				match(T_COMMA);
-				setState(1861);
+				setState(2548);
 				((Aggr_funcContext)_localctx).col2 = expr(0);
-				setState(1862);
+				setState(2549);
 				match(T_CLOSE_P);
 				 ((Aggr_funcContext)_localctx).res =  hql_double_param_func((((Aggr_funcContext)_localctx).fun_name!=null?((Aggr_funcContext)_localctx).fun_name.getText():null), "col1", ((Aggr_funcContext)_localctx).col1.res, "col2", ((Aggr_funcContext)_localctx).col2.res); 
 				}
@@ -7311,17 +10687,17 @@ public class HiveParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(1865);
+				setState(2552);
 				match(T_PERCENTILE);
-				setState(1866);
+				setState(2553);
 				match(T_OPEN_P);
-				setState(1867);
+				setState(2554);
 				((Aggr_funcContext)_localctx).col = expr(0);
-				setState(1868);
+				setState(2555);
 				match(T_COMMA);
-				setState(1869);
+				setState(2556);
 				((Aggr_funcContext)_localctx).p_expr = expr(0);
-				setState(1870);
+				setState(2557);
 				match(T_CLOSE_P);
 				 ((Aggr_funcContext)_localctx).res =  hql_double_param_func("PERCENTILE", "col", ((Aggr_funcContext)_localctx).col.res, "percentile", ((Aggr_funcContext)_localctx).p_expr.res); 
 				}
@@ -7329,17 +10705,17 @@ public class HiveParser extends Parser {
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(1873);
+				setState(2560);
 				match(T_PERCENTILE_APPROX);
-				setState(1874);
+				setState(2561);
 				match(T_OPEN_P);
-				setState(1875);
+				setState(2562);
 				((Aggr_funcContext)_localctx).col = expr(0);
-				setState(1876);
+				setState(2563);
 				match(T_COMMA);
-				setState(1877);
+				setState(2564);
 				((Aggr_funcContext)_localctx).p_expr = expr(0);
-				setState(1878);
+				setState(2565);
 				match(T_CLOSE_P);
 				 ((Aggr_funcContext)_localctx).res =  hql_double_param_func("PERCENTILE_APPROX", "col", ((Aggr_funcContext)_localctx).col.res, "percentile", ((Aggr_funcContext)_localctx).p_expr.res); 
 				}
@@ -7347,21 +10723,21 @@ public class HiveParser extends Parser {
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(1881);
+				setState(2568);
 				match(T_PERCENTILE_APPROX);
-				setState(1882);
+				setState(2569);
 				match(T_OPEN_P);
-				setState(1883);
+				setState(2570);
 				((Aggr_funcContext)_localctx).col = expr(0);
-				setState(1884);
+				setState(2571);
 				match(T_COMMA);
-				setState(1885);
+				setState(2572);
 				((Aggr_funcContext)_localctx).p_expr = expr(0);
-				setState(1886);
+				setState(2573);
 				match(T_COMMA);
-				setState(1887);
+				setState(2574);
 				((Aggr_funcContext)_localctx).b_expr = expr(0);
-				setState(1888);
+				setState(2575);
 				match(T_CLOSE_P);
 				 ((Aggr_funcContext)_localctx).res =  hql_three_param_func("PERCENTILE_APPROX", "col", ((Aggr_funcContext)_localctx).col.res, "percentile", ((Aggr_funcContext)_localctx).p_expr.res, "b", ((Aggr_funcContext)_localctx).b_expr.res); 
 				}
@@ -7369,10 +10745,10 @@ public class HiveParser extends Parser {
 			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(1891);
+				setState(2578);
 				((Aggr_funcContext)_localctx).func_name = _input.LT(1);
 				_la = _input.LA(1);
-				if ( !(((((_la - 326)) & ~0x3f) == 0 && ((1L << (_la - 326)) & ((1L << (T_REGR_AVGX - 326)) | (1L << (T_REGR_AVGY - 326)) | (1L << (T_REGR_COUNT - 326)) | (1L << (T_REGR_INTERCEPT - 326)) | (1L << (T_REGR_R2 - 326)) | (1L << (T_REGR_SLOPE - 326)) | (1L << (T_REGR_SXX - 326)) | (1L << (T_REGR_SXY - 326)) | (1L << (T_REGR_SYY - 326)))) != 0)) ) {
+				if ( !(((((_la - 341)) & ~0x3f) == 0 && ((1L << (_la - 341)) & ((1L << (T_REGR_AVGX - 341)) | (1L << (T_REGR_AVGY - 341)) | (1L << (T_REGR_COUNT - 341)) | (1L << (T_REGR_INTERCEPT - 341)) | (1L << (T_REGR_R2 - 341)) | (1L << (T_REGR_SLOPE - 341)) | (1L << (T_REGR_SXX - 341)) | (1L << (T_REGR_SXY - 341)) | (1L << (T_REGR_SYY - 341)))) != 0)) ) {
 					((Aggr_funcContext)_localctx).func_name = (Token)_errHandler.recoverInline(this);
 				}
 				else {
@@ -7380,15 +10756,15 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1892);
+				setState(2579);
 				match(T_OPEN_P);
-				setState(1893);
+				setState(2580);
 				((Aggr_funcContext)_localctx).indep = expr(0);
-				setState(1894);
+				setState(2581);
 				match(T_COMMA);
-				setState(1895);
+				setState(2582);
 				((Aggr_funcContext)_localctx).dep = expr(0);
-				setState(1896);
+				setState(2583);
 				match(T_CLOSE_P);
 				 ((Aggr_funcContext)_localctx).res =  hql_double_param_func((((Aggr_funcContext)_localctx).func_name!=null?((Aggr_funcContext)_localctx).func_name.getText():null), "independent", ((Aggr_funcContext)_localctx).indep.res, "dependent", ((Aggr_funcContext)_localctx).dep.res); 
 				}
@@ -7396,17 +10772,17 @@ public class HiveParser extends Parser {
 			case 8:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(1899);
+				setState(2586);
 				match(T_HISTOGRAM_NUMERIC);
-				setState(1900);
+				setState(2587);
 				match(T_OPEN_P);
-				setState(1901);
+				setState(2588);
 				((Aggr_funcContext)_localctx).col = expr(0);
-				setState(1902);
+				setState(2589);
 				match(T_COMMA);
-				setState(1903);
+				setState(2590);
 				((Aggr_funcContext)_localctx).b_expr = expr(0);
-				setState(1904);
+				setState(2591);
 				match(T_CLOSE_P);
 				 ((Aggr_funcContext)_localctx).res =  hql_double_param_func("HISTOGRAM_NUMERIC", "col", ((Aggr_funcContext)_localctx).col.res, "b", ((Aggr_funcContext)_localctx).b_expr.res); 
 				}
@@ -7414,7 +10790,7 @@ public class HiveParser extends Parser {
 			case 9:
 				enterOuterAlt(_localctx, 9);
 				{
-				setState(1907);
+				setState(2594);
 				((Aggr_funcContext)_localctx).func_name = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(_la==T_COLLECT_SET || _la==T_COLLECT_LIST) ) {
@@ -7425,11 +10801,11 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1908);
+				setState(2595);
 				match(T_OPEN_P);
-				setState(1909);
+				setState(2596);
 				((Aggr_funcContext)_localctx).expr = expr(0);
-				setState(1910);
+				setState(2597);
 				match(T_CLOSE_P);
 				 ((Aggr_funcContext)_localctx).res =  hql_single_param_func((((Aggr_funcContext)_localctx).func_name!=null?((Aggr_funcContext)_localctx).func_name.getText():null), "col", ((Aggr_funcContext)_localctx).expr.res); 
 				}
@@ -7437,13 +10813,13 @@ public class HiveParser extends Parser {
 			case 10:
 				enterOuterAlt(_localctx, 10);
 				{
-				setState(1913);
+				setState(2600);
 				match(T_NTILE);
-				setState(1914);
+				setState(2601);
 				match(T_OPEN_P);
-				setState(1915);
+				setState(2602);
 				((Aggr_funcContext)_localctx).expr = expr(0);
-				setState(1916);
+				setState(2603);
 				match(T_CLOSE_P);
 				 ((Aggr_funcContext)_localctx).res =  hql_single_param_func("NTILE", "x", ((Aggr_funcContext)_localctx).expr.res); 
 				}
@@ -7480,21 +10856,21 @@ public class HiveParser extends Parser {
 
 	public final Tab_generate_funcContext tab_generate_func() throws RecognitionException {
 		Tab_generate_funcContext _localctx = new Tab_generate_funcContext(_ctx, getState());
-		enterRule(_localctx, 82, RULE_tab_generate_func);
+		enterRule(_localctx, 166, RULE_tab_generate_func);
 		try {
-			setState(1939);
+			setState(2626);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_EXPLODE:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(1921);
+				setState(2608);
 				match(T_EXPLODE);
-				setState(1922);
+				setState(2609);
 				match(T_OPEN_P);
-				setState(1923);
+				setState(2610);
 				((Tab_generate_funcContext)_localctx).expr = expr(0);
-				setState(1924);
+				setState(2611);
 				match(T_CLOSE_P);
 				 ((Tab_generate_funcContext)_localctx).res =  hql_single_param_func("EXPLODE", "expr", ((Tab_generate_funcContext)_localctx).expr.res); 
 				}
@@ -7502,13 +10878,13 @@ public class HiveParser extends Parser {
 			case T_POSEXPLODE:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(1927);
+				setState(2614);
 				match(T_POSEXPLODE);
-				setState(1928);
+				setState(2615);
 				match(T_OPEN_P);
-				setState(1929);
+				setState(2616);
 				((Tab_generate_funcContext)_localctx).expr = expr(0);
-				setState(1930);
+				setState(2617);
 				match(T_CLOSE_P);
 				 ((Tab_generate_funcContext)_localctx).res =  hql_single_param_func("POSEXPLODE", "expr", ((Tab_generate_funcContext)_localctx).expr.res); 
 				}
@@ -7516,13 +10892,13 @@ public class HiveParser extends Parser {
 			case T_INLINE:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(1933);
+				setState(2620);
 				match(T_INLINE);
-				setState(1934);
+				setState(2621);
 				match(T_OPEN_P);
-				setState(1935);
+				setState(2622);
 				((Tab_generate_funcContext)_localctx).expr = expr(0);
-				setState(1936);
+				setState(2623);
 				match(T_CLOSE_P);
 				 ((Tab_generate_funcContext)_localctx).res =  hql_single_param_func("INLINE", "expr", ((Tab_generate_funcContext)_localctx).expr.res); 
 				}
@@ -7602,22 +10978,22 @@ public class HiveParser extends Parser {
 
 	public final Math_funcContext math_func() throws RecognitionException {
 		Math_funcContext _localctx = new Math_funcContext(_ctx, getState());
-		enterRule(_localctx, 84, RULE_math_func);
+		enterRule(_localctx, 168, RULE_math_func);
 		int _la;
 		try {
-			setState(2151);
+			setState(2838);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,75,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,131,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(1941);
+				setState(2628);
 				match(T_ROUND);
-				setState(1942);
+				setState(2629);
 				match(T_OPEN_P);
-				setState(1943);
+				setState(2630);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(1944);
+				setState(2631);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("ROUND", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7625,17 +11001,17 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(1947);
+				setState(2634);
 				match(T_ROUND);
-				setState(1948);
+				setState(2635);
 				match(T_OPEN_P);
-				setState(1949);
+				setState(2636);
 				((Math_funcContext)_localctx).fst = expr(0);
-				setState(1950);
+				setState(2637);
 				match(T_COMMA);
-				setState(1951);
+				setState(2638);
 				((Math_funcContext)_localctx).snd = expr(0);
-				setState(1952);
+				setState(2639);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_double_param_func("ROUND", "expr", ((Math_funcContext)_localctx).fst.res, "decimal_places", ((Math_funcContext)_localctx).snd.res); 
 				}
@@ -7643,13 +11019,13 @@ public class HiveParser extends Parser {
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(1955);
+				setState(2642);
 				match(T_FLOOR);
-				setState(1956);
+				setState(2643);
 				match(T_OPEN_P);
-				setState(1957);
+				setState(2644);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(1958);
+				setState(2645);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("FLOOR", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7657,7 +11033,7 @@ public class HiveParser extends Parser {
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(1961);
+				setState(2648);
 				_la = _input.LA(1);
 				if ( !(_la==T_CEIL || _la==T_CEILING) ) {
 				_errHandler.recoverInline(this);
@@ -7667,11 +11043,11 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(1962);
+				setState(2649);
 				match(T_OPEN_P);
-				setState(1963);
+				setState(2650);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(1964);
+				setState(2651);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("CEIL", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7679,11 +11055,11 @@ public class HiveParser extends Parser {
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(1967);
+				setState(2654);
 				((Math_funcContext)_localctx).T_RAND = match(T_RAND);
-				setState(1968);
+				setState(2655);
 				match(T_OPEN_P);
-				setState(1969);
+				setState(2656);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_fixed_func((((Math_funcContext)_localctx).T_RAND!=null?((Math_funcContext)_localctx).T_RAND.getText():null)); 
 				}
@@ -7691,13 +11067,13 @@ public class HiveParser extends Parser {
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(1971);
+				setState(2658);
 				match(T_RAND);
-				setState(1972);
+				setState(2659);
 				match(T_OPEN_P);
-				setState(1973);
+				setState(2660);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(1974);
+				setState(2661);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("RAND", "seed", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7705,13 +11081,13 @@ public class HiveParser extends Parser {
 			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(1977);
+				setState(2664);
 				match(T_EXP);
-				setState(1978);
+				setState(2665);
 				match(T_OPEN_P);
-				setState(1979);
+				setState(2666);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(1980);
+				setState(2667);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("EXP", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7719,13 +11095,13 @@ public class HiveParser extends Parser {
 			case 8:
 				enterOuterAlt(_localctx, 8);
 				{
-				setState(1983);
+				setState(2670);
 				match(T_LN);
-				setState(1984);
+				setState(2671);
 				match(T_OPEN_P);
-				setState(1985);
+				setState(2672);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(1986);
+				setState(2673);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("LN", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7733,13 +11109,13 @@ public class HiveParser extends Parser {
 			case 9:
 				enterOuterAlt(_localctx, 9);
 				{
-				setState(1989);
+				setState(2676);
 				match(T_LOG10);
-				setState(1990);
+				setState(2677);
 				match(T_OPEN_P);
-				setState(1991);
+				setState(2678);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(1992);
+				setState(2679);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("LOG10", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7747,13 +11123,13 @@ public class HiveParser extends Parser {
 			case 10:
 				enterOuterAlt(_localctx, 10);
 				{
-				setState(1995);
+				setState(2682);
 				match(T_LOG2);
-				setState(1996);
+				setState(2683);
 				match(T_OPEN_P);
-				setState(1997);
+				setState(2684);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(1998);
+				setState(2685);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("LOG2", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7761,17 +11137,17 @@ public class HiveParser extends Parser {
 			case 11:
 				enterOuterAlt(_localctx, 11);
 				{
-				setState(2001);
+				setState(2688);
 				match(T_LOG);
-				setState(2002);
+				setState(2689);
 				match(T_OPEN_P);
-				setState(2003);
+				setState(2690);
 				((Math_funcContext)_localctx).base = expr(0);
-				setState(2004);
+				setState(2691);
 				match(T_COMMA);
-				setState(2005);
+				setState(2692);
 				((Math_funcContext)_localctx).e = expr(0);
-				setState(2006);
+				setState(2693);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_double_param_func("LOG", "base", ((Math_funcContext)_localctx).base.res, "expr", ((Math_funcContext)_localctx).e.res); 
 				}
@@ -7779,7 +11155,7 @@ public class HiveParser extends Parser {
 			case 12:
 				enterOuterAlt(_localctx, 12);
 				{
-				setState(2009);
+				setState(2696);
 				_la = _input.LA(1);
 				if ( !(_la==T_POW || _la==T_POWER) ) {
 				_errHandler.recoverInline(this);
@@ -7789,15 +11165,15 @@ public class HiveParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(2010);
+				setState(2697);
 				match(T_OPEN_P);
-				setState(2011);
+				setState(2698);
 				((Math_funcContext)_localctx).base = expr(0);
-				setState(2012);
+				setState(2699);
 				match(T_COMMA);
-				setState(2013);
+				setState(2700);
 				((Math_funcContext)_localctx).e = expr(0);
-				setState(2014);
+				setState(2701);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_double_param_func("POWER", "base", ((Math_funcContext)_localctx).base.res, "exp", ((Math_funcContext)_localctx).e.res); 
 				}
@@ -7805,13 +11181,13 @@ public class HiveParser extends Parser {
 			case 13:
 				enterOuterAlt(_localctx, 13);
 				{
-				setState(2017);
+				setState(2704);
 				match(T_SQRT);
-				setState(2018);
+				setState(2705);
 				match(T_OPEN_P);
-				setState(2019);
+				setState(2706);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2020);
+				setState(2707);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("SQRT", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7819,13 +11195,13 @@ public class HiveParser extends Parser {
 			case 14:
 				enterOuterAlt(_localctx, 14);
 				{
-				setState(2023);
+				setState(2710);
 				match(T_BIN);
-				setState(2024);
+				setState(2711);
 				match(T_OPEN_P);
-				setState(2025);
+				setState(2712);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2026);
+				setState(2713);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("BIN", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7833,13 +11209,13 @@ public class HiveParser extends Parser {
 			case 15:
 				enterOuterAlt(_localctx, 15);
 				{
-				setState(2029);
+				setState(2716);
 				match(T_HEX);
-				setState(2030);
+				setState(2717);
 				match(T_OPEN_P);
-				setState(2031);
+				setState(2718);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2032);
+				setState(2719);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("HEX", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7847,13 +11223,13 @@ public class HiveParser extends Parser {
 			case 16:
 				enterOuterAlt(_localctx, 16);
 				{
-				setState(2035);
+				setState(2722);
 				match(T_UNHEX);
-				setState(2036);
+				setState(2723);
 				match(T_OPEN_P);
-				setState(2037);
+				setState(2724);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2038);
+				setState(2725);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("UNHEX", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7861,21 +11237,21 @@ public class HiveParser extends Parser {
 			case 17:
 				enterOuterAlt(_localctx, 17);
 				{
-				setState(2041);
+				setState(2728);
 				match(T_CONV);
-				setState(2042);
+				setState(2729);
 				match(T_OPEN_P);
-				setState(2043);
+				setState(2730);
 				((Math_funcContext)_localctx).e = expr(0);
-				setState(2044);
+				setState(2731);
 				match(T_COMMA);
-				setState(2045);
+				setState(2732);
 				((Math_funcContext)_localctx).fbase = expr(0);
-				setState(2046);
+				setState(2733);
 				match(T_COMMA);
-				setState(2047);
+				setState(2734);
 				((Math_funcContext)_localctx).tbase = expr(0);
-				setState(2048);
+				setState(2735);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_three_param_func("CONV", "expr", ((Math_funcContext)_localctx).e.res, "from_base", ((Math_funcContext)_localctx).fbase.res, "to_base", ((Math_funcContext)_localctx).tbase.res); 
 				}
@@ -7883,13 +11259,13 @@ public class HiveParser extends Parser {
 			case 18:
 				enterOuterAlt(_localctx, 18);
 				{
-				setState(2051);
+				setState(2738);
 				match(T_ABS);
-				setState(2052);
+				setState(2739);
 				match(T_OPEN_P);
-				setState(2053);
+				setState(2740);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2054);
+				setState(2741);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("ABS", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7897,17 +11273,17 @@ public class HiveParser extends Parser {
 			case 19:
 				enterOuterAlt(_localctx, 19);
 				{
-				setState(2057);
+				setState(2744);
 				match(T_PMOD);
-				setState(2058);
+				setState(2745);
 				match(T_OPEN_P);
-				setState(2059);
+				setState(2746);
 				((Math_funcContext)_localctx).a = expr(0);
-				setState(2060);
+				setState(2747);
 				match(T_COMMA);
-				setState(2061);
+				setState(2748);
 				((Math_funcContext)_localctx).b = expr(0);
-				setState(2062);
+				setState(2749);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_double_param_func("PMOD", "a", ((Math_funcContext)_localctx).a.res, "b", ((Math_funcContext)_localctx).b.res); 
 				}
@@ -7915,13 +11291,13 @@ public class HiveParser extends Parser {
 			case 20:
 				enterOuterAlt(_localctx, 20);
 				{
-				setState(2065);
+				setState(2752);
 				match(T_SIN);
-				setState(2066);
+				setState(2753);
 				match(T_OPEN_P);
-				setState(2067);
+				setState(2754);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2068);
+				setState(2755);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("SIN", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7929,13 +11305,13 @@ public class HiveParser extends Parser {
 			case 21:
 				enterOuterAlt(_localctx, 21);
 				{
-				setState(2071);
+				setState(2758);
 				match(T_ASIN);
-				setState(2072);
+				setState(2759);
 				match(T_OPEN_P);
-				setState(2073);
+				setState(2760);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2074);
+				setState(2761);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("ASIN", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7943,13 +11319,13 @@ public class HiveParser extends Parser {
 			case 22:
 				enterOuterAlt(_localctx, 22);
 				{
-				setState(2077);
+				setState(2764);
 				match(T_COS);
-				setState(2078);
+				setState(2765);
 				match(T_OPEN_P);
-				setState(2079);
+				setState(2766);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2080);
+				setState(2767);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("COS", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7957,13 +11333,13 @@ public class HiveParser extends Parser {
 			case 23:
 				enterOuterAlt(_localctx, 23);
 				{
-				setState(2083);
+				setState(2770);
 				match(T_ACOS);
-				setState(2084);
+				setState(2771);
 				match(T_OPEN_P);
-				setState(2085);
+				setState(2772);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2086);
+				setState(2773);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("ACOS", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7971,13 +11347,13 @@ public class HiveParser extends Parser {
 			case 24:
 				enterOuterAlt(_localctx, 24);
 				{
-				setState(2089);
+				setState(2776);
 				match(T_TAN);
-				setState(2090);
+				setState(2777);
 				match(T_OPEN_P);
-				setState(2091);
+				setState(2778);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2092);
+				setState(2779);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("TAN", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7985,13 +11361,13 @@ public class HiveParser extends Parser {
 			case 25:
 				enterOuterAlt(_localctx, 25);
 				{
-				setState(2095);
+				setState(2782);
 				match(T_ATAN);
-				setState(2096);
+				setState(2783);
 				match(T_OPEN_P);
-				setState(2097);
+				setState(2784);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2098);
+				setState(2785);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("ATAN", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -7999,13 +11375,13 @@ public class HiveParser extends Parser {
 			case 26:
 				enterOuterAlt(_localctx, 26);
 				{
-				setState(2101);
+				setState(2788);
 				match(T_DEGREES);
-				setState(2102);
+				setState(2789);
 				match(T_OPEN_P);
-				setState(2103);
+				setState(2790);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2104);
+				setState(2791);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("DEGREES", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -8013,13 +11389,13 @@ public class HiveParser extends Parser {
 			case 27:
 				enterOuterAlt(_localctx, 27);
 				{
-				setState(2107);
+				setState(2794);
 				match(T_RADIANS);
-				setState(2108);
+				setState(2795);
 				match(T_OPEN_P);
-				setState(2109);
+				setState(2796);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2110);
+				setState(2797);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("RADIANS", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -8027,13 +11403,13 @@ public class HiveParser extends Parser {
 			case 28:
 				enterOuterAlt(_localctx, 28);
 				{
-				setState(2113);
+				setState(2800);
 				match(T_POSITIVE);
-				setState(2114);
+				setState(2801);
 				match(T_OPEN_P);
-				setState(2115);
+				setState(2802);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2116);
+				setState(2803);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("POSITIVE", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -8041,13 +11417,13 @@ public class HiveParser extends Parser {
 			case 29:
 				enterOuterAlt(_localctx, 29);
 				{
-				setState(2119);
+				setState(2806);
 				match(T_NEGATIVE);
-				setState(2120);
+				setState(2807);
 				match(T_OPEN_P);
-				setState(2121);
+				setState(2808);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2122);
+				setState(2809);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("NEGATIVE", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -8055,13 +11431,13 @@ public class HiveParser extends Parser {
 			case 30:
 				enterOuterAlt(_localctx, 30);
 				{
-				setState(2125);
+				setState(2812);
 				match(T_SIGN);
-				setState(2126);
+				setState(2813);
 				match(T_OPEN_P);
-				setState(2127);
+				setState(2814);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2128);
+				setState(2815);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("SIGN", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -8069,11 +11445,11 @@ public class HiveParser extends Parser {
 			case 31:
 				enterOuterAlt(_localctx, 31);
 				{
-				setState(2131);
+				setState(2818);
 				match(T__7);
-				setState(2132);
+				setState(2819);
 				match(T_OPEN_P);
-				setState(2133);
+				setState(2820);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_fixed_func("EULER_CONST"); 
 				}
@@ -8081,11 +11457,11 @@ public class HiveParser extends Parser {
 			case 32:
 				enterOuterAlt(_localctx, 32);
 				{
-				setState(2135);
+				setState(2822);
 				match(T__8);
-				setState(2136);
+				setState(2823);
 				match(T_OPEN_P);
-				setState(2137);
+				setState(2824);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_fixed_func("PI_CONST"); 
 				}
@@ -8093,13 +11469,13 @@ public class HiveParser extends Parser {
 			case 33:
 				enterOuterAlt(_localctx, 33);
 				{
-				setState(2139);
+				setState(2826);
 				match(T_FACTORIAL);
-				setState(2140);
+				setState(2827);
 				match(T_OPEN_P);
-				setState(2141);
+				setState(2828);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2142);
+				setState(2829);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("FACTORIAL", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -8107,13 +11483,13 @@ public class HiveParser extends Parser {
 			case 34:
 				enterOuterAlt(_localctx, 34);
 				{
-				setState(2145);
+				setState(2832);
 				match(T_CBR);
-				setState(2146);
+				setState(2833);
 				match(T_OPEN_P);
-				setState(2147);
+				setState(2834);
 				((Math_funcContext)_localctx).expr = expr(0);
-				setState(2148);
+				setState(2835);
 				match(T_CLOSE_P);
 				 ((Math_funcContext)_localctx).res =  hql_single_param_func("CUBE_ROOT", "expr", ((Math_funcContext)_localctx).expr.res); 
 				}
@@ -8158,15 +11534,15 @@ public class HiveParser extends Parser {
 
 	public final Literal_valuesContext literal_values() throws RecognitionException {
 		Literal_valuesContext _localctx = new Literal_valuesContext(_ctx, getState());
-		enterRule(_localctx, 86, RULE_literal_values);
+		enterRule(_localctx, 170, RULE_literal_values);
 		try {
-			setState(2169);
+			setState(2856);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case STRING_LITERAL:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(2153);
+				setState(2840);
 				((Literal_valuesContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
 				 ((Literal_valuesContext)_localctx).res =  hql_string_type((((Literal_valuesContext)_localctx).STRING_LITERAL!=null?((Literal_valuesContext)_localctx).STRING_LITERAL.getText():null)); 
 				}
@@ -8174,7 +11550,7 @@ public class HiveParser extends Parser {
 			case DECIMAL_LITERAL:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(2155);
+				setState(2842);
 				((Literal_valuesContext)_localctx).DECIMAL_LITERAL = match(DECIMAL_LITERAL);
 				 ((Literal_valuesContext)_localctx).res =  hql_decimal_type((((Literal_valuesContext)_localctx).DECIMAL_LITERAL!=null?((Literal_valuesContext)_localctx).DECIMAL_LITERAL.getText():null)); 
 				}
@@ -8182,7 +11558,7 @@ public class HiveParser extends Parser {
 			case INT_LITERAL:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(2157);
+				setState(2844);
 				((Literal_valuesContext)_localctx).INT_LITERAL = match(INT_LITERAL);
 				 ((Literal_valuesContext)_localctx).res =  hql_int_type((((Literal_valuesContext)_localctx).INT_LITERAL!=null?((Literal_valuesContext)_localctx).INT_LITERAL.getText():null)); 
 				}
@@ -8190,7 +11566,7 @@ public class HiveParser extends Parser {
 			case BOOL_LITERAL:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(2159);
+				setState(2846);
 				((Literal_valuesContext)_localctx).BOOL_LITERAL = match(BOOL_LITERAL);
 				 ((Literal_valuesContext)_localctx).res =  hql_boolean_type((((Literal_valuesContext)_localctx).BOOL_LITERAL!=null?((Literal_valuesContext)_localctx).BOOL_LITERAL.getText():null)); 
 				}
@@ -8198,7 +11574,7 @@ public class HiveParser extends Parser {
 			case NULL_CONST:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(2161);
+				setState(2848);
 				match(NULL_CONST);
 				 ((Literal_valuesContext)_localctx).res =  hql_null_constant(); 
 				}
@@ -8206,7 +11582,7 @@ public class HiveParser extends Parser {
 			case T_DATE:
 				enterOuterAlt(_localctx, 6);
 				{
-				setState(2163);
+				setState(2850);
 				((Literal_valuesContext)_localctx).date_literal = date_literal();
 				 ((Literal_valuesContext)_localctx).res =  hql_type_date_literal(((Literal_valuesContext)_localctx).date_literal.res); 
 				}
@@ -8214,7 +11590,7 @@ public class HiveParser extends Parser {
 			case T_TIMESTAMP:
 				enterOuterAlt(_localctx, 7);
 				{
-				setState(2166);
+				setState(2853);
 				((Literal_valuesContext)_localctx).timestamp_literal = timestamp_literal();
 				 ((Literal_valuesContext)_localctx).res =  hql_type_timestamp_literal(((Literal_valuesContext)_localctx).timestamp_literal.res); 
 				}
@@ -8251,35 +11627,35 @@ public class HiveParser extends Parser {
 
 	public final IdentContext ident() throws RecognitionException {
 		IdentContext _localctx = new IdentContext(_ctx, getState());
-		enterRule(_localctx, 88, RULE_ident);
+		enterRule(_localctx, 172, RULE_ident);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(2173);
+			setState(2860);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,77,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,133,_ctx) ) {
 			case 1:
 				{
-				setState(2171);
+				setState(2858);
 				((IdentContext)_localctx).database = match(IDENTIFIER);
-				setState(2172);
-				match(T__1);
+				setState(2859);
+				match(T__0);
 				}
 				break;
 			}
-			setState(2177);
+			setState(2864);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,78,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,134,_ctx) ) {
 			case 1:
 				{
-				setState(2175);
+				setState(2862);
 				((IdentContext)_localctx).tablename = match(IDENTIFIER);
-				setState(2176);
-				match(T__1);
+				setState(2863);
+				match(T__0);
 				}
 				break;
 			}
-			setState(2179);
+			setState(2866);
 			((IdentContext)_localctx).field = match(IDENTIFIER);
 			 ((IdentContext)_localctx).res =  hql_type_identifier((((IdentContext)_localctx).database!=null?((IdentContext)_localctx).database.getText():null), (((IdentContext)_localctx).tablename!=null?((IdentContext)_localctx).tablename.getText():null), (((IdentContext)_localctx).field!=null?((IdentContext)_localctx).field.getText():null)); 
 			}
@@ -8311,23 +11687,23 @@ public class HiveParser extends Parser {
 
 	public final Tab_identContext tab_ident() throws RecognitionException {
 		Tab_identContext _localctx = new Tab_identContext(_ctx, getState());
-		enterRule(_localctx, 90, RULE_tab_ident);
+		enterRule(_localctx, 174, RULE_tab_ident);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(2184);
+			setState(2871);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,79,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,135,_ctx) ) {
 			case 1:
 				{
-				setState(2182);
+				setState(2869);
 				((Tab_identContext)_localctx).database = match(IDENTIFIER);
-				setState(2183);
-				match(T__1);
+				setState(2870);
+				match(T__0);
 				}
 				break;
 			}
-			setState(2186);
+			setState(2873);
 			((Tab_identContext)_localctx).tablename = match(IDENTIFIER);
 			 ((Tab_identContext)_localctx).res =  hql_type_table_identifier((((Tab_identContext)_localctx).database!=null?((Tab_identContext)_localctx).database.getText():null), (((Tab_identContext)_localctx).tablename!=null?((Tab_identContext)_localctx).tablename.getText():null)); 
 			}
@@ -8356,13 +11732,13 @@ public class HiveParser extends Parser {
 
 	public final Date_literalContext date_literal() throws RecognitionException {
 		Date_literalContext _localctx = new Date_literalContext(_ctx, getState());
-		enterRule(_localctx, 92, RULE_date_literal);
+		enterRule(_localctx, 176, RULE_date_literal);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(2189);
+			setState(2876);
 			match(T_DATE);
-			setState(2190);
+			setState(2877);
 			((Date_literalContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
 			 ((Date_literalContext)_localctx).res =  (((Date_literalContext)_localctx).STRING_LITERAL!=null?((Date_literalContext)_localctx).STRING_LITERAL.getText():null); 
 			}
@@ -8391,13 +11767,13 @@ public class HiveParser extends Parser {
 
 	public final Timestamp_literalContext timestamp_literal() throws RecognitionException {
 		Timestamp_literalContext _localctx = new Timestamp_literalContext(_ctx, getState());
-		enterRule(_localctx, 94, RULE_timestamp_literal);
+		enterRule(_localctx, 178, RULE_timestamp_literal);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(2193);
+			setState(2880);
 			match(T_TIMESTAMP);
-			setState(2194);
+			setState(2881);
 			((Timestamp_literalContext)_localctx).STRING_LITERAL = match(STRING_LITERAL);
 			 ((Timestamp_literalContext)_localctx).res =  (((Timestamp_literalContext)_localctx).STRING_LITERAL!=null?((Timestamp_literalContext)_localctx).STRING_LITERAL.getText():null); 
 			}
@@ -8425,15 +11801,15 @@ public class HiveParser extends Parser {
 
 	public final Set_operators_isContext set_operators_is() throws RecognitionException {
 		Set_operators_isContext _localctx = new Set_operators_isContext(_ctx, getState());
-		enterRule(_localctx, 96, RULE_set_operators_is);
+		enterRule(_localctx, 180, RULE_set_operators_is);
 		try {
-			setState(2202);
+			setState(2889);
 			_errHandler.sync(this);
-			switch ( getInterpreter().adaptivePredict(_input,80,_ctx) ) {
+			switch ( getInterpreter().adaptivePredict(_input,136,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(2197);
+				setState(2884);
 				match(T_IS);
 				 ((Set_operators_isContext)_localctx).res =  "IS"; 
 				}
@@ -8441,9 +11817,9 @@ public class HiveParser extends Parser {
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(2199);
+				setState(2886);
 				match(T_IS);
-				setState(2200);
+				setState(2887);
 				match(T_NOT);
 				 ((Set_operators_isContext)_localctx).res =  "IS_NOT"; 
 				}
@@ -8475,15 +11851,15 @@ public class HiveParser extends Parser {
 
 	public final Set_operators_likeContext set_operators_like() throws RecognitionException {
 		Set_operators_likeContext _localctx = new Set_operators_likeContext(_ctx, getState());
-		enterRule(_localctx, 98, RULE_set_operators_like);
+		enterRule(_localctx, 182, RULE_set_operators_like);
 		try {
-			setState(2213);
+			setState(2900);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_LIKE:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(2204);
+				setState(2891);
 				match(T_LIKE);
 				 ((Set_operators_likeContext)_localctx).res =  "LIKE"; 
 				}
@@ -8491,9 +11867,9 @@ public class HiveParser extends Parser {
 			case T_NOT:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(2206);
+				setState(2893);
 				match(T_NOT);
-				setState(2207);
+				setState(2894);
 				match(T_LIKE);
 				 ((Set_operators_likeContext)_localctx).res =  "NOT_LIKE"; 
 				}
@@ -8501,7 +11877,7 @@ public class HiveParser extends Parser {
 			case T_RLIKE:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(2209);
+				setState(2896);
 				match(T_RLIKE);
 				 ((Set_operators_likeContext)_localctx).res =  "RLIKE"; 
 				}
@@ -8509,7 +11885,7 @@ public class HiveParser extends Parser {
 			case T_REGEXP:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(2211);
+				setState(2898);
 				match(T_REGEXP);
 				 ((Set_operators_likeContext)_localctx).res =  "REGEXP "; 
 				}
@@ -8541,15 +11917,15 @@ public class HiveParser extends Parser {
 
 	public final Set_operators_inContext set_operators_in() throws RecognitionException {
 		Set_operators_inContext _localctx = new Set_operators_inContext(_ctx, getState());
-		enterRule(_localctx, 100, RULE_set_operators_in);
+		enterRule(_localctx, 184, RULE_set_operators_in);
 		try {
-			setState(2220);
+			setState(2907);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_IN:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(2215);
+				setState(2902);
 				match(T_IN);
 				 ((Set_operators_inContext)_localctx).res =  "IN"; 
 				}
@@ -8557,9 +11933,9 @@ public class HiveParser extends Parser {
 			case T_NOT:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(2217);
+				setState(2904);
 				match(T_NOT);
-				setState(2218);
+				setState(2905);
 				match(T_IN);
 				 ((Set_operators_inContext)_localctx).res =  "NOT_IN"; 
 				}
@@ -8591,15 +11967,15 @@ public class HiveParser extends Parser {
 
 	public final Set_operators_existsContext set_operators_exists() throws RecognitionException {
 		Set_operators_existsContext _localctx = new Set_operators_existsContext(_ctx, getState());
-		enterRule(_localctx, 102, RULE_set_operators_exists);
+		enterRule(_localctx, 186, RULE_set_operators_exists);
 		try {
-			setState(2227);
+			setState(2914);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T_EXISTS:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(2222);
+				setState(2909);
 				match(T_EXISTS);
 				 ((Set_operators_existsContext)_localctx).res =  "EXISTS"; 
 				}
@@ -8607,9 +11983,9 @@ public class HiveParser extends Parser {
 			case T_NOT:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(2224);
+				setState(2911);
 				match(T_NOT);
-				setState(2225);
+				setState(2912);
 				match(T_EXISTS);
 				 ((Set_operators_existsContext)_localctx).res =  "NOT_EXISTS"; 
 				}
@@ -8639,12 +12015,12 @@ public class HiveParser extends Parser {
 
 	public final Unary_operatorContext unary_operator() throws RecognitionException {
 		Unary_operatorContext _localctx = new Unary_operatorContext(_ctx, getState());
-		enterRule(_localctx, 104, RULE_unary_operator);
+		enterRule(_localctx, 188, RULE_unary_operator);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(2229);
+			setState(2916);
 			_la = _input.LA(1);
 			if ( !(_la==T__9 || _la==T_NOT || _la==T_ADD || _la==T_SUB) ) {
 			_errHandler.recoverInline(this);
@@ -8669,7 +12045,7 @@ public class HiveParser extends Parser {
 
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 26:
+		case 68:
 			return expr_sempred((ExprContext)_localctx, predIndex);
 		}
 		return true;
@@ -8710,906 +12086,1160 @@ public class HiveParser extends Parser {
 		return true;
 	}
 
-	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\u020a\u08ba\4\2\t"+
+	private static final int _serializedATNSegments = 2;
+	private static final String _serializedATNSegment0 =
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\u0221\u0b69\4\2\t"+
 		"\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13"+
 		"\t\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
 		"\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36\t\36\4\37\t\37\4 \t \4!"+
 		"\t!\4\"\t\"\4#\t#\4$\t$\4%\t%\4&\t&\4\'\t\'\4(\t(\4)\t)\4*\t*\4+\t+\4"+
 		",\t,\4-\t-\4.\t.\4/\t/\4\60\t\60\4\61\t\61\4\62\t\62\4\63\t\63\4\64\t"+
-		"\64\4\65\t\65\4\66\t\66\3\2\3\2\3\2\3\2\3\3\3\3\3\3\3\3\6\3u\n\3\r\3\16"+
-		"\3v\3\3\3\3\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3"+
-		"\4\3\4\3\4\3\4\5\4\u008d\n\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3"+
-		"\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4"+
-		"\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3"+
-		"\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4\u00c6\n\4\3\4\3\4\5\4\u00ca"+
-		"\n\4\3\5\3\5\3\5\5\5\u00cf\n\5\3\5\3\5\5\5\u00d3\n\5\3\5\3\5\3\6\3\6\3"+
-		"\6\3\7\3\7\3\7\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b"+
-		"\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\5\b\u00f4\n\b\3\t\3\t\3\t\3\t\3\t"+
-		"\3\t\3\t\3\t\3\t\3\t\7\t\u0100\n\t\f\t\16\t\u0103\13\t\3\t\3\t\5\t\u0107"+
-		"\n\t\3\n\3\n\3\n\3\13\3\13\3\13\3\13\3\13\5\13\u0111\n\13\3\f\3\f\3\f"+
-		"\3\f\3\f\3\f\3\f\7\f\u011a\n\f\f\f\16\f\u011d\13\f\3\f\3\f\5\f\u0121\n"+
-		"\f\3\r\3\r\3\r\3\r\3\r\5\r\u0128\n\r\3\16\3\16\3\16\3\16\3\16\3\16\3\16"+
-		"\3\16\3\16\3\16\7\16\u0134\n\16\f\16\16\16\u0137\13\16\3\16\3\16\5\16"+
-		"\u013b\n\16\3\17\3\17\3\17\3\17\3\17\5\17\u0142\n\17\3\20\3\20\3\20\3"+
-		"\20\3\20\3\20\3\20\3\20\3\20\5\20\u014d\n\20\3\21\3\21\3\21\3\21\3\21"+
-		"\3\21\3\21\6\21\u0156\n\21\r\21\16\21\u0157\3\21\3\21\3\21\3\21\3\21\6"+
-		"\21\u015f\n\21\r\21\16\21\u0160\3\21\3\21\5\21\u0165\n\21\3\22\5\22\u0168"+
-		"\n\22\3\22\3\22\3\22\3\22\3\22\5\22\u016f\n\22\3\22\3\22\3\22\3\22\3\22"+
-		"\3\22\3\22\5\22\u0178\n\22\3\22\3\22\3\22\3\22\3\22\3\22\3\22\3\22\3\22"+
-		"\3\22\3\22\3\22\3\22\3\22\3\22\3\22\5\22\u018a\n\22\3\23\3\23\3\23\3\23"+
-		"\3\24\3\24\3\24\3\24\3\24\5\24\u0195\n\24\3\24\3\24\3\24\3\24\3\24\3\24"+
-		"\3\24\5\24\u019e\n\24\3\24\3\24\3\24\5\24\u01a3\n\24\3\25\3\25\3\25\3"+
-		"\25\3\25\5\25\u01aa\n\25\3\26\3\26\3\26\3\26\7\26\u01b0\n\26\f\26\16\26"+
-		"\u01b3\13\26\3\26\3\26\3\27\3\27\5\27\u01b9\n\27\3\27\3\27\3\27\3\27\3"+
-		"\27\3\27\3\27\3\27\5\27\u01c3\n\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27"+
-		"\3\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27\3\27\5\27\u01d6\n\27\3\27"+
-		"\3\27\3\27\5\27\u01db\n\27\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30"+
-		"\7\30\u01e6\n\30\f\30\16\30\u01e9\13\30\3\30\3\30\3\30\3\30\3\30\3\30"+
-		"\3\30\3\30\3\30\3\30\3\30\3\30\7\30\u01f7\n\30\f\30\16\30\u01fa\13\30"+
-		"\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\7\30\u0208"+
-		"\n\30\f\30\16\30\u020b\13\30\3\30\3\30\3\30\3\30\3\30\7\30\u0212\n\30"+
-		"\f\30\16\30\u0215\13\30\3\30\3\30\3\30\5\30\u021a\n\30\3\31\3\31\3\31"+
-		"\3\31\3\31\3\31\5\31\u0222\n\31\3\32\3\32\3\32\3\32\3\32\3\33\3\33\3\33"+
-		"\3\33\3\33\7\33\u022e\n\33\f\33\16\33\u0231\13\33\3\33\3\33\3\33\3\34"+
-		"\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34"+
-		"\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34"+
-		"\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34"+
-		"\5\34\u0261\n\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34"+
-		"\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34"+
-		"\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34"+
-		"\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34"+
-		"\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34"+
-		"\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34"+
-		"\3\34\3\34\3\34\7\34\u02b7\n\34\f\34\16\34\u02ba\13\34\3\35\3\35\3\35"+
-		"\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35"+
-		"\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35"+
-		"\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\3\35\5\35\u02e4\n\35\3\36\3\36"+
-		"\3\36\3\36\3\36\3\36\7\36\u02ec\n\36\f\36\16\36\u02ef\13\36\3\36\3\36"+
-		"\3\36\3\37\3\37\3\37\3\37\3\37\3\37\3\37\3\37\3\37\3\37\3\37\7\37\u02ff"+
-		"\n\37\f\37\16\37\u0302\13\37\3\37\3\37\3\37\3 \3 \3 \3 \3 \3 \7 \u030d"+
-		"\n \f \16 \u0310\13 \3 \3 \3 \3!\3!\3!\3!\3!\3!\3!\3!\3!\3!\3!\7!\u0320"+
-		"\n!\f!\16!\u0323\13!\3!\3!\3!\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\6\"\u0346\n\"\r\"\16\"\u0347\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\6\"\u0355\n\"\r\"\16\"\u0356\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\7\"\u036c\n\"\f\"\16"+
-		"\"\u036f\13\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\7\"\u0384\n\"\f\"\16\"\u0387\13\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\6\"\u0402\n\"\r\"\16"+
-		"\"\u0403\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3"+
-		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\""+
-		"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\5\"\u0529\n\"\3#"+
-		"\3#\3#\3#\3#\3#\3#\3#\7#\u0533\n#\f#\16#\u0536\13#\3#\3#\3#\3#\3#\3#\3"+
-		"#\3#\3#\3#\3#\7#\u0543\n#\f#\16#\u0546\13#\3#\3#\3#\3#\3#\3#\3#\3#\3#"+
-		"\7#\u0551\n#\f#\16#\u0554\13#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3"+
-		"#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3"+
-		"#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\3#\5#\u058f"+
-		"\n#\3$\3$\3$\3$\6$\u0595\n$\r$\16$\u0596\3$\3$\3%\3%\3%\3%\3%\3%\3%\3"+
-		"%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3"+
-		"%\3%\5%\u05bb\n%\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3"+
-		"&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\7&\u05e4"+
-		"\n&\f&\16&\u05e7\13&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\6&\u05f4\n&\r&\16"+
-		"&\u05f5\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\6&\u0603\n&\r&\16&\u0604\3&\3"+
-		"&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\6&\u0613\n&\r&\16&\u0614\3&\3&\3&\3&\3"+
-		"&\3&\3&\3&\3&\3&\6&\u0621\n&\r&\16&\u0622\3&\3&\3&\3&\3&\3&\3&\3&\3&\3"+
-		"&\3&\3&\3&\3&\3&\3&\3&\3&\3&\5&\u0638\n&\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3"+
-		"\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'"+
-		"\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3"+
-		"\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'"+
-		"\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3"+
-		"\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'"+
-		"\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\5\'\u06a7\n\'"+
-		"\3\'\3\'\3\'\3\'\5\'\u06ad\n\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'"+
-		"\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3"+
-		"\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'"+
-		"\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\5\'\u06ea\n\'"+
-		"\3(\3(\3(\3(\3(\3(\5(\u06f2\n(\3(\3(\3(\3(\3(\3(\3(\3(\3(\5(\u06fd\n("+
-		"\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\7)\u070c\n)\f)\16)\u070f\13)\3"+
-		")\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3"+
-		")\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\5)\u0739\n)\3*\3*\3"+
-		"*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3"+
-		"*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3"+
-		"*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\3*\5"+
-		"*\u0782\n*\3+\3+\3+\3+\3+\3+\3+\3+\3+\3+\3+\3+\3+\3+\3+\3+\3+\3+\5+\u0796"+
-		"\n+\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,"+
-		"\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,"+
-		"\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,"+
-		"\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,"+
-		"\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,"+
-		"\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,"+
-		"\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,"+
-		"\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,"+
-		"\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,\3,"+
-		"\3,\3,\3,\3,\5,\u086a\n,\3-\3-\3-\3-\3-\3-\3-\3-\3-\3-\3-\3-\3-\3-\3-"+
-		"\3-\5-\u087c\n-\3.\3.\5.\u0880\n.\3.\3.\5.\u0884\n.\3.\3.\3.\3/\3/\5/"+
-		"\u088b\n/\3/\3/\3/\3\60\3\60\3\60\3\60\3\61\3\61\3\61\3\61\3\62\3\62\3"+
-		"\62\3\62\3\62\5\62\u089d\n\62\3\63\3\63\3\63\3\63\3\63\3\63\3\63\3\63"+
-		"\3\63\5\63\u08a8\n\63\3\64\3\64\3\64\3\64\3\64\5\64\u08af\n\64\3\65\3"+
-		"\65\3\65\3\65\3\65\5\65\u08b6\n\65\3\66\3\66\3\66\2\3\66\67\2\4\6\b\n"+
-		"\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>@BDFHJLNPRTVXZ\\"+
-		"^`bdfhj\2\31\4\2\u0161\u0161\u01a9\u01a9\4\2\u00fb\u00fb\u0207\u0207\4"+
-		"\2++\64\64\5\2\u00a3\u00a3\u00dc\u00dc\u015a\u015a\6\2\u012b\u012b\u01d3"+
-		"\u01d3\u01d7\u01d7\u01e4\u01e5\5\2\3\3\u01f0\u01f0\u01fa\u01fa\4\2\u01ec"+
-		"\u01ec\u0202\u0202\3\2\5\b\3\2\u01f6\u01f9\4\2\t\t\u01f2\u01f5\4\2\u00da"+
-		"\u00da\u00ef\u00ef\3\2\u0191\u0192\4\2\u01aa\u01aa\u01b1\u01b1\5\2TT\u00fd"+
-		"\u00fd\u0173\u0174\3\2\u01c7\u01cf\4\2\u00fb\u00fb\u0102\u0102\4\2\u0188"+
-		"\u0189\u01e8\u01ea\4\2NNRS\3\2\u0148\u0150\3\2?@\3\2\62\63\3\2\u0132\u0133"+
-		"\6\2\f\f\u0112\u0112\u01ec\u01ec\u0202\u0202\2\u09cd\2l\3\2\2\2\4p\3\2"+
-		"\2\2\6\u00c9\3\2\2\2\b\u00cb\3\2\2\2\n\u00d6\3\2\2\2\f\u00d9\3\2\2\2\16"+
-		"\u00f3\3\2\2\2\20\u0106\3\2\2\2\22\u0108\3\2\2\2\24\u0110\3\2\2\2\26\u0120"+
-		"\3\2\2\2\30\u0127\3\2\2\2\32\u013a\3\2\2\2\34\u0141\3\2\2\2\36\u014c\3"+
-		"\2\2\2 \u0164\3\2\2\2\"\u0189\3\2\2\2$\u018b\3\2\2\2&\u01a2\3\2\2\2(\u01a9"+
-		"\3\2\2\2*\u01ab\3\2\2\2,\u01da\3\2\2\2.\u0219\3\2\2\2\60\u0221\3\2\2\2"+
-		"\62\u0223\3\2\2\2\64\u0228\3\2\2\2\66\u0260\3\2\2\28\u02e3\3\2\2\2:\u02e5"+
-		"\3\2\2\2<\u02f3\3\2\2\2>\u0306\3\2\2\2@\u0314\3\2\2\2B\u0528\3\2\2\2D"+
-		"\u058e\3\2\2\2F\u0590\3\2\2\2H\u05ba\3\2\2\2J\u0637\3\2\2\2L\u06e9\3\2"+
-		"\2\2N\u06fc\3\2\2\2P\u0738\3\2\2\2R\u0781\3\2\2\2T\u0795\3\2\2\2V\u0869"+
-		"\3\2\2\2X\u087b\3\2\2\2Z\u087f\3\2\2\2\\\u088a\3\2\2\2^\u088f\3\2\2\2"+
-		"`\u0893\3\2\2\2b\u089c\3\2\2\2d\u08a7\3\2\2\2f\u08ae\3\2\2\2h\u08b5\3"+
-		"\2\2\2j\u08b7\3\2\2\2lm\5\4\3\2mn\7\2\2\3no\b\2\1\2o\3\3\2\2\2pt\b\3\1"+
-		"\2qr\5\n\6\2rs\7\u0201\2\2su\3\2\2\2tq\3\2\2\2uv\3\2\2\2vt\3\2\2\2vw\3"+
-		"\2\2\2wx\3\2\2\2xy\b\3\1\2y\5\3\2\2\2z{\7\64\2\2{\u00ca\b\4\1\2|}\7\65"+
-		"\2\2}\u00ca\b\4\1\2~\177\7$\2\2\177\u00ca\b\4\1\2\u0080\u0081\7\'\2\2"+
-		"\u0081\u00ca\b\4\1\2\u0082\u0083\7_\2\2\u0083\u00ca\b\4\1\2\u0084\u0085"+
-		"\7d\2\2\u0085\u00ca\b\4\1\2\u0086\u0087\7g\2\2\u0087\u00ca\b\4\1\2\u0088"+
-		"\u0089\7h\2\2\u0089\u00ca\b\4\1\2\u008a\u008c\7|\2\2\u008b\u008d\7\u0134"+
-		"\2\2\u008c\u008b\3\2\2\2\u008c\u008d\3\2\2\2\u008d\u008e\3\2\2\2\u008e"+
-		"\u00ca\b\4\1\2\u008f\u0090\7\u009a\2\2\u0090\u00ca\b\4\1\2\u0091\u0092"+
-		"\7\u00c3\2\2\u0092\u00ca\b\4\1\2\u0093\u0094\7\u00c4\2\2\u0094\u00ca\b"+
-		"\4\1\2\u0095\u0096\7\u00c5\2\2\u0096\u00ca\b\4\1\2\u0097\u0098\7\u00c6"+
-		"\2\2\u0098\u00ca\b\4\1\2\u0099\u009a\7\u00c7\2\2\u009a\u00ca\b\4\1\2\u009b"+
-		"\u009c\7\u0108\2\2\u009c\u00ca\b\4\1\2\u009d\u009e\7\u010c\2\2\u009e\u00ca"+
-		"\b\4\1\2\u009f\u00a0\7\u0118\2\2\u00a0\u00ca\b\4\1\2\u00a1\u00a2\7\u0117"+
-		"\2\2\u00a2\u00ca\b\4\1\2\u00a3\u00a4\7\u012e\2\2\u00a4\u00ca\b\4\1\2\u00a5"+
-		"\u00a6\7\u0142\2\2\u00a6\u00ca\b\4\1\2\u00a7\u00a8\7\u0156\2\2\u00a8\u00a9"+
-		"\7\u01ba\2\2\u00a9\u00ca\b\4\1\2\u00aa\u00ab\7\u0179\2\2\u00ab\u00ca\b"+
-		"\4\1\2\u00ac\u00ad\7\u0178\2\2\u00ad\u00ca\b\4\1\2\u00ae\u00af\7\u017a"+
-		"\2\2\u00af\u00ca\b\4\1\2\u00b0\u00b1\7\u017c\2\2\u00b1\u00ca\b\4\1\2\u00b2"+
-		"\u00b3\7\u017b\2\2\u00b3\u00ca\b\4\1\2\u00b4\u00b5\7\u018d\2\2\u00b5\u00ca"+
-		"\b\4\1\2\u00b6\u00b7\7\u0196\2\2\u00b7\u00ca\b\4\1\2\u00b8\u00b9\7\u019e"+
-		"\2\2\u00b9\u00ca\b\4\1\2\u00ba\u00bb\7\u019f\2\2\u00bb\u00ca\b\4\1\2\u00bc"+
-		"\u00bd\7\u01b8\2\2\u00bd\u00ca\b\4\1\2\u00be\u00bf\7\u01b9\2\2\u00bf\u00ca"+
-		"\b\4\1\2\u00c0\u00c1\7\u01c6\2\2\u00c1\u00ca\b\4\1\2\u00c2\u00c5\5Z.\2"+
-		"\u00c3\u00c4\7\3\2\2\u00c4\u00c6\t\2\2\2\u00c5\u00c3\3\2\2\2\u00c5\u00c6"+
-		"\3\2\2\2\u00c6\u00c7\3\2\2\2\u00c7\u00c8\b\4\1\2\u00c8\u00ca\3\2\2\2\u00c9"+
-		"z\3\2\2\2\u00c9|\3\2\2\2\u00c9~\3\2\2\2\u00c9\u0080\3\2\2\2\u00c9\u0082"+
-		"\3\2\2\2\u00c9\u0084\3\2\2\2\u00c9\u0086\3\2\2\2\u00c9\u0088\3\2\2\2\u00c9"+
-		"\u008a\3\2\2\2\u00c9\u008f\3\2\2\2\u00c9\u0091\3\2\2\2\u00c9\u0093\3\2"+
-		"\2\2\u00c9\u0095\3\2\2\2\u00c9\u0097\3\2\2\2\u00c9\u0099\3\2\2\2\u00c9"+
-		"\u009b\3\2\2\2\u00c9\u009d\3\2\2\2\u00c9\u009f\3\2\2\2\u00c9\u00a1\3\2"+
-		"\2\2\u00c9\u00a3\3\2\2\2\u00c9\u00a5\3\2\2\2\u00c9\u00a7\3\2\2\2\u00c9"+
-		"\u00aa\3\2\2\2\u00c9\u00ac\3\2\2\2\u00c9\u00ae\3\2\2\2\u00c9\u00b0\3\2"+
-		"\2\2\u00c9\u00b2\3\2\2\2\u00c9\u00b4\3\2\2\2\u00c9\u00b6\3\2\2\2\u00c9"+
-		"\u00b8\3\2\2\2\u00c9\u00ba\3\2\2\2\u00c9\u00bc\3\2\2\2\u00c9\u00be\3\2"+
-		"\2\2\u00c9\u00c0\3\2\2\2\u00c9\u00c2\3\2\2\2\u00ca\7\3\2\2\2\u00cb\u00cc"+
-		"\7\u01fc\2\2\u00cc\u00ce\t\3\2\2\u00cd\u00cf\t\4\2\2\u00ce\u00cd\3\2\2"+
-		"\2\u00ce\u00cf\3\2\2\2\u00cf\u00d2\3\2\2\2\u00d0\u00d1\7\u01ee\2\2\u00d1"+
-		"\u00d3\7\u0207\2\2\u00d2\u00d0\3\2\2\2\u00d2\u00d3\3\2\2\2\u00d3\u00d4"+
-		"\3\2\2\2\u00d4\u00d5\7\u01ff\2\2\u00d5\t\3\2\2\2\u00d6\u00d7\5\f\7\2\u00d7"+
-		"\u00d8\b\6\1\2\u00d8\13\3\2\2\2\u00d9\u00da\5\16\b\2\u00da\u00db\b\7\1"+
-		"\2\u00db\r\3\2\2\2\u00dc\u00dd\7\u016f\2\2\u00dd\u00de\5(\25\2\u00de\u00df"+
-		"\5*\26\2\u00df\u00e0\b\b\1\2\u00e0\u00f4\3\2\2\2\u00e1\u00e2\7\u016f\2"+
-		"\2\u00e2\u00e3\5(\25\2\u00e3\u00e4\5T+\2\u00e4\u00e5\b\b\1\2\u00e5\u00f4"+
-		"\3\2\2\2\u00e6\u00e7\7\u016f\2\2\u00e7\u00e8\5(\25\2\u00e8\u00e9\5*\26"+
-		"\2\u00e9\u00ea\7\u00a1\2\2\u00ea\u00eb\5 \21\2\u00eb\u00ec\5\20\t\2\u00ec"+
-		"\u00ed\5\24\13\2\u00ed\u00ee\5\26\f\2\u00ee\u00ef\5\30\r\2\u00ef\u00f0"+
-		"\5\32\16\2\u00f0\u00f1\5\36\20\2\u00f1\u00f2\b\b\1\2\u00f2\u00f4\3\2\2"+
-		"\2\u00f3\u00dc\3\2\2\2\u00f3\u00e1\3\2\2\2\u00f3\u00e6\3\2\2\2\u00f4\17"+
-		"\3\2\2\2\u00f5\u0107\b\t\1\2\u00f6\u00f7\b\t\1\2\u00f7\u00f8\7\u00d9\2"+
-		"\2\u00f8\u00f9\7\u01bc\2\2\u00f9\u00fa\5T+\2\u00fa\u00fb\5\22\n\2\u00fb"+
-		"\u00fc\7\30\2\2\u00fc\u0101\5\22\n\2\u00fd\u00fe\7\u01ee\2\2\u00fe\u0100"+
-		"\5\22\n\2\u00ff\u00fd\3\2\2\2\u0100\u0103\3\2\2\2\u0101\u00ff\3\2\2\2"+
-		"\u0101\u0102\3\2\2\2\u0102\u0104\3\2\2\2\u0103\u0101\3\2\2\2\u0104\u0105"+
-		"\b\t\1\2\u0105\u0107\3\2\2\2\u0106\u00f5\3\2\2\2\u0106\u00f6\3\2\2\2\u0107"+
-		"\21\3\2\2\2\u0108\u0109\7\u0203\2\2\u0109\u010a\b\n\1\2\u010a\23\3\2\2"+
-		"\2\u010b\u0111\b\13\1\2\u010c\u010d\7\u01c0\2\2\u010d\u010e\5\66\34\2"+
-		"\u010e\u010f\b\13\1\2\u010f\u0111\3\2\2\2\u0110\u010b\3\2\2\2\u0110\u010c"+
-		"\3\2\2\2\u0111\25\3\2\2\2\u0112\u0121\b\f\1\2\u0113\u0114\b\f\1\2\u0114"+
-		"\u0115\7\u00aa\2\2\u0115\u0116\7*\2\2\u0116\u011b\5\66\34\2\u0117\u0118"+
-		"\7\u01ee\2\2\u0118\u011a\5\66\34\2\u0119\u0117\3\2\2\2\u011a\u011d\3\2"+
-		"\2\2\u011b\u0119\3\2\2\2\u011b\u011c\3\2\2\2\u011c\u011e\3\2\2\2\u011d"+
-		"\u011b\3\2\2\2\u011e\u011f\b\f\1\2\u011f\u0121\3\2\2\2\u0120\u0112\3\2"+
-		"\2\2\u0120\u0113\3\2\2\2\u0121\27\3\2\2\2\u0122\u0128\b\r\1\2\u0123\u0124"+
-		"\7\u00ad\2\2\u0124\u0125\5\66\34\2\u0125\u0126\b\r\1\2\u0126\u0128\3\2"+
-		"\2\2\u0127\u0122\3\2\2\2\u0127\u0123\3\2\2\2\u0128\31\3\2\2\2\u0129\u013b"+
-		"\b\16\1\2\u012a\u012b\b\16\1\2\u012b\u012c\7\u0120\2\2\u012c\u012d\7*"+
-		"\2\2\u012d\u012e\5Z.\2\u012e\u0135\5\34\17\2\u012f\u0130\7\u01ee\2\2\u0130"+
-		"\u0131\5Z.\2\u0131\u0132\5\34\17\2\u0132\u0134\3\2\2\2\u0133\u012f\3\2"+
-		"\2\2\u0134\u0137\3\2\2\2\u0135\u0133\3\2\2\2\u0135\u0136\3\2\2\2\u0136"+
-		"\u0138\3\2\2\2\u0137\u0135\3\2\2\2\u0138\u0139\b\16\1\2\u0139\u013b\3"+
-		"\2\2\2\u013a\u0129\3\2\2\2\u013a\u012a\3\2\2\2\u013b\33\3\2\2\2\u013c"+
-		"\u0142\b\17\1\2\u013d\u013e\7\31\2\2\u013e\u0142\b\17\1\2\u013f\u0140"+
-		"\7t\2\2\u0140\u0142\b\17\1\2\u0141\u013c\3\2\2\2\u0141\u013d\3\2\2\2\u0141"+
-		"\u013f\3\2\2\2\u0142\35\3\2\2\2\u0143\u014d\b\20\1\2\u0144\u0145\7\u00e0"+
-		"\2\2\u0145\u0146\7\u0204\2\2\u0146\u014d\b\20\1\2\u0147\u0148\7\u00e0"+
-		"\2\2\u0148\u0149\7\u0204\2\2\u0149\u014a\7\u01ee\2\2\u014a\u014b\7\u0204"+
-		"\2\2\u014b\u014d\b\20\1\2\u014c\u0143\3\2\2\2\u014c\u0144\3\2\2\2\u014c"+
-		"\u0147\3\2\2\2\u014d\37\3\2\2\2\u014e\u014f\5&\24\2\u014f\u0150\b\21\1"+
-		"\2\u0150\u0165\3\2\2\2\u0151\u0152\b\21\1\2\u0152\u0155\5&\24\2\u0153"+
-		"\u0154\7\u01ee\2\2\u0154\u0156\5&\24\2\u0155\u0153\3\2\2\2\u0156\u0157"+
-		"\3\2\2\2\u0157\u0155\3\2\2\2\u0157\u0158\3\2\2\2\u0158\u0159\3\2\2\2\u0159"+
-		"\u015a\b\21\1\2\u015a\u0165\3\2\2\2\u015b\u015c\b\21\1\2\u015c\u015e\5"+
-		"&\24\2\u015d\u015f\5\"\22\2\u015e\u015d\3\2\2\2\u015f\u0160\3\2\2\2\u0160"+
-		"\u015e\3\2\2\2\u0160\u0161\3\2\2\2\u0161\u0162\3\2\2\2\u0162\u0163\b\21"+
-		"\1\2\u0163\u0165\3\2\2\2\u0164\u014e\3\2\2\2\u0164\u0151\3\2\2\2\u0164"+
-		"\u015b\3\2\2\2\u0165!\3\2\2\2\u0166\u0168\7\u00bf\2\2\u0167\u0166\3\2"+
-		"\2\2\u0167\u0168\3\2\2\2\u0168\u0169\3\2\2\2\u0169\u016a\7\u00d3\2\2\u016a"+
-		"\u016b\5&\24\2\u016b\u016c\b\22\1\2\u016c\u018a\3\2\2\2\u016d\u016f\7"+
-		"\u00bf\2\2\u016e\u016d\3\2\2\2\u016e\u016f\3\2\2\2\u016f\u0170\3\2\2\2"+
-		"\u0170\u0171\7\u00d3\2\2\u0171\u0172\5&\24\2\u0172\u0173\5$\23\2\u0173"+
-		"\u0174\b\22\1\2\u0174\u018a\3\2\2\2\u0175\u0177\t\5\2\2\u0176\u0178\7"+
-		"\u0122\2\2\u0177\u0176\3\2\2\2\u0177\u0178\3\2\2\2\u0178\u0179\3\2\2\2"+
-		"\u0179\u017a\7\u00d3\2\2\u017a\u017b\5&\24\2\u017b\u017c\5$\23\2\u017c"+
-		"\u017d\b\22\1\2\u017d\u018a\3\2\2\2\u017e\u017f\7X\2\2\u017f\u0180\7\u00d3"+
-		"\2\2\u0180\u0181\5&\24\2\u0181\u0182\b\22\1\2\u0182\u018a\3\2\2\2\u0183"+
-		"\u0184\7X\2\2\u0184\u0185\7\u00d3\2\2\u0185\u0186\5&\24\2\u0186\u0187"+
-		"\5$\23\2\u0187\u0188\b\22\1\2\u0188\u018a\3\2\2\2\u0189\u0167\3\2\2\2"+
-		"\u0189\u016e\3\2\2\2\u0189\u0175\3\2\2\2\u0189\u017e\3\2\2\2\u0189\u0183"+
-		"\3\2\2\2\u018a#\3\2\2\2\u018b\u018c\7\u011c\2\2\u018c\u018d\5\66\34\2"+
-		"\u018d\u018e\b\23\1\2\u018e%\3\2\2\2\u018f\u0190\5\\/\2\u0190\u0191\b"+
-		"\24\1\2\u0191\u01a3\3\2\2\2\u0192\u0194\5\\/\2\u0193\u0195\7\30\2\2\u0194"+
-		"\u0193\3\2\2\2\u0194\u0195\3\2\2\2\u0195\u0196\3\2\2\2\u0196\u0197\7\u0203"+
-		"\2\2\u0197\u0198\b\24\1\2\u0198\u01a3\3\2\2\2\u0199\u019a\7\u01fc\2\2"+
-		"\u019a\u019b\5\16\b\2\u019b\u019d\7\u01ff\2\2\u019c\u019e\7\30\2\2\u019d"+
-		"\u019c\3\2\2\2\u019d\u019e\3\2\2\2\u019e\u019f\3\2\2\2\u019f\u01a0\7\u0203"+
-		"\2\2\u01a0\u01a1\b\24\1\2\u01a1\u01a3\3\2\2\2\u01a2\u018f\3\2\2\2\u01a2"+
-		"\u0192\3\2\2\2\u01a2\u0199\3\2\2\2\u01a3\'\3\2\2\2\u01a4\u01aa\b\25\1"+
-		"\2\u01a5\u01a6\7\24\2\2\u01a6\u01aa\b\25\1\2\u01a7\u01a8\7y\2\2\u01a8"+
-		"\u01aa\b\25\1\2\u01a9\u01a4\3\2\2\2\u01a9\u01a5\3\2\2\2\u01a9\u01a7\3"+
-		"\2\2\2\u01aa)\3\2\2\2\u01ab\u01ac\b\26\1\2\u01ac\u01b1\5,\27\2\u01ad\u01ae"+
-		"\7\u01ee\2\2\u01ae\u01b0\5,\27\2\u01af\u01ad\3\2\2\2\u01b0\u01b3\3\2\2"+
-		"\2\u01b1\u01af\3\2\2\2\u01b1\u01b2\3\2\2\2\u01b2\u01b4\3\2\2\2\u01b3\u01b1"+
-		"\3\2\2\2\u01b4\u01b5\b\26\1\2\u01b5+\3\2\2\2\u01b6\u01b8\5\66\34\2\u01b7"+
-		"\u01b9\7\30\2\2\u01b8\u01b7\3\2\2\2\u01b8\u01b9\3\2\2\2\u01b9\u01ba\3"+
-		"\2\2\2\u01ba\u01bb\7\u0203\2\2\u01bb\u01bc\b\27\1\2\u01bc\u01db\3\2\2"+
-		"\2\u01bd\u01be\5\66\34\2\u01be\u01bf\b\27\1\2\u01bf\u01db\3\2\2\2\u01c0"+
-		"\u01c2\5\66\34\2\u01c1\u01c3\7\30\2\2\u01c2\u01c1\3\2\2\2\u01c2\u01c3"+
-		"\3\2\2\2\u01c3\u01c4\3\2\2\2\u01c4\u01c5\7\u0203\2\2\u01c5\u01c6\b\27"+
-		"\1\2\u01c6\u01db\3\2\2\2\u01c7\u01c8\5\66\34\2\u01c8\u01c9\b\27\1\2\u01c9"+
-		"\u01db\3\2\2\2\u01ca\u01cb\7\u01fa\2\2\u01cb\u01db\b\27\1\2\u01cc\u01cd"+
-		"\7\u0203\2\2\u01cd\u01ce\7\4\2\2\u01ce\u01cf\7\u01fa\2\2\u01cf\u01db\b"+
-		"\27\1\2\u01d0\u01d1\5.\30\2\u01d1\u01d2\b\27\1\2\u01d2\u01db\3\2\2\2\u01d3"+
-		"\u01d5\5.\30\2\u01d4\u01d6\7\30\2\2\u01d5\u01d4\3\2\2\2\u01d5\u01d6\3"+
-		"\2\2\2\u01d6\u01d7\3\2\2\2\u01d7\u01d8\7\u0203\2\2\u01d8\u01d9\b\27\1"+
-		"\2\u01d9\u01db\3\2\2\2\u01da\u01b6\3\2\2\2\u01da\u01bd\3\2\2\2\u01da\u01c0"+
-		"\3\2\2\2\u01da\u01c7\3\2\2\2\u01da\u01ca\3\2\2\2\u01da\u01cc\3\2\2\2\u01da"+
-		"\u01d0\3\2\2\2\u01da\u01d3\3\2\2\2\u01db-\3\2\2\2\u01dc\u01dd\b\30\1\2"+
-		"\u01dd\u01de\5\60\31\2\u01de\u01df\7\u0123\2\2\u01df\u01e0\7\u01fc\2\2"+
-		"\u01e0\u01e1\7\u0128\2\2\u01e1\u01e2\7*\2\2\u01e2\u01e7\5Z.\2\u01e3\u01e4"+
-		"\7\u01ee\2\2\u01e4\u01e6\5Z.\2\u01e5\u01e3\3\2\2\2\u01e6\u01e9\3\2\2\2"+
-		"\u01e7\u01e5\3\2\2\2\u01e7\u01e8\3\2\2\2\u01e8\u01ea\3\2\2\2\u01e9\u01e7"+
-		"\3\2\2\2\u01ea\u01eb\7\u01ff\2\2\u01eb\u01ec\b\30\1\2\u01ec\u021a\3\2"+
-		"\2\2\u01ed\u01ee\b\30\1\2\u01ee\u01ef\5\60\31\2\u01ef\u01f0\7\u0123\2"+
-		"\2\u01f0\u01f1\7\u01fc\2\2\u01f1\u01f2\7\u0120\2\2\u01f2\u01f3\7*\2\2"+
-		"\u01f3\u01f8\5Z.\2\u01f4\u01f5\7\u01ee\2\2\u01f5\u01f7\5Z.\2\u01f6\u01f4"+
-		"\3\2\2\2\u01f7\u01fa\3\2\2\2\u01f8\u01f6\3\2\2\2\u01f8\u01f9\3\2\2\2\u01f9"+
-		"\u01fb\3\2\2\2\u01fa\u01f8\3\2\2\2\u01fb\u01fc\7\u01ff\2\2\u01fc\u01fd"+
-		"\b\30\1\2\u01fd\u021a\3\2\2\2\u01fe\u01ff\b\30\1\2\u01ff\u0200\5\60\31"+
-		"\2\u0200\u0201\7\u0123\2\2\u0201\u0202\7\u01fc\2\2\u0202\u0203\7\u0128"+
-		"\2\2\u0203\u0204\7*\2\2\u0204\u0209\5Z.\2\u0205\u0206\7\u01ee\2\2\u0206"+
-		"\u0208\5Z.\2\u0207\u0205\3\2\2\2\u0208\u020b\3\2\2\2\u0209\u0207\3\2\2"+
-		"\2\u0209\u020a\3\2\2\2\u020a\u020c\3\2\2\2\u020b\u0209\3\2\2\2\u020c\u020d"+
-		"\7\u0120\2\2\u020d\u020e\7*\2\2\u020e\u0213\5Z.\2\u020f\u0210\7\u01ee"+
-		"\2\2\u0210\u0212\5Z.\2\u0211\u020f\3\2\2\2\u0212\u0215\3\2\2\2\u0213\u0211"+
-		"\3\2\2\2\u0213\u0214\3\2\2\2\u0214\u0216\3\2\2\2\u0215\u0213\3\2\2\2\u0216"+
-		"\u0217\7\u01ff\2\2\u0217\u0218\b\30\1\2\u0218\u021a\3\2\2\2\u0219\u01dc"+
-		"\3\2\2\2\u0219\u01ed\3\2\2\2\u0219\u01fe\3\2\2\2\u021a/\3\2\2\2\u021b"+
-		"\u021c\5P)\2\u021c\u021d\b\31\1\2\u021d\u0222\3\2\2\2\u021e\u021f\5\62"+
-		"\32\2\u021f\u0220\b\31\1\2\u0220\u0222\3\2\2\2\u0221\u021b\3\2\2\2\u0221"+
-		"\u021e\3\2\2\2\u0222\61\3\2\2\2\u0223\u0224\t\6\2\2\u0224\u0225\7\u01fc"+
-		"\2\2\u0225\u0226\7\u01ff\2\2\u0226\u0227\b\32\1\2\u0227\63\3\2\2\2\u0228"+
-		"\u0229\b\33\1\2\u0229\u022a\7\u01fc\2\2\u022a\u022f\5\66\34\2\u022b\u022c"+
-		"\7\u01ee\2\2\u022c\u022e\5\66\34\2\u022d\u022b\3\2\2\2\u022e\u0231\3\2"+
-		"\2\2\u022f\u022d\3\2\2\2\u022f\u0230\3\2\2\2\u0230\u0232\3\2\2\2\u0231"+
-		"\u022f\3\2\2\2\u0232\u0233\7\u01ff\2\2\u0233\u0234\b\33\1\2\u0234\65\3"+
-		"\2\2\2\u0235\u0236\b\34\1\2\u0236\u0237\5X-\2\u0237\u0238\b\34\1\2\u0238"+
-		"\u0261\3\2\2\2\u0239\u023a\5Z.\2\u023a\u023b\b\34\1\2\u023b\u0261\3\2"+
-		"\2\2\u023c\u023d\5j\66\2\u023d\u023e\5\66\34\r\u023e\u023f\b\34\1\2\u023f"+
-		"\u0261\3\2\2\2\u0240\u0241\7\u01fc\2\2\u0241\u0242\5\66\34\2\u0242\u0243"+
-		"\7\u01ff\2\2\u0243\u0244\b\34\1\2\u0244\u0261\3\2\2\2\u0245\u0246\5N("+
-		"\2\u0246\u0247\b\34\1\2\u0247\u0261\3\2\2\2\u0248\u0249\5V,\2\u0249\u024a"+
-		"\b\34\1\2\u024a\u0261\3\2\2\2\u024b\u024c\5L\'\2\u024c\u024d\b\34\1\2"+
-		"\u024d\u0261\3\2\2\2\u024e\u024f\5J&\2\u024f\u0250\b\34\1\2\u0250\u0261"+
-		"\3\2\2\2\u0251\u0252\5B\"\2\u0252\u0253\b\34\1\2\u0253\u0261\3\2\2\2\u0254"+
-		"\u0255\5F$\2\u0255\u0256\b\34\1\2\u0256\u0261\3\2\2\2\u0257\u0258\5D#"+
-		"\2\u0258\u0259\b\34\1\2\u0259\u0261\3\2\2\2\u025a\u025b\5R*\2\u025b\u025c"+
-		"\b\34\1\2\u025c\u0261\3\2\2\2\u025d\u025e\58\35\2\u025e\u025f\b\34\1\2"+
-		"\u025f\u0261\3\2\2\2\u0260\u0235\3\2\2\2\u0260\u0239\3\2\2\2\u0260\u023c"+
-		"\3\2\2\2\u0260\u0240\3\2\2\2\u0260\u0245\3\2\2\2\u0260\u0248\3\2\2\2\u0260"+
-		"\u024b\3\2\2\2\u0260\u024e\3\2\2\2\u0260\u0251\3\2\2\2\u0260\u0254\3\2"+
-		"\2\2\u0260\u0257\3\2\2\2\u0260\u025a\3\2\2\2\u0260\u025d\3\2\2\2\u0261"+
-		"\u02b8\3\2\2\2\u0262\u0263\f\36\2\2\u0263\u0264\t\7\2\2\u0264\u0265\5"+
-		"\66\34\37\u0265\u0266\b\34\1\2\u0266\u02b7\3\2\2\2\u0267\u0268\f\35\2"+
-		"\2\u0268\u0269\t\b\2\2\u0269\u026a\5\66\34\36\u026a\u026b\b\34\1\2\u026b"+
-		"\u02b7\3\2\2\2\u026c\u026d\f\34\2\2\u026d\u026e\t\t\2\2\u026e\u026f\5"+
-		"\66\34\35\u026f\u0270\b\34\1\2\u0270\u02b7\3\2\2\2\u0271\u0272\f\33\2"+
-		"\2\u0272\u0273\t\n\2\2\u0273\u0274\5\66\34\34\u0274\u0275\b\34\1\2\u0275"+
-		"\u02b7\3\2\2\2\u0276\u0277\f\32\2\2\u0277\u0278\t\13\2\2\u0278\u0279\5"+
-		"\66\34\33\u0279\u027a\b\34\1\2\u027a\u02b7\3\2\2\2\u027b\u027c\f\31\2"+
-		"\2\u027c\u027d\7\26\2\2\u027d\u027e\5\66\34\32\u027e\u027f\b\34\1\2\u027f"+
-		"\u02b7\3\2\2\2\u0280\u0281\f\30\2\2\u0281\u0282\7\u011f\2\2\u0282\u0283"+
-		"\5\66\34\31\u0283\u0284\b\34\1\2\u0284\u02b7\3\2\2\2\u0285\u0286\f\25"+
-		"\2\2\u0286\u0287\7#\2\2\u0287\u0288\5\66\34\2\u0288\u0289\7\26\2\2\u0289"+
-		"\u028a\5\66\34\26\u028a\u028b\b\34\1\2\u028b\u02b7\3\2\2\2\u028c\u028d"+
-		"\f\24\2\2\u028d\u028e\7\u0112\2\2\u028e\u028f\7#\2\2\u028f\u0290\5\66"+
-		"\34\2\u0290\u0291\7\26\2\2\u0291\u0292\5\66\34\25\u0292\u0293\b\34\1\2"+
-		"\u0293\u02b7\3\2\2\2\u0294\u0295\f\20\2\2\u0295\u0296\5d\63\2\u0296\u0297"+
-		"\5\66\34\21\u0297\u0298\b\34\1\2\u0298\u02b7\3\2\2\2\u0299\u029a\f\27"+
-		"\2\2\u029a\u029b\5b\62\2\u029b\u029c\7\16\2\2\u029c\u029d\b\34\1\2\u029d"+
-		"\u02b7\3\2\2\2\u029e\u029f\f\26\2\2\u029f\u02a0\5b\62\2\u02a0\u02a1\7"+
-		"\r\2\2\u02a1\u02a2\b\34\1\2\u02a2\u02b7\3\2\2\2\u02a3\u02a4\f\23\2\2\u02a4"+
-		"\u02a5\5f\64\2\u02a5\u02a6\5\64\33\2\u02a6\u02a7\b\34\1\2\u02a7\u02b7"+
-		"\3\2\2\2\u02a8\u02a9\f\22\2\2\u02a9\u02aa\5f\64\2\u02aa\u02ab\7\u01fc"+
-		"\2\2\u02ab\u02ac\5\16\b\2\u02ac\u02ad\7\u01ff\2\2\u02ad\u02ae\b\34\1\2"+
-		"\u02ae\u02b7\3\2\2\2\u02af\u02b0\f\21\2\2\u02b0\u02b1\5h\65\2\u02b1\u02b2"+
-		"\7\u01fc\2\2\u02b2\u02b3\5\16\b\2\u02b3\u02b4\7\u01ff\2\2\u02b4\u02b5"+
-		"\b\34\1\2\u02b5\u02b7\3\2\2\2\u02b6\u0262\3\2\2\2\u02b6\u0267\3\2\2\2"+
-		"\u02b6\u026c\3\2\2\2\u02b6\u0271\3\2\2\2\u02b6\u0276\3\2\2\2\u02b6\u027b"+
-		"\3\2\2\2\u02b6\u0280\3\2\2\2\u02b6\u0285\3\2\2\2\u02b6\u028c\3\2\2\2\u02b6"+
-		"\u0294\3\2\2\2\u02b6\u0299\3\2\2\2\u02b6\u029e\3\2\2\2\u02b6\u02a3\3\2"+
-		"\2\2\u02b6\u02a8\3\2\2\2\u02b6\u02af\3\2\2\2\u02b7\u02ba\3\2\2\2\u02b8"+
-		"\u02b6\3\2\2\2\u02b8\u02b9\3\2\2\2\u02b9\67\3\2\2\2\u02ba\u02b8\3\2\2"+
-		"\2\u02bb\u02bc\5:\36\2\u02bc\u02bd\b\35\1\2\u02bd\u02e4\3\2\2\2\u02be"+
-		"\u02bf\5<\37\2\u02bf\u02c0\b\35\1\2\u02c0\u02e4\3\2\2\2\u02c1\u02c2\5"+
-		"> \2\u02c2\u02c3\b\35\1\2\u02c3\u02e4\3\2\2\2\u02c4\u02c5\5@!\2\u02c5"+
-		"\u02c6\b\35\1\2\u02c6\u02e4\3\2\2\2\u02c7\u02c8\5Z.\2\u02c8\u02c9\7\u01fd"+
-		"\2\2\u02c9\u02ca\5\66\34\2\u02ca\u02cb\7\u0200\2\2\u02cb\u02cc\b\35\1"+
-		"\2\u02cc\u02e4\3\2\2\2\u02cd\u02ce\5:\36\2\u02ce\u02cf\7\u01fd\2\2\u02cf"+
-		"\u02d0\5\66\34\2\u02d0\u02d1\7\u0200\2\2\u02d1\u02d2\b\35\1\2\u02d2\u02e4"+
-		"\3\2\2\2\u02d3\u02d4\5<\37\2\u02d4\u02d5\7\u01fd\2\2\u02d5\u02d6\5\66"+
-		"\34\2\u02d6\u02d7\7\u0200\2\2\u02d7\u02d8\b\35\1\2\u02d8\u02e4\3\2\2\2"+
-		"\u02d9\u02da\5Z.\2\u02da\u02db\7\4\2\2\u02db\u02dc\5\66\34\2\u02dc\u02dd"+
-		"\b\35\1\2\u02dd\u02e4\3\2\2\2\u02de\u02df\5> \2\u02df\u02e0\7\4\2\2\u02e0"+
-		"\u02e1\5\66\34\2\u02e1\u02e2\b\35\1\2\u02e2\u02e4\3\2\2\2\u02e3\u02bb"+
-		"\3\2\2\2\u02e3\u02be\3\2\2\2\u02e3\u02c1\3\2\2\2\u02e3\u02c4\3\2\2\2\u02e3"+
-		"\u02c7\3\2\2\2\u02e3\u02cd\3\2\2\2\u02e3\u02d3\3\2\2\2\u02e3\u02d9\3\2"+
-		"\2\2\u02e3\u02de\3\2\2\2\u02e49\3\2\2\2\u02e5\u02e6\b\36\1\2\u02e6\u02e7"+
-		"\7\27\2\2\u02e7\u02e8\7\u01fc\2\2\u02e8\u02ed\5\66\34\2\u02e9\u02ea\7"+
-		"\u01ee\2\2\u02ea\u02ec\5\66\34\2\u02eb\u02e9\3\2\2\2\u02ec\u02ef\3\2\2"+
-		"\2\u02ed\u02eb\3\2\2\2\u02ed\u02ee\3\2\2\2\u02ee\u02f0\3\2\2\2\u02ef\u02ed"+
-		"\3\2\2\2\u02f0\u02f1\7\u01ff\2\2\u02f1\u02f2\b\36\1\2\u02f2;\3\2\2\2\u02f3"+
-		"\u02f4\b\37\1\2\u02f4\u02f5\7\u00f3\2\2\u02f5\u02f6\7\u01fc\2\2\u02f6"+
-		"\u02f7\5\66\34\2\u02f7\u02f8\7\u01ee\2\2\u02f8\u0300\5\66\34\2\u02f9\u02fa"+
-		"\7\u01ee\2\2\u02fa\u02fb\5\66\34\2\u02fb\u02fc\7\u01ee\2\2\u02fc\u02fd"+
-		"\5\66\34\2\u02fd\u02ff\3\2\2\2\u02fe\u02f9\3\2\2\2\u02ff\u0302\3\2\2\2"+
-		"\u0300\u02fe\3\2\2\2\u0300\u0301\3\2\2\2\u0301\u0303\3\2\2\2\u0302\u0300"+
-		"\3\2\2\2\u0303\u0304\7\u01ff\2\2\u0304\u0305\b\37\1\2\u0305=\3\2\2\2\u0306"+
-		"\u0307\b \1\2\u0307\u0308\7\u018f\2\2\u0308\u0309\7\u01fc\2\2\u0309\u030e"+
-		"\5\66\34\2\u030a\u030b\7\u01ee\2\2\u030b\u030d\5\66\34\2\u030c\u030a\3"+
-		"\2\2\2\u030d\u0310\3\2\2\2\u030e\u030c\3\2\2\2\u030e\u030f\3\2\2\2\u030f"+
-		"\u0311\3\2\2\2\u0310\u030e\3\2\2\2\u0311\u0312\7\u01ff\2\2\u0312\u0313"+
-		"\b \1\2\u0313?\3\2\2\2\u0314\u0315\b!\1\2\u0315\u0316\7\u0107\2\2\u0316"+
-		"\u0317\7\u01fc\2\2\u0317\u0318\5\66\34\2\u0318\u0319\7\u01ee\2\2\u0319"+
-		"\u0321\5\66\34\2\u031a\u031b\7\u01ee\2\2\u031b\u031c\5\66\34\2\u031c\u031d"+
-		"\7\u01ee\2\2\u031d\u031e\5\66\34\2\u031e\u0320\3\2\2\2\u031f\u031a\3\2"+
-		"\2\2\u0320\u0323\3\2\2\2\u0321\u031f\3\2\2\2\u0321\u0322\3\2\2\2\u0322"+
-		"\u0324\3\2\2\2\u0323\u0321\3\2\2\2\u0324\u0325\7\u01ff\2\2\u0325\u0326"+
-		"\b!\1\2\u0326A\3\2\2\2\u0327\u0328\7\32\2\2\u0328\u0329\7\u01fc\2\2\u0329"+
-		"\u032a\5\66\34\2\u032a\u032b\7\u01ff\2\2\u032b\u032c\b\"\1\2\u032c\u0529"+
-		"\3\2\2\2\u032d\u032e\7!\2\2\u032e\u032f\7\u01fc\2\2\u032f\u0330\5\66\34"+
-		"\2\u0330\u0331\7\u01ff\2\2\u0331\u0332\b\"\1\2\u0332\u0529\3\2\2\2\u0333"+
-		"\u0334\7\66\2\2\u0334\u0335\7\u01fc\2\2\u0335\u0336\5\66\34\2\u0336\u0337"+
-		"\7\u01ff\2\2\u0337\u0338\b\"\1\2\u0338\u0529\3\2\2\2\u0339\u033a\78\2"+
-		"\2\u033a\u033b\7\u01fc\2\2\u033b\u033c\5\66\34\2\u033c\u033d\7\u01ff\2"+
-		"\2\u033d\u033e\b\"\1\2\u033e\u0529\3\2\2\2\u033f\u0340\b\"\1\2\u0340\u0341"+
-		"\7G\2\2\u0341\u0342\7\u01fc\2\2\u0342\u0345\5\66\34\2\u0343\u0344\7\u01ee"+
-		"\2\2\u0344\u0346\5\66\34\2\u0345\u0343\3\2\2\2\u0346\u0347\3\2\2\2\u0347"+
-		"\u0345\3\2\2\2\u0347\u0348\3\2\2\2\u0348\u0349\3\2\2\2\u0349\u034a\7\u01ff"+
-		"\2\2\u034a\u034b\b\"\1\2\u034b\u0529\3\2\2\2\u034c\u034d\b\"\1\2\u034d"+
-		"\u034e\7H\2\2\u034e\u034f\7\u01fc\2\2\u034f\u0350\5\66\34\2\u0350\u0351"+
-		"\7\u01ee\2\2\u0351\u0354\5\66\34\2\u0352\u0353\7\u01ee\2\2\u0353\u0355"+
-		"\5\66\34\2\u0354\u0352\3\2\2\2\u0355\u0356\3\2\2\2\u0356\u0354\3\2\2\2"+
-		"\u0356\u0357\3\2\2\2\u0357\u0358\3\2\2\2\u0358\u0359\7\u01ff\2\2\u0359"+
-		"\u035a\b\"\1\2\u035a\u0529\3\2\2\2\u035b\u035c\7i\2\2\u035c\u035d\7\u01fc"+
-		"\2\2\u035d\u035e\5\66\34\2\u035e\u035f\7\u01ee\2\2\u035f\u0360\5\66\34"+
-		"\2\u0360\u0361\7\u01ff\2\2\u0361\u0362\b\"\1\2\u0362\u0529\3\2\2\2\u0363"+
-		"\u0364\b\"\1\2\u0364\u0365\7\u0082\2\2\u0365\u0366\7\u01fc\2\2\u0366\u0367"+
-		"\5\66\34\2\u0367\u0368\7\u01ee\2\2\u0368\u036d\5\66\34\2\u0369\u036a\7"+
-		"\u01ee\2\2\u036a\u036c\5\66\34\2\u036b\u0369\3\2\2\2\u036c\u036f\3\2\2"+
-		"\2\u036d\u036b\3\2\2\2\u036d\u036e\3\2\2\2\u036e\u0370\3\2\2\2\u036f\u036d"+
-		"\3\2\2\2\u0370\u0371\7\u01ff\2\2\u0371\u0372\b\"\1\2\u0372\u0529\3\2\2"+
-		"\2\u0373\u0374\7\u0084\2\2\u0374\u0375\7\u01fc\2\2\u0375\u0376\5\66\34"+
-		"\2\u0376\u0377\7\u01ee\2\2\u0377\u0378\5\66\34\2\u0378\u0379\7\u01ff\2"+
-		"\2\u0379\u037a\b\"\1\2\u037a\u0529\3\2\2\2\u037b\u037c\b\"\1\2\u037c\u037d"+
-		"\7\u0095\2\2\u037d\u037e\7\u01fc\2\2\u037e\u037f\5\66\34\2\u037f\u0380"+
-		"\7\u01ee\2\2\u0380\u0385\5\66\34\2\u0381\u0382\7\u01ee\2\2\u0382\u0384"+
-		"\5\66\34\2\u0383\u0381\3\2\2\2\u0384\u0387\3\2\2\2\u0385\u0383\3\2\2\2"+
-		"\u0385\u0386\3\2\2\2\u0386\u0388\3\2\2\2\u0387\u0385\3\2\2\2\u0388\u0389"+
-		"\7\u01ff\2\2\u0389\u038a\b\"\1\2\u038a\u0529\3\2\2\2\u038b\u038c\7\u0097"+
-		"\2\2\u038c\u038d\7\u01fc\2\2\u038d\u038e\5\66\34\2\u038e\u038f\7\u01ee"+
-		"\2\2\u038f\u0390\5\66\34\2\u0390\u0391\7\u01ff\2\2\u0391\u0392\b\"\1\2"+
-		"\u0392\u0529\3\2\2\2\u0393\u0394\7\u009f\2\2\u0394\u0395\7\u01fc\2\2\u0395"+
-		"\u0396\5\66\34\2\u0396\u0397\7\u01ee\2\2\u0397\u0398\5\66\34\2\u0398\u0399"+
-		"\7\u01ff\2\2\u0399\u039a\b\"\1\2\u039a\u0529\3\2\2\2\u039b\u039c\7\u00a6"+
-		"\2\2\u039c\u039d\7\u01fc\2\2\u039d\u039e\5\66\34\2\u039e\u039f\7\u01ee"+
-		"\2\2\u039f\u03a0\5\66\34\2\u03a0\u03a1\7\u01ff\2\2\u03a1\u03a2\b\"\1\2"+
-		"\u03a2\u0529\3\2\2\2\u03a3\u03a4\7\u00bb\2\2\u03a4\u03a5\7\u01fc\2\2\u03a5"+
-		"\u03a6\5\66\34\2\u03a6\u03a7\7\u01ee\2\2\u03a7\u03a8\5\66\34\2\u03a8\u03a9"+
-		"\7\u01ff\2\2\u03a9\u03aa\b\"\1\2\u03aa\u0529\3\2\2\2\u03ab\u03ac\7\u00c2"+
-		"\2\2\u03ac\u03ad\7\u01fc\2\2\u03ad\u03ae\5\66\34\2\u03ae\u03af\7\u01ee"+
-		"\2\2\u03af\u03b0\5\66\34\2\u03b0\u03b1\7\u01ff\2\2\u03b1\u03b2\b\"\1\2"+
-		"\u03b2\u0529\3\2\2\2\u03b3\u03b4\7\u00dd\2\2\u03b4\u03b5\7\u01fc\2\2\u03b5"+
-		"\u03b6\5\66\34\2\u03b6\u03b7\7\u01ff\2\2\u03b7\u03b8\b\"\1\2\u03b8\u0529"+
-		"\3\2\2\2\u03b9\u03ba\7\u00e3\2\2\u03ba\u03bb\7\u01fc\2\2\u03bb\u03bc\5"+
-		"\66\34\2\u03bc\u03bd\7\u01ee\2\2\u03bd\u03be\5\66\34\2\u03be\u03bf\7\u01ff"+
-		"\2\2\u03bf\u03c0\b\"\1\2\u03c0\u0529\3\2\2\2\u03c1\u03c2\7\u00e3\2\2\u03c2"+
-		"\u03c3\7\u01fc\2\2\u03c3\u03c4\5\66\34\2\u03c4\u03c5\7\u01ee\2\2\u03c5"+
-		"\u03c6\5\66\34\2\u03c6\u03c7\7\u01ee\2\2\u03c7\u03c8\5\66\34\2\u03c8\u03c9"+
-		"\7\u01ff\2\2\u03c9\u03ca\b\"\1\2\u03ca\u0529\3\2\2\2\u03cb\u03cc\t\f\2"+
-		"\2\u03cc\u03cd\7\u01fc\2\2\u03cd\u03ce\5\66\34\2\u03ce\u03cf\7\u01ff\2"+
-		"\2\u03cf\u03d0\b\"\1\2\u03d0\u0529\3\2\2\2\u03d1\u03d2\7\u00f0\2\2\u03d2"+
-		"\u03d3\7\u01fc\2\2\u03d3\u03d4\5\66\34\2\u03d4\u03d5\7\u01ee\2\2\u03d5"+
-		"\u03d6\5\66\34\2\u03d6\u03d7\7\u01ee\2\2\u03d7\u03d8\5\66\34\2\u03d8\u03d9"+
-		"\7\u01ff\2\2\u03d9\u03da\b\"\1\2\u03da\u0529\3\2\2\2\u03db\u03dc\7\u00f2"+
-		"\2\2\u03dc\u03dd\7\u01fc\2\2\u03dd\u03de\5\66\34\2\u03de\u03df\7\u01ff"+
-		"\2\2\u03df\u03e0\b\"\1\2\u03e0\u0529\3\2\2\2\u03e1\u03e2\7\u011a\2\2\u03e2"+
-		"\u03e3\7\u01fc\2\2\u03e3\u03e4\5\66\34\2\u03e4\u03e5\7\u01ff\2\2\u03e5"+
-		"\u03e6\b\"\1\2\u03e6\u0529\3\2\2\2\u03e7\u03e8\7\u0127\2\2\u03e8\u03e9"+
-		"\7\u01fc\2\2\u03e9\u03ea\5\66\34\2\u03ea\u03eb\7\u01ee\2\2\u03eb\u03ec"+
-		"\5\66\34\2\u03ec\u03ed\7\u01ff\2\2\u03ed\u03ee\b\"\1\2\u03ee\u0529\3\2"+
-		"\2\2\u03ef\u03f0\7\u0127\2\2\u03f0\u03f1\7\u01fc\2\2\u03f1\u03f2\5\66"+
-		"\34\2\u03f2\u03f3\7\u01ee\2\2\u03f3\u03f4\5\66\34\2\u03f4\u03f5\7\u01ee"+
-		"\2\2\u03f5\u03f6\5\66\34\2\u03f6\u03f7\7\u01ff\2\2\u03f7\u03f8\b\"\1\2"+
-		"\u03f8\u0529\3\2\2\2\u03f9\u03fa\b\"\1\2\u03fa\u03fb\7\u0137\2\2\u03fb"+
-		"\u03fc\7\u01fc\2\2\u03fc\u03fd\5\66\34\2\u03fd\u03fe\7\u01ee\2\2\u03fe"+
-		"\u0401\5\66\34\2\u03ff\u0400\7\u01ee\2\2\u0400\u0402\5\66\34\2\u0401\u03ff"+
-		"\3\2\2\2\u0402\u0403\3\2\2\2\u0403\u0401\3\2\2\2\u0403\u0404\3\2\2\2\u0404"+
-		"\u0405\3\2\2\2\u0405\u0406\7\u01ff\2\2\u0406\u0407\b\"\1\2\u0407\u0529"+
-		"\3\2\2\2\u0408\u0409\7\u013e\2\2\u0409\u040a\7\u01fc\2\2\u040a\u040b\5"+
-		"\66\34\2\u040b\u040c\7\u01ff\2\2\u040c\u040d\b\"\1\2\u040d\u0529\3\2\2"+
-		"\2\u040e\u040f\7\u0146\2\2\u040f\u0410\7\u01fc\2\2\u0410\u0411\5\66\34"+
-		"\2\u0411\u0412\7\u01ee\2\2\u0412\u0413\5\66\34\2\u0413\u0414\7\u01ee\2"+
-		"\2\u0414\u0415\5\66\34\2\u0415\u0416\7\u01ff\2\2\u0416\u0417\b\"\1\2\u0417"+
-		"\u0529\3\2\2\2\u0418\u0419\7\u0147\2\2\u0419\u041a\7\u01fc\2\2\u041a\u041b"+
-		"\5\66\34\2\u041b\u041c\7\u01ee\2\2\u041c\u041d\5\66\34\2\u041d\u041e\7"+
-		"\u01ee\2\2\u041e\u041f\5\66\34\2\u041f\u0420\7\u01ff\2\2\u0420\u0421\b"+
-		"\"\1\2\u0421\u0529\3\2\2\2\u0422\u0423\7\u0151\2\2\u0423\u0424\7\u01fc"+
-		"\2\2\u0424\u0425\5\66\34\2\u0425\u0426\7\u01ee\2\2\u0426\u0427\5\66\34"+
-		"\2\u0427\u0428\7\u01ff\2\2\u0428\u0429\b\"\1\2\u0429\u0529\3\2\2\2\u042a"+
-		"\u042b\7\u0152\2\2\u042b\u042c\7\u01fc\2\2\u042c\u042d\5\66\34\2\u042d"+
-		"\u042e\7\u01ee\2\2\u042e\u042f\5\66\34\2\u042f\u0430\7\u01ee\2\2\u0430"+
-		"\u0431\5\66\34\2\u0431\u0432\7\u01ff\2\2\u0432\u0433\b\"\1\2\u0433\u0529"+
-		"\3\2\2\2\u0434\u0435\7\u0159\2\2\u0435\u0436\7\u01fc\2\2\u0436\u0437\5"+
-		"\66\34\2\u0437\u0438\7\u01ff\2\2\u0438\u0439\b\"\1\2\u0439\u0529\3\2\2"+
-		"\2\u043a\u043b\7\u0163\2\2\u043b\u043c\7\u01fc\2\2\u043c\u043d\5\66\34"+
-		"\2\u043d\u043e\7\u01ee\2\2\u043e\u043f\5\66\34\2\u043f\u0440\7\u01ee\2"+
-		"\2\u0440\u0441\5\66\34\2\u0441\u0442\7\u01ff\2\2\u0442\u0443\b\"\1\2\u0443"+
-		"\u0529\3\2\2\2\u0444\u0445\7\u0166\2\2\u0445\u0446\7\u01fc\2\2\u0446\u0447"+
-		"\5\66\34\2\u0447\u0448\7\u01ff\2\2\u0448\u0449\b\"\1\2\u0449\u0529\3\2"+
-		"\2\2\u044a\u044b\7\u0170\2\2\u044b\u044c\7\u01fc\2\2\u044c\u044d\5\66"+
-		"\34\2\u044d\u044e\7\u01ee\2\2\u044e\u044f\5\66\34\2\u044f\u0450\7\u01ee"+
-		"\2\2\u0450\u0451\5\66\34\2\u0451\u0452\7\u01ff\2\2\u0452\u0453\b\"\1\2"+
-		"\u0453\u0529\3\2\2\2\u0454\u0455\7\u017e\2\2\u0455\u0456\7\u01fc\2\2\u0456"+
-		"\u0457\5\66\34\2\u0457\u0458\7\u01ff\2\2\u0458\u0459\b\"\1\2\u0459\u0529"+
-		"\3\2\2\2\u045a\u045b\7\u017f\2\2\u045b\u045c\7\u01fc\2\2\u045c\u045d\5"+
-		"\66\34\2\u045d\u045e\7\u01ee\2\2\u045e\u045f\5\66\34\2\u045f\u0460\7\u01ff"+
-		"\2\2\u0460\u0461\b\"\1\2\u0461\u0529\3\2\2\2\u0462\u0463\7\u018e\2\2\u0463"+
-		"\u0464\7\u01fc\2\2\u0464\u0465\5\66\34\2\u0465\u0466\7\u01ff\2\2\u0466"+
-		"\u0467\b\"\1\2\u0467\u0529\3\2\2\2\u0468\u0469\7\u018e\2\2\u0469\u046a"+
-		"\7\u01fc\2\2\u046a\u046b\5\66\34\2\u046b\u046c\7\u01ee\2\2\u046c\u046d"+
-		"\5\66\34\2\u046d\u046e\7\u01ff\2\2\u046e\u046f\b\"\1\2\u046f\u0529\3\2"+
-		"\2\2\u0470\u0471\7\u018e\2\2\u0471\u0472\7\u01fc\2\2\u0472\u0473\5\66"+
-		"\34\2\u0473\u0474\7\u01ee\2\2\u0474\u0475\5\66\34\2\u0475\u0476\7\u01ee"+
-		"\2\2\u0476\u0477\5\66\34\2\u0477\u0478\7\u01ff\2\2\u0478\u0479\b\"\1\2"+
-		"\u0479\u0529\3\2\2\2\u047a\u047b\t\r\2\2\u047b\u047c\7\u01fc\2\2\u047c"+
-		"\u047d\5\66\34\2\u047d\u047e\7\u01ee\2\2\u047e\u047f\5\66\34\2\u047f\u0480"+
-		"\7\u01ff\2\2\u0480\u0481\b\"\1\2\u0481\u0529\3\2\2\2\u0482\u0483\t\r\2"+
-		"\2\u0483\u0484\7\u01fc\2\2\u0484\u0485\5\66\34\2\u0485\u0486\7\u01ee\2"+
-		"\2\u0486\u0487\5\66\34\2\u0487\u0488\7\u01ee\2\2\u0488\u0489\5\66\34\2"+
-		"\u0489\u048a\7\u01ff\2\2\u048a\u048b\b\"\1\2\u048b\u0529\3\2\2\2\u048c"+
-		"\u048d\7\u0193\2\2\u048d\u048e\7\u01fc\2\2\u048e\u048f\5\66\34\2\u048f"+
-		"\u0490\7\u01ee\2\2\u0490\u0491\5\66\34\2\u0491\u0492\7\u01ee\2\2\u0492"+
-		"\u0493\5\66\34\2\u0493\u0494\7\u01ff\2\2\u0494\u0495\b\"\1\2\u0495\u0529"+
-		"\3\2\2\2\u0496\u0497\7\u01a5\2\2\u0497\u0498\7\u01fc\2\2\u0498\u0499\5"+
-		"\66\34\2\u0499\u049a\7\u01ee\2\2\u049a\u049b\5\66\34\2\u049b\u049c\7\u01ee"+
-		"\2\2\u049c\u049d\5\66\34\2\u049d\u049e\7\u01ff\2\2\u049e\u049f\b\"\1\2"+
-		"\u049f\u0529\3\2\2\2\u04a0\u04a1\7\u0168\2\2\u04a1\u04a2\7\u01fc\2\2\u04a2"+
-		"\u04a3\5\66\34\2\u04a3\u04a4\7\u01ff\2\2\u04a4\u04a5\b\"\1\2\u04a5\u0529"+
-		"\3\2\2\2\u04a6\u04a7\7\u01ab\2\2\u04a7\u04a8\7\u01fc\2\2\u04a8\u04a9\5"+
-		"\66\34\2\u04a9\u04aa\7\u01ff\2\2\u04aa\u04ab\b\"\1\2\u04ab\u0529\3\2\2"+
-		"\2\u04ac\u04ad\t\16\2\2\u04ad\u04ae\7\u01fc\2\2\u04ae\u04af\5\66\34\2"+
-		"\u04af\u04b0\7\u01ff\2\2\u04b0\u04b1\b\"\1\2\u04b1\u0529\3\2\2\2\u04b2"+
-		"\u04b3\7\u00bc\2\2\u04b3\u04b4\7\u01fc\2\2\u04b4\u04b5\5\66\34\2\u04b5"+
-		"\u04b6\7\u01ff\2\2\u04b6\u04b7\b\"\1\2\u04b7\u0529\3\2\2\2\u04b8\u04b9"+
-		"\7\u00de\2\2\u04b9\u04ba\7\u01fc\2\2\u04ba\u04bb\5\66\34\2\u04bb\u04bc"+
-		"\7\u01ee\2\2\u04bc\u04bd\5\66\34\2\u04bd\u04be\7\u01ff\2\2\u04be\u04bf"+
-		"\b\"\1\2\u04bf\u0529\3\2\2\2\u04c0\u04c1\7\u017d\2\2\u04c1\u04c2\7\u01fc"+
-		"\2\2\u04c2\u04c3\5\66\34\2\u04c3\u04c4\7\u01ff\2\2\u04c4\u04c5\b\"\1\2"+
-		"\u04c5\u0529\3\2\2\2\u04c6\u04c7\7\u00f4\2\2\u04c7\u04c8\7\u01fc\2\2\u04c8"+
-		"\u04c9\5\66\34\2\u04c9\u04ca\7\u01ff\2\2\u04ca\u04cb\b\"\1\2\u04cb\u0529"+
-		"\3\2\2\2\u04cc\u04cd\7\u00f4\2\2\u04cd\u04ce\7\u01fc\2\2\u04ce\u04cf\5"+
-		"\66\34\2\u04cf\u04d0\7\u01ee\2\2\u04d0\u04d1\5\66\34\2\u04d1\u04d2\7\u01ff"+
-		"\2\2\u04d2\u04d3\b\"\1\2\u04d3\u0529\3\2\2\2\u04d4\u04d5\7\u00f4\2\2\u04d5"+
-		"\u04d6\7\u01fc\2\2\u04d6\u04d7\5\66\34\2\u04d7\u04d8\7\u01ee\2\2\u04d8"+
-		"\u04d9\5\66\34\2\u04d9\u04da\7\u01ee\2\2\u04da\u04db\5\66\34\2\u04db\u04dc"+
-		"\7\u01ff\2\2\u04dc\u04dd\b\"\1\2\u04dd\u0529\3\2\2\2\u04de\u04df\7\u00f4"+
-		"\2\2\u04df\u04e0\7\u01fc\2\2\u04e0\u04e1\5\66\34\2\u04e1\u04e2\7\u01ee"+
-		"\2\2\u04e2\u04e3\5\66\34\2\u04e3\u04e4\7\u01ee\2\2\u04e4\u04e5\5\66\34"+
-		"\2\u04e5\u04e6\7\u01ee\2\2\u04e6\u04e7\5\66\34\2\u04e7\u04e8\7\u01ff\2"+
-		"\2\u04e8\u04e9\b\"\1\2\u04e9\u0529\3\2\2\2\u04ea\u04eb\7\u00f5\2\2\u04eb"+
-		"\u04ec\7\u01fc\2\2\u04ec\u04ed\5\66\34\2\u04ed\u04ee\7\u01ff\2\2\u04ee"+
-		"\u04ef\b\"\1\2\u04ef\u0529\3\2\2\2\u04f0\u04f1\7\u00f5\2\2\u04f1\u04f2"+
-		"\7\u01fc\2\2\u04f2\u04f3\5\66\34\2\u04f3\u04f4\7\u01ee\2\2\u04f4\u04f5"+
-		"\5\66\34\2\u04f5\u04f6\7\u01ff\2\2\u04f6\u04f7\b\"\1\2\u04f7\u0529\3\2"+
-		"\2\2\u04f8\u04f9\7\u00f7\2\2\u04f9\u04fa\7\u01fc\2\2\u04fa\u04fb\5\66"+
-		"\34\2\u04fb\u04fc\7\u01ff\2\2\u04fc\u04fd\b\"\1\2\u04fd\u0529\3\2\2\2"+
-		"\u04fe\u04ff\7\u00f7\2\2\u04ff\u0500\7\u01fc\2\2\u0500\u0501\5\66\34\2"+
-		"\u0501\u0502\7\u01ee\2\2\u0502\u0503\5\66\34\2\u0503\u0504\7\u01ff\2\2"+
-		"\u0504\u0505\b\"\1\2\u0505\u0529\3\2\2\2\u0506\u0507\7\u00f8\2\2\u0507"+
-		"\u0508\7\u01fc\2\2\u0508\u0509\5\66\34\2\u0509\u050a\7\u01ff\2\2\u050a"+
-		"\u050b\b\"\1\2\u050b\u0529\3\2\2\2\u050c\u050d\7\u00f8\2\2\u050d\u050e"+
-		"\7\u01fc\2\2\u050e\u050f\5\66\34\2\u050f\u0510\7\u01ee\2\2\u0510\u0511"+
-		"\5\66\34\2\u0511\u0512\7\u01ff\2\2\u0512\u0513\b\"\1\2\u0513\u0529\3\2"+
-		"\2\2\u0514\u0515\7\u00f9\2\2\u0515\u0516\7\u01fc\2\2\u0516\u0517\5\66"+
-		"\34\2\u0517\u0518\7\u01ff\2\2\u0518\u0519\b\"\1\2\u0519\u0529\3\2\2\2"+
-		"\u051a\u051b\7\u00f9\2\2\u051b\u051c\7\u01fc\2\2\u051c\u051d\5\66\34\2"+
-		"\u051d\u051e\7\u01ee\2\2\u051e\u051f\5\66\34\2\u051f\u0520\7\u01ff\2\2"+
-		"\u0520\u0521\b\"\1\2\u0521\u0529\3\2\2\2\u0522\u0523\7\u00f6\2\2\u0523"+
-		"\u0524\7\u01fc\2\2\u0524\u0525\5\66\34\2\u0525\u0526\7\u01ff\2\2\u0526"+
-		"\u0527\b\"\1\2\u0527\u0529\3\2\2\2\u0528\u0327\3\2\2\2\u0528\u032d\3\2"+
-		"\2\2\u0528\u0333\3\2\2\2\u0528\u0339\3\2\2\2\u0528\u033f\3\2\2\2\u0528"+
-		"\u034c\3\2\2\2\u0528\u035b\3\2\2\2\u0528\u0363\3\2\2\2\u0528\u0373\3\2"+
-		"\2\2\u0528\u037b\3\2\2\2\u0528\u038b\3\2\2\2\u0528\u0393\3\2\2\2\u0528"+
-		"\u039b\3\2\2\2\u0528\u03a3\3\2\2\2\u0528\u03ab\3\2\2\2\u0528\u03b3\3\2"+
-		"\2\2\u0528\u03b9\3\2\2\2\u0528\u03c1\3\2\2\2\u0528\u03cb\3\2\2\2\u0528"+
-		"\u03d1\3\2\2\2\u0528\u03db\3\2\2\2\u0528\u03e1\3\2\2\2\u0528\u03e7\3\2"+
-		"\2\2\u0528\u03ef\3\2\2\2\u0528\u03f9\3\2\2\2\u0528\u0408\3\2\2\2\u0528"+
-		"\u040e\3\2\2\2\u0528\u0418\3\2\2\2\u0528\u0422\3\2\2\2\u0528\u042a\3\2"+
-		"\2\2\u0528\u0434\3\2\2\2\u0528\u043a\3\2\2\2\u0528\u0444\3\2\2\2\u0528"+
-		"\u044a\3\2\2\2\u0528\u0454\3\2\2\2\u0528\u045a\3\2\2\2\u0528\u0462\3\2"+
-		"\2\2\u0528\u0468\3\2\2\2\u0528\u0470\3\2\2\2\u0528\u047a\3\2\2\2\u0528"+
-		"\u0482\3\2\2\2\u0528\u048c\3\2\2\2\u0528\u0496\3\2\2\2\u0528\u04a0\3\2"+
-		"\2\2\u0528\u04a6\3\2\2\2\u0528\u04ac\3\2\2\2\u0528\u04b2\3\2\2\2\u0528"+
-		"\u04b8\3\2\2\2\u0528\u04c0\3\2\2\2\u0528\u04c6\3\2\2\2\u0528\u04cc\3\2"+
-		"\2\2\u0528\u04d4\3\2\2\2\u0528\u04de\3\2\2\2\u0528\u04ea\3\2\2\2\u0528"+
-		"\u04f0\3\2\2\2\u0528\u04f8\3\2\2\2\u0528\u04fe\3\2\2\2\u0528\u0506\3\2"+
-		"\2\2\u0528\u050c\3\2\2\2\u0528\u0514\3\2\2\2\u0528\u051a\3\2\2\2\u0528"+
-		"\u0522\3\2\2\2\u0529C\3\2\2\2\u052a\u052b\b#\1\2\u052b\u052c\7\u00d2\2"+
-		"\2\u052c\u052d\7\u01fc\2\2\u052d\u052e\5\66\34\2\u052e\u052f\7\u01ee\2"+
-		"\2\u052f\u0534\5\66\34\2\u0530\u0531\7\u01ee\2\2\u0531\u0533\5\66\34\2"+
-		"\u0532\u0530\3\2\2\2\u0533\u0536\3\2\2\2\u0534\u0532\3\2\2\2\u0534\u0535"+
-		"\3\2\2\2\u0535\u0537\3\2\2\2\u0536\u0534\3\2\2\2\u0537\u0538\7\u01ff\2"+
-		"\2\u0538\u0539\b#\1\2\u0539\u058f\3\2\2\2\u053a\u053b\b#\1\2\u053b\u053c"+
-		"\7\u0144\2\2\u053c\u053d\7\u01fc\2\2\u053d\u053e\5\66\34\2\u053e\u053f"+
-		"\7\u01ee\2\2\u053f\u0544\5\66\34\2\u0540\u0541\7\u01ee\2\2\u0541\u0543"+
-		"\5\66\34\2\u0542\u0540\3\2\2\2\u0543\u0546\3\2\2\2\u0544\u0542\3\2\2\2"+
-		"\u0544\u0545\3\2\2\2\u0545\u0547\3\2\2\2\u0546\u0544\3\2\2\2\u0547\u0548"+
-		"\7\u01ff\2\2\u0548\u0549\b#\1\2\u0549\u058f\3\2\2\2\u054a\u054b\b#\1\2"+
-		"\u054b\u054c\7\u00ac\2\2\u054c\u054d\7\u01fc\2\2\u054d\u0552\5\66\34\2"+
-		"\u054e\u054f\7\u01ee\2\2\u054f\u0551\5\66\34\2\u0550\u054e\3\2\2\2\u0551"+
-		"\u0554\3\2\2\2\u0552\u0550\3\2\2\2\u0552\u0553\3\2\2\2\u0553\u0555\3\2"+
-		"\2\2\u0554\u0552\3\2\2\2\u0555\u0556\7\u01ff\2\2\u0556\u0557\b#\1\2\u0557"+
-		"\u058f\3\2\2\2\u0558\u0559\7\u01d6\2\2\u0559\u055a\7\u01fc\2\2\u055a\u055b"+
-		"\7\u01ff\2\2\u055b\u058f\b#\1\2\u055c\u055d\7\u00ec\2\2\u055d\u055e\7"+
-		"\u01fc\2\2\u055e\u055f\7\u01ff\2\2\u055f\u058f\b#\1\2\u0560\u0561\7\\"+
-		"\2\2\u0561\u0562\7\u01fc\2\2\u0562\u0563\7\u01ff\2\2\u0563\u058f\b#\1"+
-		"\2\u0564\u0565\t\17\2\2\u0565\u0566\7\u01fc\2\2\u0566\u0567\5\66\34\2"+
-		"\u0567\u0568\7\u01ff\2\2\u0568\u0569\b#\1\2\u0569\u058f\3\2\2\2\u056a"+
-		"\u056b\7\u0175\2\2\u056b\u056c\7\u01fc\2\2\u056c\u056d\5\66\34\2\u056d"+
-		"\u056e\7\u01ee\2\2\u056e\u056f\5\66\34\2\u056f\u0570\7\u01ff\2\2\u0570"+
-		"\u0571\b#\1\2\u0571\u058f\3\2\2\2\u0572\u0573\7\22\2\2\u0573\u0574\7\u01fc"+
-		"\2\2\u0574\u0575\5\66\34\2\u0575\u0576\7\u01ee\2\2\u0576\u0577\5\66\34"+
-		"\2\u0577\u0578\7\u01ff\2\2\u0578\u0579\b#\1\2\u0579\u058f\3\2\2\2\u057a"+
-		"\u057b\7\23\2\2\u057b\u057c\7\u01fc\2\2\u057c\u057d\5\66\34\2\u057d\u057e"+
-		"\7\u01ee\2\2\u057e\u057f\5\66\34\2\u057f\u0580\7\u01ff\2\2\u0580\u0581"+
-		"\b#\1\2\u0581\u058f\3\2\2\2\u0582\u0583\7\u01bb\2\2\u0583\u0584\7\u01fc"+
-		"\2\2\u0584\u0585\7\u01ff\2\2\u0585\u058f\b#\1\2\u0586\u0587\t\20\2\2\u0587"+
-		"\u0588\7\u01fc\2\2\u0588\u0589\5\66\34\2\u0589\u058a\7\u01ee\2\2\u058a"+
-		"\u058b\5\66\34\2\u058b\u058c\7\u01ff\2\2\u058c\u058d\b#\1\2\u058d\u058f"+
-		"\3\2\2\2\u058e\u052a\3\2\2\2\u058e\u053a\3\2\2\2\u058e\u054a\3\2\2\2\u058e"+
-		"\u0558\3\2\2\2\u058e\u055c\3\2\2\2\u058e\u0560\3\2\2\2\u058e\u0564\3\2"+
-		"\2\2\u058e\u056a\3\2\2\2\u058e\u0572\3\2\2\2\u058e\u057a\3\2\2\2\u058e"+
-		"\u0582\3\2\2\2\u058e\u0586\3\2\2\2\u058fE\3\2\2\2\u0590\u0591\b$\1\2\u0591"+
-		"\u0594\5H%\2\u0592\u0593\7\u01ef\2\2\u0593\u0595\5H%\2\u0594\u0592\3\2"+
-		"\2\2\u0595\u0596\3\2\2\2\u0596\u0594\3\2\2\2\u0596\u0597\3\2\2\2\u0597"+
-		"\u0598\3\2\2\2\u0598\u0599\b$\1\2\u0599G\3\2\2\2\u059a\u059b\5X-\2\u059b"+
-		"\u059c\b%\1\2\u059c\u05bb\3\2\2\2\u059d\u059e\5Z.\2\u059e\u059f\b%\1\2"+
-		"\u059f\u05bb\3\2\2\2\u05a0\u05a1\7\u01fc\2\2\u05a1\u05a2\5\66\34\2\u05a2"+
-		"\u05a3\7\u01ff\2\2\u05a3\u05a4\b%\1\2\u05a4\u05bb\3\2\2\2\u05a5\u05a6"+
-		"\5N(\2\u05a6\u05a7\b%\1\2\u05a7\u05bb\3\2\2\2\u05a8\u05a9\5V,\2\u05a9"+
-		"\u05aa\b%\1\2\u05aa\u05bb\3\2\2\2\u05ab\u05ac\5L\'\2\u05ac\u05ad\b%\1"+
-		"\2\u05ad\u05bb\3\2\2\2\u05ae\u05af\5J&\2\u05af\u05b0\b%\1\2\u05b0\u05bb"+
-		"\3\2\2\2\u05b1\u05b2\5B\"\2\u05b2\u05b3\b%\1\2\u05b3\u05bb\3\2\2\2\u05b4"+
-		"\u05b5\5D#\2\u05b5\u05b6\b%\1\2\u05b6\u05bb\3\2\2\2\u05b7\u05b8\5R*\2"+
-		"\u05b8\u05b9\b%\1\2\u05b9\u05bb\3\2\2\2\u05ba\u059a\3\2\2\2\u05ba\u059d"+
-		"\3\2\2\2\u05ba\u05a0\3\2\2\2\u05ba\u05a5\3\2\2\2\u05ba\u05a8\3\2\2\2\u05ba"+
-		"\u05ab\3\2\2\2\u05ba\u05ae\3\2\2\2\u05ba\u05b1\3\2\2\2\u05ba\u05b4\3\2"+
-		"\2\2\u05ba\u05b7\3\2\2\2\u05bbI\3\2\2\2\u05bc\u05bd\7\u00b5\2\2\u05bd"+
-		"\u05be\7\u01fc\2\2\u05be\u05bf\5\66\34\2\u05bf\u05c0\7\u01ee\2\2\u05c0"+
-		"\u05c1\5\66\34\2\u05c1\u05c2\7\u01ee\2\2\u05c2\u05c3\5\66\34\2\u05c3\u05c4"+
-		"\7\u01ff\2\2\u05c4\u05c5\b&\1\2\u05c5\u0638\3\2\2\2\u05c6\u05c7\7\u00ce"+
-		"\2\2\u05c7\u05c8\7\u01fc\2\2\u05c8\u05c9\5\66\34\2\u05c9\u05ca\7\u01ff"+
-		"\2\2\u05ca\u05cb\b&\1\2\u05cb\u0638\3\2\2\2\u05cc\u05cd\7\u00cd\2\2\u05cd"+
-		"\u05ce\7\u01fc\2\2\u05ce\u05cf\5\66\34\2\u05cf\u05d0\7\u01ff\2\2\u05d0"+
-		"\u05d1\b&\1\2\u05d1\u0638\3\2\2\2\u05d2\u05d3\7\u00cf\2\2\u05d3\u05d4"+
-		"\7\u01fc\2\2\u05d4\u05d5\5\66\34\2\u05d5\u05d6\7\u01ee\2\2\u05d6\u05d7"+
-		"\5\66\34\2\u05d7\u05d8\7\u01ff\2\2\u05d8\u05d9\b&\1\2\u05d9\u0638\3\2"+
-		"\2\2\u05da\u05db\b&\1\2\u05db\u05dc\7=\2\2\u05dc\u05dd\7\u01fc\2\2\u05dd"+
-		"\u05de\5\66\34\2\u05de\u05df\7\u01ee\2\2\u05df\u05e0\5\66\34\2\u05e0\u05e5"+
-		"\3\2\2\2\u05e1\u05e2\7\u01ee\2\2\u05e2\u05e4\5\66\34\2\u05e3\u05e1\3\2"+
-		"\2\2\u05e4\u05e7\3\2\2\2\u05e5\u05e3\3\2\2\2\u05e5\u05e6\3\2\2\2\u05e6"+
-		"\u05e8\3\2\2\2\u05e7\u05e5\3\2\2\2\u05e8\u05e9\7\u01ff\2\2\u05e9\u05ea"+
-		"\b&\1\2\u05ea\u0638\3\2\2\2\u05eb\u05ec\b&\1\2\u05ec\u05ed\7/\2\2\u05ed"+
-		"\u05f3\5\66\34\2\u05ee\u05ef\7\u01bf\2\2\u05ef\u05f0\5\66\34\2\u05f0\u05f1"+
-		"\7\u019d\2\2\u05f1\u05f2\5\66\34\2\u05f2\u05f4\3\2\2\2\u05f3\u05ee\3\2"+
-		"\2\2\u05f4\u05f5\3\2\2\2\u05f5\u05f3\3\2\2\2\u05f5\u05f6\3\2\2\2\u05f6"+
-		"\u05f7\3\2\2\2\u05f7\u05f8\7\u0085\2\2\u05f8\u05f9\b&\1\2\u05f9\u0638"+
-		"\3\2\2\2\u05fa\u05fb\b&\1\2\u05fb\u05fc\7/\2\2\u05fc\u0602\5\66\34\2\u05fd"+
-		"\u05fe\7\u01bf\2\2\u05fe\u05ff\5\66\34\2\u05ff\u0600\7\u019d\2\2\u0600"+
-		"\u0601\5\66\34\2\u0601\u0603\3\2\2\2\u0602\u05fd\3\2\2\2\u0603\u0604\3"+
-		"\2\2\2\u0604\u0602\3\2\2\2\u0604\u0605\3\2\2\2\u0605\u0606\3\2\2\2\u0606"+
-		"\u0607\7\177\2\2\u0607\u0608\5\66\34\2\u0608\u0609\7\u0085\2\2\u0609\u060a"+
-		"\b&\1\2\u060a\u0638\3\2\2\2\u060b\u060c\b&\1\2\u060c\u0612\7/\2\2\u060d"+
-		"\u060e\7\u01bf\2\2\u060e\u060f\5\66\34\2\u060f\u0610\7\u019d\2\2\u0610"+
-		"\u0611\5\66\34\2\u0611\u0613\3\2\2\2\u0612\u060d\3\2\2\2\u0613\u0614\3"+
-		"\2\2\2\u0614\u0612\3\2\2\2\u0614\u0615\3\2\2\2\u0615\u0616\3\2\2\2\u0616"+
-		"\u0617\7\u0085\2\2\u0617\u0618\b&\1\2\u0618\u0638\3\2\2\2\u0619\u061a"+
-		"\b&\1\2\u061a\u0620\7/\2\2\u061b\u061c\7\u01bf\2\2\u061c\u061d\5\66\34"+
-		"\2\u061d\u061e\7\u019d\2\2\u061e\u061f\5\66\34\2\u061f\u0621\3\2\2\2\u0620"+
-		"\u061b\3\2\2\2\u0621\u0622\3\2\2\2\u0622\u0620\3\2\2\2\u0622\u0623\3\2"+
-		"\2\2\u0623\u0624\3\2\2\2\u0624\u0625\7\177\2\2\u0625\u0626\5\66\34\2\u0626"+
-		"\u0627\7\u0085\2\2\u0627\u0628\b&\1\2\u0628\u0638\3\2\2\2\u0629\u062a"+
-		"\7\u0116\2\2\u062a\u062b\7\u01fc\2\2\u062b\u062c\5\66\34\2\u062c\u062d"+
-		"\7\u01ee\2\2\u062d\u062e\5\66\34\2\u062e\u062f\7\u01ff\2\2\u062f\u0630"+
-		"\b&\1\2\u0630\u0638\3\2\2\2\u0631\u0632\7\34\2\2\u0632\u0633\7\u01fc\2"+
-		"\2\u0633\u0634\5\66\34\2\u0634\u0635\7\u01ff\2\2\u0635\u0636\b&\1\2\u0636"+
-		"\u0638\3\2\2\2\u0637\u05bc\3\2\2\2\u0637\u05c6\3\2\2\2\u0637\u05cc\3\2"+
-		"\2\2\u0637\u05d2\3\2\2\2\u0637\u05da\3\2\2\2\u0637\u05eb\3\2\2\2\u0637"+
-		"\u05fa\3\2\2\2\u0637\u060b\3\2\2\2\u0637\u0619\3\2\2\2\u0637\u0629\3\2"+
-		"\2\2\u0637\u0631\3\2\2\2\u0638K\3\2\2\2\u0639\u063a\7\u01af\2\2\u063a"+
-		"\u063b\7\u01fc\2\2\u063b\u063c\7\u01ff\2\2\u063c\u06ea\b\'\1\2\u063d\u063e"+
-		"\7\u01af\2\2\u063e\u063f\7\u01fc\2\2\u063f\u0640\5\66\34\2\u0640\u0641"+
-		"\7\u01ff\2\2\u0641\u0642\b\'\1\2\u0642\u06ea\3\2\2\2\u0643\u0644\7\u01af"+
-		"\2\2\u0644\u0645\7\u01fc\2\2\u0645\u0646\5\66\34\2\u0646\u0647\7\u01ee"+
-		"\2\2\u0647\u0648\5\66\34\2\u0648\u0649\7\u01ff\2\2\u0649\u064a\b\'\1\2"+
-		"\u064a\u06ea\3\2\2\2\u064b\u064c\7\u01d0\2\2\u064c\u064d\7\u01fc\2\2\u064d"+
-		"\u064e\5\66\34\2\u064e\u064f\7\u01ff\2\2\u064f\u0650\b\'\1\2\u0650\u06ea"+
-		"\3\2\2\2\u0651\u0652\7\u013b\2\2\u0652\u0653\7\u01fc\2\2\u0653\u0654\5"+
-		"\66\34\2\u0654\u0655\7\u01ff\2\2\u0655\u0656\b\'\1\2\u0656\u06ea\3\2\2"+
-		"\2\u0657\u0658\7\u0104\2\2\u0658\u0659\7\u01fc\2\2\u0659\u065a\5\66\34"+
-		"\2\u065a\u065b\7\u01ff\2\2\u065b\u065c\b\'\1\2\u065c\u06ea\3\2\2\2\u065d"+
-		"\u065e\7e\2\2\u065e\u065f\7\u01fc\2\2\u065f\u0660\5\66\34\2\u0660\u0661"+
-		"\7\u01ff\2\2\u0661\u0662\b\'\1\2\u0662\u06ea\3\2\2\2\u0663\u0664\7\u00b3"+
-		"\2\2\u0664\u0665\7\u01fc\2\2\u0665\u0666\5\66\34\2\u0666\u0667\7\u01ff"+
-		"\2\2\u0667\u0668\b\'\1\2\u0668\u06ea\3\2\2\2\u0669\u066a\7\u0103\2\2\u066a"+
-		"\u066b\7\u01fc\2\2\u066b\u066c\5\66\34\2\u066c\u066d\7\u01ff\2\2\u066d"+
-		"\u066e\b\'\1\2\u066e\u06ea\3\2\2\2\u066f\u0670\7\u016a\2\2\u0670\u0671"+
-		"\7\u01fc\2\2\u0671\u0672\5\66\34\2\u0672\u0673\7\u01ff\2\2\u0673\u0674"+
-		"\b\'\1\2\u0674\u06ea\3\2\2\2\u0675\u0676\7\u01be\2\2\u0676\u0677\7\u01fc"+
-		"\2\2\u0677\u0678\5\66\34\2\u0678\u0679\7\u01ff\2\2\u0679\u067a\b\'\1\2"+
-		"\u067a\u06ea\3\2\2\2\u067b\u067c\7a\2\2\u067c\u067d\7\u01fc\2\2\u067d"+
-		"\u067e\5\66\34\2\u067e\u067f\7\u01ee\2\2\u067f\u0680\5\66\34\2\u0680\u0681"+
-		"\7\u01ff\2\2\u0681\u0682\b\'\1\2\u0682\u06ea\3\2\2\2\u0683\u0684\7`\2"+
-		"\2\u0684\u0685\7\u01fc\2\2\u0685\u0686\5\66\34\2\u0686\u0687\7\u01ee\2"+
-		"\2\u0687\u0688\5\66\34\2\u0688\u0689\7\u01ff\2\2\u0689\u068a\b\'\1\2\u068a"+
-		"\u06ea\3\2\2\2\u068b\u068c\7c\2\2\u068c\u068d\7\u01fc\2\2\u068d\u068e"+
-		"\5\66\34\2\u068e\u068f\7\u01ee\2\2\u068f\u0690\5\66\34\2\u0690\u0691\7"+
-		"\u01ff\2\2\u0691\u0692\b\'\1\2\u0692\u06ea\3\2\2\2\u0693\u0694\7\u01a3"+
-		"\2\2\u0694\u0695\7\u01fc\2\2\u0695\u0696\5\66\34\2\u0696\u0697\7\u01ee"+
-		"\2\2\u0697\u0698\5\66\34\2\u0698\u0699\7\u01ff\2\2\u0699\u069a\b\'\1\2"+
-		"\u069a\u06ea\3\2\2\2\u069b\u069c\7\u00a2\2\2\u069c\u069d\7\u01fc\2\2\u069d"+
-		"\u069e\5\66\34\2\u069e\u069f\7\u01ee\2\2\u069f\u06a0\5\66\34\2\u06a0\u06a1"+
-		"\7\u01ff\2\2\u06a1\u06a2\b\'\1\2\u06a2\u06ea\3\2\2\2\u06a3\u06a6\7\u01d4"+
-		"\2\2\u06a4\u06a5\7\u01fc\2\2\u06a5\u06a7\7\u01ff\2\2\u06a6\u06a4\3\2\2"+
-		"\2\u06a6\u06a7\3\2\2\2\u06a7\u06a8\3\2\2\2\u06a8\u06ea\b\'\1\2\u06a9\u06ac"+
-		"\7\u01d5\2\2\u06aa\u06ab\7\u01fc\2\2\u06ab\u06ad\7\u01ff\2\2\u06ac\u06aa"+
-		"\3\2\2\2\u06ac\u06ad\3\2\2\2\u06ad\u06ae\3\2\2\2\u06ae\u06ea\b\'\1\2\u06af"+
-		"\u06b0\7\21\2\2\u06b0\u06b1\7\u01fc\2\2\u06b1\u06b2\5\66\34\2\u06b2\u06b3"+
-		"\7\u01ee\2\2\u06b3\u06b4\5\66\34\2\u06b4\u06b5\7\u01ff\2\2\u06b5\u06b6"+
-		"\b\'\1\2\u06b6\u06ea\3\2\2\2\u06b7\u06b8\7\21\2\2\u06b8\u06b9\7\u01fc"+
-		"\2\2\u06b9\u06ba\5\66\34\2\u06ba\u06bb\7\u01ee\2\2\u06bb\u06bc\5\66\34"+
-		"\2\u06bc\u06bd\7\u01ee\2\2\u06bd\u06be\5\66\34\2\u06be\u06bf\7\u01ff\2"+
-		"\2\u06bf\u06c0\b\'\1\2\u06c0\u06ea\3\2\2\2\u06c1\u06c2\7\u00d8\2\2\u06c2"+
-		"\u06c3\7\u01fc\2\2\u06c3\u06c4\5\66\34\2\u06c4\u06c5\7\u01ff\2\2\u06c5"+
-		"\u06c6\b\'\1\2\u06c6\u06ea\3\2\2\2\u06c7\u06c8\7\u010a\2\2\u06c8\u06c9"+
-		"\7\u01fc\2\2\u06c9\u06ca\5\66\34\2\u06ca\u06cb\7\u01ee\2\2\u06cb\u06cc"+
-		"\5\66\34\2\u06cc\u06cd\7\u01ff\2\2\u06cd\u06ce\b\'\1\2\u06ce\u06ea\3\2"+
-		"\2\2\u06cf\u06d0\7\u01a8\2\2\u06d0\u06d1\7\u01fc\2\2\u06d1\u06d2\5\66"+
-		"\34\2\u06d2\u06d3\7\u01ee\2\2\u06d3\u06d4\5\66\34\2\u06d4\u06d5\7\u01ff"+
-		"\2\2\u06d5\u06d6\b\'\1\2\u06d6\u06ea\3\2\2\2\u06d7\u06d8\7\u0105\2\2\u06d8"+
-		"\u06d9\7\u01fc\2\2\u06d9\u06da\5\66\34\2\u06da\u06db\7\u01ee\2\2\u06db"+
-		"\u06dc\5\66\34\2\u06dc\u06dd\7\u01ff\2\2\u06dd\u06de\b\'\1\2\u06de\u06ea"+
-		"\3\2\2\2\u06df\u06e0\7b\2\2\u06e0\u06e1\7\u01fc\2\2\u06e1\u06e2\5\66\34"+
-		"\2\u06e2\u06e3\7\u01ee\2\2\u06e3\u06e4\5\66\34\2\u06e4\u06e5\7\u01ff\2"+
-		"\2\u06e5\u06e6\b\'\1\2\u06e6\u06ea\3\2\2\2\u06e7\u06e8\7\u01e7\2\2\u06e8"+
-		"\u06ea\b\'\1\2\u06e9\u0639\3\2\2\2\u06e9\u063d\3\2\2\2\u06e9\u0643\3\2"+
-		"\2\2\u06e9\u064b\3\2\2\2\u06e9\u0651\3\2\2\2\u06e9\u0657\3\2\2\2\u06e9"+
-		"\u065d\3\2\2\2\u06e9\u0663\3\2\2\2\u06e9\u0669\3\2\2\2\u06e9\u066f\3\2"+
-		"\2\2\u06e9\u0675\3\2\2\2\u06e9\u067b\3\2\2\2\u06e9\u0683\3\2\2\2\u06e9"+
-		"\u068b\3\2\2\2\u06e9\u0693\3\2\2\2\u06e9\u069b\3\2\2\2\u06e9\u06a3\3\2"+
-		"\2\2\u06e9\u06a9\3\2\2\2\u06e9\u06af\3\2\2\2\u06e9\u06b7\3\2\2\2\u06e9"+
-		"\u06c1\3\2\2\2\u06e9\u06c7\3\2\2\2\u06e9\u06cf\3\2\2\2\u06e9\u06d7\3\2"+
-		"\2\2\u06e9\u06df\3\2\2\2\u06e9\u06e7\3\2\2\2\u06eaM\3\2\2\2\u06eb\u06ec"+
-		"\7\60\2\2\u06ec\u06ed\7\u01fc\2\2\u06ed\u06ee\5\66\34\2\u06ee\u06ef\7"+
-		"\30\2\2\u06ef\u06f1\5\6\4\2\u06f0\u06f2\5\b\5\2\u06f1\u06f0\3\2\2\2\u06f1"+
-		"\u06f2\3\2\2\2\u06f2\u06f3\3\2\2\2\u06f3\u06f4\7\u01ff\2\2\u06f4\u06f5"+
-		"\b(\1\2\u06f5\u06fd\3\2\2\2\u06f6\u06f7\7&\2\2\u06f7\u06f8\7\u01fc\2\2"+
-		"\u06f8\u06f9\5\66\34\2\u06f9\u06fa\7\u01ff\2\2\u06fa\u06fb\b(\1\2\u06fb"+
-		"\u06fd\3\2\2\2\u06fc\u06eb\3\2\2\2\u06fc\u06f6\3\2\2\2\u06fdO\3\2\2\2"+
-		"\u06fe\u06ff\7P\2\2\u06ff\u0700\7\u01fc\2\2\u0700\u0701\5\66\34\2\u0701"+
-		"\u0702\7\u01ff\2\2\u0702\u0703\b)\1\2\u0703\u0739\3\2\2\2\u0704\u0705"+
-		"\b)\1\2\u0705\u0706\7P\2\2\u0706\u0707\7\u01fc\2\2\u0707\u0708\7y\2\2"+
-		"\u0708\u070d\5\66\34\2\u0709\u070a\7\u01ee\2\2\u070a\u070c\5\66\34\2\u070b"+
-		"\u0709\3\2\2\2\u070c\u070f\3\2\2\2\u070d\u070b\3\2\2\2\u070d\u070e\3\2"+
-		"\2\2\u070e\u0710\3\2\2\2\u070f\u070d\3\2\2\2\u0710\u0711\7\u01ff\2\2\u0711"+
-		"\u0712\b)\1\2\u0712\u0739\3\2\2\2\u0713\u0714\7P\2\2\u0714\u0715\7\u01fc"+
-		"\2\2\u0715\u0716\7\u01fa\2\2\u0716\u0717\7\u01ff\2\2\u0717\u0739\b)\1"+
-		"\2\u0718\u0719\7\u0194\2\2\u0719\u071a\7\u01fc\2\2\u071a\u071b\5\66\34"+
-		"\2\u071b\u071c\7\u01ff\2\2\u071c\u071d\b)\1\2\u071d\u0739\3\2\2\2\u071e"+
-		"\u071f\7\u0194\2\2\u071f\u0720\7\u01fc\2\2\u0720\u0721\7y\2\2\u0721\u0722"+
-		"\5\66\34\2\u0722\u0723\7\u01ff\2\2\u0723\u0724\b)\1\2\u0724\u0739\3\2"+
-		"\2\2\u0725\u0726\7 \2\2\u0726\u0727\7\u01fc\2\2\u0727\u0728\5\66\34\2"+
-		"\u0728\u0729\7\u01ff\2\2\u0729\u072a\b)\1\2\u072a\u0739\3\2\2\2\u072b"+
-		"\u072c\7 \2\2\u072c\u072d\7\u01fc\2\2\u072d\u072e\7y\2\2\u072e\u072f\5"+
-		"\66\34\2\u072f\u0730\7\u01ff\2\2\u0730\u0731\b)\1\2\u0731\u0739\3\2\2"+
-		"\2\u0732\u0733\t\21\2\2\u0733\u0734\7\u01fc\2\2\u0734\u0735\5\66\34\2"+
-		"\u0735\u0736\7\u01ff\2\2\u0736\u0737\b)\1\2\u0737\u0739\3\2\2\2\u0738"+
-		"\u06fe\3\2\2\2\u0738\u0704\3\2\2\2\u0738\u0713\3\2\2\2\u0738\u0718\3\2"+
-		"\2\2\u0738\u071e\3\2\2\2\u0738\u0725\3\2\2\2\u0738\u072b\3\2\2\2\u0738"+
-		"\u0732\3\2\2\2\u0739Q\3\2\2\2\u073a\u073b\5P)\2\u073b\u073c\b*\1\2\u073c"+
-		"\u0782\3\2\2\2\u073d\u073e\t\22\2\2\u073e\u073f\7\u01fc\2\2\u073f\u0740"+
-		"\5\66\34\2\u0740\u0741\7\u01ff\2\2\u0741\u0742\b*\1\2\u0742\u0782\3\2"+
-		"\2\2\u0743\u0744\t\23\2\2\u0744\u0745\7\u01fc\2\2\u0745\u0746\5\66\34"+
-		"\2\u0746\u0747\7\u01ee\2\2\u0747\u0748\5\66\34\2\u0748\u0749\7\u01ff\2"+
-		"\2\u0749\u074a\b*\1\2\u074a\u0782\3\2\2\2\u074b\u074c\7\u012c\2\2\u074c"+
-		"\u074d\7\u01fc\2\2\u074d\u074e\5\66\34\2\u074e\u074f\7\u01ee\2\2\u074f"+
-		"\u0750\5\66\34\2\u0750\u0751\7\u01ff\2\2\u0751\u0752\b*\1\2\u0752\u0782"+
-		"\3\2\2\2\u0753\u0754\7\u012d\2\2\u0754\u0755\7\u01fc\2\2\u0755\u0756\5"+
-		"\66\34\2\u0756\u0757\7\u01ee\2\2\u0757\u0758\5\66\34\2\u0758\u0759\7\u01ff"+
-		"\2\2\u0759\u075a\b*\1\2\u075a\u0782\3\2\2\2\u075b\u075c\7\u012d\2\2\u075c"+
-		"\u075d\7\u01fc\2\2\u075d\u075e\5\66\34\2\u075e\u075f\7\u01ee\2\2\u075f"+
-		"\u0760\5\66\34\2\u0760\u0761\7\u01ee\2\2\u0761\u0762\5\66\34\2\u0762\u0763"+
-		"\7\u01ff\2\2\u0763\u0764\b*\1\2\u0764\u0782\3\2\2\2\u0765\u0766\t\24\2"+
-		"\2\u0766\u0767\7\u01fc\2\2\u0767\u0768\5\66\34\2\u0768\u0769\7\u01ee\2"+
-		"\2\u0769\u076a\5\66\34\2\u076a\u076b\7\u01ff\2\2\u076b\u076c\b*\1\2\u076c"+
-		"\u0782\3\2\2\2\u076d\u076e\7\u00b0\2\2\u076e\u076f\7\u01fc\2\2\u076f\u0770"+
-		"\5\66\34\2\u0770\u0771\7\u01ee\2\2\u0771\u0772\5\66\34\2\u0772\u0773\7"+
-		"\u01ff\2\2\u0773\u0774\b*\1\2\u0774\u0782\3\2\2\2\u0775\u0776\t\25\2\2"+
-		"\u0776\u0777\7\u01fc\2\2\u0777\u0778\5\66\34\2\u0778\u0779\7\u01ff\2\2"+
-		"\u0779\u077a\b*\1\2\u077a\u0782\3\2\2\2\u077b\u077c\7\u0114\2\2\u077c"+
-		"\u077d\7\u01fc\2\2\u077d\u077e\5\66\34\2\u077e\u077f\7\u01ff\2\2\u077f"+
-		"\u0780\b*\1\2\u0780\u0782\3\2\2\2\u0781\u073a\3\2\2\2\u0781\u073d\3\2"+
-		"\2\2\u0781\u0743\3\2\2\2\u0781\u074b\3\2\2\2\u0781\u0753\3\2\2\2\u0781"+
-		"\u075b\3\2\2\2\u0781\u0765\3\2\2\2\u0781\u076d\3\2\2\2\u0781\u0775\3\2"+
-		"\2\2\u0781\u077b\3\2\2\2\u0782S\3\2\2\2\u0783\u0784\7\u0090\2\2\u0784"+
-		"\u0785\7\u01fc\2\2\u0785\u0786\5\66\34\2\u0786\u0787\7\u01ff\2\2\u0787"+
-		"\u0788\b+\1\2\u0788\u0796\3\2\2\2\u0789\u078a\7\u0131\2\2\u078a\u078b"+
-		"\7\u01fc\2\2\u078b\u078c\5\66\34\2\u078c\u078d\7\u01ff\2\2\u078d\u078e"+
-		"\b+\1\2\u078e\u0796\3\2\2\2\u078f\u0790\7\u00be\2\2\u0790\u0791\7\u01fc"+
-		"\2\2\u0791\u0792\5\66\34\2\u0792\u0793\7\u01ff\2\2\u0793\u0794\b+\1\2"+
-		"\u0794\u0796\3\2\2\2\u0795\u0783\3\2\2\2\u0795\u0789\3\2\2\2\u0795\u078f"+
-		"\3\2\2\2\u0796U\3\2\2\2\u0797\u0798\7\u015e\2\2\u0798\u0799\7\u01fc\2"+
-		"\2\u0799\u079a\5\66\34\2\u079a\u079b\7\u01ff\2\2\u079b\u079c\b,\1\2\u079c"+
-		"\u086a\3\2\2\2\u079d\u079e\7\u015e\2\2\u079e\u079f\7\u01fc\2\2\u079f\u07a0"+
-		"\5\66\34\2\u07a0\u07a1\7\u01ee\2\2\u07a1\u07a2\5\66\34\2\u07a2\u07a3\7"+
-		"\u01ff\2\2\u07a3\u07a4\b,\1\2\u07a4\u086a\3\2\2\2\u07a5\u07a6\7\u009b"+
-		"\2\2\u07a6\u07a7\7\u01fc\2\2\u07a7\u07a8\5\66\34\2\u07a8\u07a9\7\u01ff"+
-		"\2\2\u07a9\u07aa\b,\1\2\u07aa\u086a\3\2\2\2\u07ab\u07ac\t\26\2\2\u07ac"+
-		"\u07ad\7\u01fc\2\2\u07ad\u07ae\5\66\34\2\u07ae\u07af\7\u01ff\2\2\u07af"+
-		"\u07b0\b,\1\2\u07b0\u086a\3\2\2\2\u07b1\u07b2\7\u0141\2\2\u07b2\u07b3"+
-		"\7\u01fc\2\2\u07b3\u07b4\7\u01ff\2\2\u07b4\u086a\b,\1\2\u07b5\u07b6\7"+
-		"\u0141\2\2\u07b6\u07b7\7\u01fc\2\2\u07b7\u07b8\5\66\34\2\u07b8\u07b9\7"+
-		"\u01ff\2\2\u07b9\u07ba\b,\1\2\u07ba\u086a\3\2\2\2\u07bb\u07bc\7\u008f"+
-		"\2\2\u07bc\u07bd\7\u01fc\2\2\u07bd\u07be\5\66\34\2\u07be\u07bf\7\u01ff"+
-		"\2\2\u07bf\u07c0\b,\1\2\u07c0\u086a\3\2\2\2\u07c1\u07c2\7\u00f1\2\2\u07c2"+
-		"\u07c3\7\u01fc\2\2\u07c3\u07c4\5\66\34\2\u07c4\u07c5\7\u01ff\2\2\u07c5"+
-		"\u07c6\b,\1\2\u07c6\u086a\3\2\2\2\u07c7\u07c8\7\u00e9\2\2\u07c8\u07c9"+
-		"\7\u01fc\2\2\u07c9\u07ca\5\66\34\2\u07ca\u07cb\7\u01ff\2\2\u07cb\u07cc"+
-		"\b,\1\2\u07cc\u086a\3\2\2\2\u07cd\u07ce\7\u00ea\2\2\u07ce\u07cf\7\u01fc"+
-		"\2\2\u07cf\u07d0\5\66\34\2\u07d0\u07d1\7\u01ff\2\2\u07d1\u07d2\b,\1\2"+
-		"\u07d2\u086a\3\2\2\2\u07d3\u07d4\7\u00e8\2\2\u07d4\u07d5\7\u01fc\2\2\u07d5"+
-		"\u07d6\5\66\34\2\u07d6\u07d7\7\u01ee\2\2\u07d7\u07d8\5\66\34\2\u07d8\u07d9"+
-		"\7\u01ff\2\2\u07d9\u07da\b,\1\2\u07da\u086a\3\2\2\2\u07db\u07dc\t\27\2"+
-		"\2\u07dc\u07dd\7\u01fc\2\2\u07dd\u07de\5\66\34\2\u07de\u07df\7\u01ee\2"+
-		"\2\u07df\u07e0\5\66\34\2\u07e0\u07e1\7\u01ff\2\2\u07e1\u07e2\b,\1\2\u07e2"+
-		"\u086a\3\2\2\2\u07e3\u07e4\7\u0185\2\2\u07e4\u07e5\7\u01fc\2\2\u07e5\u07e6"+
-		"\5\66\34\2\u07e6\u07e7\7\u01ff\2\2\u07e7\u07e8\b,\1\2\u07e8\u086a\3\2"+
-		"\2\2\u07e9\u07ea\7%\2\2\u07ea\u07eb\7\u01fc\2\2\u07eb\u07ec\5\66\34\2"+
-		"\u07ec\u07ed\7\u01ff\2\2\u07ed\u07ee\b,\1\2\u07ee\u086a\3\2\2\2\u07ef"+
-		"\u07f0\7\u00af\2\2\u07f0\u07f1\7\u01fc\2\2\u07f1\u07f2\5\66\34\2\u07f2"+
-		"\u07f3\7\u01ff\2\2\u07f3\u07f4\b,\1\2\u07f4\u086a\3\2\2\2\u07f5\u07f6"+
-		"\7\u01ac\2\2\u07f6\u07f7\7\u01fc\2\2\u07f7\u07f8\5\66\34\2\u07f8\u07f9"+
-		"\7\u01ff\2\2\u07f9\u07fa\b,\1\2\u07fa\u086a\3\2\2\2\u07fb\u07fc\7L\2\2"+
-		"\u07fc\u07fd\7\u01fc\2\2\u07fd\u07fe\5\66\34\2\u07fe\u07ff\7\u01ee\2\2"+
-		"\u07ff\u0800\5\66\34\2\u0800\u0801\7\u01ee\2\2\u0801\u0802\5\66\34\2\u0802"+
-		"\u0803\7\u01ff\2\2\u0803\u0804\b,\1\2\u0804\u086a\3\2\2\2\u0805\u0806"+
-		"\7\17\2\2\u0806\u0807\7\u01fc\2\2\u0807\u0808\5\66\34\2\u0808\u0809\7"+
-		"\u01ff\2\2\u0809\u080a\b,\1\2\u080a\u086a\3\2\2\2\u080b\u080c\7\u012f"+
-		"\2\2\u080c\u080d\7\u01fc\2\2\u080d\u080e\5\66\34\2\u080e\u080f\7\u01ee"+
-		"\2\2\u080f\u0810\5\66\34\2\u0810\u0811\7\u01ff\2\2\u0811\u0812\b,\1\2"+
-		"\u0812\u086a\3\2\2\2\u0813\u0814\7\u0177\2\2\u0814\u0815\7\u01fc\2\2\u0815"+
-		"\u0816\5\66\34\2\u0816\u0817\7\u01ff\2\2\u0817\u0818\b,\1\2\u0818\u086a"+
-		"\3\2\2\2\u0819\u081a\7\33\2\2\u081a\u081b\7\u01fc\2\2\u081b\u081c\5\66"+
-		"\34\2\u081c\u081d\7\u01ff\2\2\u081d\u081e\b,\1\2\u081e\u086a\3\2\2\2\u081f"+
-		"\u0820\7O\2\2\u0820\u0821\7\u01fc\2\2\u0821\u0822\5\66\34\2\u0822\u0823"+
-		"\7\u01ff\2\2\u0823\u0824\b,\1\2\u0824\u086a\3\2\2\2\u0825\u0826\7\20\2"+
-		"\2\u0826\u0827\7\u01fc\2\2\u0827\u0828\5\66\34\2\u0828\u0829\7\u01ff\2"+
-		"\2\u0829\u082a\b,\1\2\u082a\u086a\3\2\2\2\u082b\u082c\7\u0199\2\2\u082c"+
-		"\u082d\7\u01fc\2\2\u082d\u082e\5\66\34\2\u082e\u082f\7\u01ff\2\2\u082f"+
-		"\u0830\b,\1\2\u0830\u086a\3\2\2\2\u0831\u0832\7\36\2\2\u0832\u0833\7\u01fc"+
-		"\2\2\u0833\u0834\5\66\34\2\u0834\u0835\7\u01ff\2\2\u0835\u0836\b,\1\2"+
-		"\u0836\u086a\3\2\2\2\u0837\u0838\7p\2\2\u0838\u0839\7\u01fc\2\2\u0839"+
-		"\u083a\5\66\34\2\u083a\u083b\7\u01ff\2\2\u083b\u083c\b,\1\2\u083c\u086a"+
-		"\3\2\2\2\u083d\u083e\7\u013f\2\2\u083e\u083f\7\u01fc\2\2\u083f\u0840\5"+
-		"\66\34\2\u0840\u0841\7\u01ff\2\2\u0841\u0842\b,\1\2\u0842\u086a\3\2\2"+
-		"\2\u0843\u0844\7\u0130\2\2\u0844\u0845\7\u01fc\2\2\u0845\u0846\5\66\34"+
-		"\2\u0846\u0847\7\u01ff\2\2\u0847\u0848\b,\1\2\u0848\u086a\3\2\2\2\u0849"+
-		"\u084a\7\u0109\2\2\u084a\u084b\7\u01fc\2\2\u084b\u084c\5\66\34\2\u084c"+
-		"\u084d\7\u01ff\2\2\u084d\u084e\b,\1\2\u084e\u086a\3\2\2\2\u084f\u0850"+
-		"\7\u0176\2\2\u0850\u0851\7\u01fc\2\2\u0851\u0852\5\66\34\2\u0852\u0853"+
-		"\7\u01ff\2\2\u0853\u0854\b,\1\2\u0854\u086a\3\2\2\2\u0855\u0856\7\n\2"+
-		"\2\u0856\u0857\7\u01fc\2\2\u0857\u0858\7\u01ff\2\2\u0858\u086a\b,\1\2"+
-		"\u0859\u085a\7\13\2\2\u085a\u085b\7\u01fc\2\2\u085b\u085c\7\u01ff\2\2"+
-		"\u085c\u086a\b,\1\2\u085d\u085e\7\u0091\2\2\u085e\u085f\7\u01fc\2\2\u085f"+
-		"\u0860\5\66\34\2\u0860\u0861\7\u01ff\2\2\u0861\u0862\b,\1\2\u0862\u086a"+
-		"\3\2\2\2\u0863\u0864\7\61\2\2\u0864\u0865\7\u01fc\2\2\u0865\u0866\5\66"+
-		"\34\2\u0866\u0867\7\u01ff\2\2\u0867\u0868\b,\1\2\u0868\u086a\3\2\2\2\u0869"+
-		"\u0797\3\2\2\2\u0869\u079d\3\2\2\2\u0869\u07a5\3\2\2\2\u0869\u07ab\3\2"+
-		"\2\2\u0869\u07b1\3\2\2\2\u0869\u07b5\3\2\2\2\u0869\u07bb\3\2\2\2\u0869"+
-		"\u07c1\3\2\2\2\u0869\u07c7\3\2\2\2\u0869\u07cd\3\2\2\2\u0869\u07d3\3\2"+
-		"\2\2\u0869\u07db\3\2\2\2\u0869\u07e3\3\2\2\2\u0869\u07e9\3\2\2\2\u0869"+
-		"\u07ef\3\2\2\2\u0869\u07f5\3\2\2\2\u0869\u07fb\3\2\2\2\u0869\u0805\3\2"+
-		"\2\2\u0869\u080b\3\2\2\2\u0869\u0813\3\2\2\2\u0869\u0819\3\2\2\2\u0869"+
-		"\u081f\3\2\2\2\u0869\u0825\3\2\2\2\u0869\u082b\3\2\2\2\u0869\u0831\3\2"+
-		"\2\2\u0869\u0837\3\2\2\2\u0869\u083d\3\2\2\2\u0869\u0843\3\2\2\2\u0869"+
-		"\u0849\3\2\2\2\u0869\u084f\3\2\2\2\u0869\u0855\3\2\2\2\u0869\u0859\3\2"+
-		"\2\2\u0869\u085d\3\2\2\2\u0869\u0863\3\2\2\2\u086aW\3\2\2\2\u086b\u086c"+
-		"\7\u0206\2\2\u086c\u087c\b-\1\2\u086d\u086e\7\u0205\2\2\u086e\u087c\b"+
-		"-\1\2\u086f\u0870\7\u0204\2\2\u0870\u087c\b-\1\2\u0871\u0872\7\16\2\2"+
-		"\u0872\u087c\b-\1\2\u0873\u0874\7\r\2\2\u0874\u087c\b-\1\2\u0875\u0876"+
-		"\5^\60\2\u0876\u0877\b-\1\2\u0877\u087c\3\2\2\2\u0878\u0879\5`\61\2\u0879"+
-		"\u087a\b-\1\2\u087a\u087c\3\2\2\2\u087b\u086b\3\2\2\2\u087b\u086d\3\2"+
-		"\2\2\u087b\u086f\3\2\2\2\u087b\u0871\3\2\2\2\u087b\u0873\3\2\2\2\u087b"+
-		"\u0875\3\2\2\2\u087b\u0878\3\2\2\2\u087cY\3\2\2\2\u087d\u087e\7\u0203"+
-		"\2\2\u087e\u0880\7\4\2\2\u087f\u087d\3\2\2\2\u087f\u0880\3\2\2\2\u0880"+
-		"\u0883\3\2\2\2\u0881\u0882\7\u0203\2\2\u0882\u0884\7\4\2\2\u0883\u0881"+
-		"\3\2\2\2\u0883\u0884\3\2\2\2\u0884\u0885\3\2\2\2\u0885\u0886\7\u0203\2"+
-		"\2\u0886\u0887\b.\1\2\u0887[\3\2\2\2\u0888\u0889\7\u0203\2\2\u0889\u088b"+
-		"\7\4\2\2\u088a\u0888\3\2\2\2\u088a\u088b\3\2\2\2\u088b\u088c\3\2\2\2\u088c"+
-		"\u088d\7\u0203\2\2\u088d\u088e\b/\1\2\u088e]\3\2\2\2\u088f\u0890\7_\2"+
-		"\2\u0890\u0891\7\u0206\2\2\u0891\u0892\b\60\1\2\u0892_\3\2\2\2\u0893\u0894"+
-		"\7\u019e\2\2\u0894\u0895\7\u0206\2\2\u0895\u0896\b\61\1\2\u0896a\3\2\2"+
-		"\2\u0897\u0898\7\u00cc\2\2\u0898\u089d\b\62\1\2\u0899\u089a\7\u00cc\2"+
-		"\2\u089a\u089b\7\u0112\2\2\u089b\u089d\b\62\1\2\u089c\u0897\3\2\2\2\u089c"+
-		"\u0899\3\2\2\2\u089dc\3\2\2\2\u089e\u089f\7\u00df\2\2\u089f\u08a8\b\63"+
-		"\1\2\u08a0\u08a1\7\u0112\2\2\u08a1\u08a2\7\u00df\2\2\u08a2\u08a8\b\63"+
-		"\1\2\u08a3\u08a4\7\u015b\2\2\u08a4\u08a8\b\63\1\2\u08a5\u08a6\7\u0145"+
-		"\2\2\u08a6\u08a8\b\63\1\2\u08a7\u089e\3\2\2\2\u08a7\u08a0\3\2\2\2\u08a7"+
-		"\u08a3\3\2\2\2\u08a7\u08a5\3\2\2\2\u08a8e\3\2\2\2\u08a9\u08aa\7\u00b8"+
-		"\2\2\u08aa\u08af\b\64\1\2\u08ab\u08ac\7\u0112\2\2\u08ac\u08ad\7\u00b8"+
-		"\2\2\u08ad\u08af\b\64\1\2\u08ae\u08a9\3\2\2\2\u08ae\u08ab\3\2\2\2\u08af"+
-		"g\3\2\2\2\u08b0\u08b1\7\u008d\2\2\u08b1\u08b6\b\65\1\2\u08b2\u08b3\7\u0112"+
-		"\2\2\u08b3\u08b4\7\u008d\2\2\u08b4\u08b6\b\65\1\2\u08b5\u08b0\3\2\2\2"+
-		"\u08b5\u08b2\3\2\2\2\u08b6i\3\2\2\2\u08b7\u08b8\t\30\2\2\u08b8k\3\2\2"+
-		"\2Vv\u008c\u00c5\u00c9\u00ce\u00d2\u00f3\u0101\u0106\u0110\u011b\u0120"+
-		"\u0127\u0135\u013a\u0141\u014c\u0157\u0160\u0164\u0167\u016e\u0177\u0189"+
-		"\u0194\u019d\u01a2\u01a9\u01b1\u01b8\u01c2\u01d5\u01da\u01e7\u01f8\u0209"+
-		"\u0213\u0219\u0221\u022f\u0260\u02b6\u02b8\u02e3\u02ed\u0300\u030e\u0321"+
-		"\u0347\u0356\u036d\u0385\u0403\u0528\u0534\u0544\u0552\u058e\u0596\u05ba"+
-		"\u05e5\u05f5\u0604\u0614\u0622\u0637\u06a6\u06ac\u06e9\u06f1\u06fc\u070d"+
-		"\u0738\u0781\u0795\u0869\u087b\u087f\u0883\u088a\u089c\u08a7\u08ae\u08b5";
+		"\64\4\65\t\65\4\66\t\66\4\67\t\67\48\t8\49\t9\4:\t:\4;\t;\4<\t<\4=\t="+
+		"\4>\t>\4?\t?\4@\t@\4A\tA\4B\tB\4C\tC\4D\tD\4E\tE\4F\tF\4G\tG\4H\tH\4I"+
+		"\tI\4J\tJ\4K\tK\4L\tL\4M\tM\4N\tN\4O\tO\4P\tP\4Q\tQ\4R\tR\4S\tS\4T\tT"+
+		"\4U\tU\4V\tV\4W\tW\4X\tX\4Y\tY\4Z\tZ\4[\t[\4\\\t\\\4]\t]\4^\t^\4_\t_\4"+
+		"`\t`\3\2\3\2\3\2\3\2\3\3\3\3\3\3\3\3\6\3\u00c9\n\3\r\3\16\3\u00ca\3\3"+
+		"\3\3\3\4\3\4\3\4\3\4\3\4\3\4\5\4\u00d5\n\4\3\5\3\5\3\5\3\5\3\5\3\5\3\5"+
+		"\3\5\3\5\3\5\3\5\3\5\3\5\3\5\5\5\u00e5\n\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5"+
+		"\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\5\5\u00fd"+
+		"\n\5\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3"+
+		"\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\7\6\u0118\n\6\f\6\16\6\u011b\13\6\3"+
+		"\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\3\6\7\6\u0126\n\6\f\6\16\6\u0129\13\6\3"+
+		"\6\3\6\3\6\5\6\u012e\n\6\3\7\3\7\3\7\5\7\u0133\n\7\3\7\3\7\5\7\u0137\n"+
+		"\7\3\7\3\7\3\b\3\b\3\b\3\b\3\b\3\b\5\b\u0141\n\b\3\t\3\t\3\t\3\n\3\n\3"+
+		"\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\n\3\13\3"+
+		"\13\3\13\3\13\3\13\3\13\7\13\u015e\n\13\f\13\16\13\u0161\13\13\3\13\3"+
+		"\13\3\13\5\13\u0166\n\13\3\f\3\f\3\f\3\f\7\f\u016c\n\f\f\f\16\f\u016f"+
+		"\13\f\3\f\3\f\5\f\u0173\n\f\3\r\3\r\3\r\3\r\5\r\u0179\n\r\3\16\3\16\3"+
+		"\17\3\17\3\17\3\17\3\17\3\17\3\17\3\17\7\17\u0185\n\17\f\17\16\17\u0188"+
+		"\13\17\3\17\3\17\3\17\5\17\u018d\n\17\3\20\3\20\3\20\3\20\3\20\3\20\3"+
+		"\20\3\20\3\20\3\20\5\20\u0199\n\20\3\21\3\21\3\21\3\21\3\21\3\21\3\21"+
+		"\3\21\7\21\u01a3\n\21\f\21\16\21\u01a6\13\21\3\21\3\21\3\21\3\21\3\21"+
+		"\3\21\3\21\5\21\u01af\n\21\3\22\3\22\3\22\3\22\3\22\3\22\3\22\3\22\3\22"+
+		"\3\22\3\22\7\22\u01bc\n\22\f\22\16\22\u01bf\13\22\3\22\3\22\3\22\5\22"+
+		"\u01c4\n\22\3\23\3\23\3\23\3\23\3\23\5\23\u01cb\n\23\3\24\3\24\3\24\3"+
+		"\24\3\24\3\24\3\24\3\24\7\24\u01d5\n\24\f\24\16\24\u01d8\13\24\3\24\3"+
+		"\24\3\24\3\24\3\24\5\24\u01df\n\24\3\25\3\25\3\25\3\25\3\25\3\25\3\25"+
+		"\7\25\u01e8\n\25\f\25\16\25\u01eb\13\25\3\25\3\25\3\25\3\25\3\25\3\25"+
+		"\3\25\3\25\3\25\3\25\7\25\u01f7\n\25\f\25\16\25\u01fa\13\25\3\25\3\25"+
+		"\3\25\3\25\3\25\3\25\7\25\u0202\n\25\f\25\16\25\u0205\13\25\3\25\3\25"+
+		"\7\25\u0209\n\25\f\25\16\25\u020c\13\25\3\25\3\25\3\25\5\25\u0211\n\25"+
+		"\3\26\3\26\3\26\3\26\3\26\5\26\u0218\n\26\3\27\3\27\3\27\3\27\3\27\3\27"+
+		"\5\27\u0220\n\27\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30\3\30"+
+		"\3\30\3\30\5\30\u022f\n\30\3\31\3\31\3\31\3\31\3\31\3\31\3\31\3\31\3\31"+
+		"\3\31\3\31\3\31\3\31\3\31\5\31\u023f\n\31\3\32\3\32\3\32\3\32\3\32\3\32"+
+		"\3\32\5\32\u0248\n\32\3\33\3\33\3\33\3\33\3\33\3\33\3\33\5\33\u0251\n"+
+		"\33\3\34\3\34\3\34\3\34\3\34\3\34\5\34\u0259\n\34\3\35\3\35\3\35\3\35"+
+		"\3\35\3\35\5\35\u0261\n\35\3\36\3\36\3\36\3\36\3\36\3\36\3\36\3\36\3\36"+
+		"\3\36\3\36\3\36\3\36\7\36\u0270\n\36\f\36\16\36\u0273\13\36\3\36\3\36"+
+		"\3\36\5\36\u0278\n\36\3\37\3\37\3\37\3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 "+
+		"\3 \3 \3 \3 \3 \3 \3 \3 \5 \u0290\n \3!\3!\3!\3!\5!\u0296\n!\3\"\3\"\3"+
+		"\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\3\"\5\"\u02a7\n\"\3#\3"+
+		"#\3#\3$\3$\3$\3$\3$\3$\3$\5$\u02b3\n$\3%\3%\3%\3%\3%\3%\3%\3%\3%\3%\3"+
+		"%\3%\3%\3%\5%\u02c3\n%\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\3&\6&\u02d3"+
+		"\n&\r&\16&\u02d4\3&\3&\3&\3&\3&\3&\3&\3&\6&\u02df\n&\r&\16&\u02e0\3&\3"+
+		"&\5&\u02e5\n&\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'"+
+		"\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\3\'\5\'\u0301\n\'\3(\3(\3"+
+		"(\3(\3(\3(\3(\3(\3(\3(\5(\u030d\n(\3)\3)\3)\3)\3)\3)\3)\7)\u0316\n)\f"+
+		")\16)\u0319\13)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\7)\u032a"+
+		"\n)\f)\16)\u032d\13)\3)\3)\3)\3)\3)\3)\3)\7)\u0336\n)\f)\16)\u0339\13"+
+		")\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\7)\u0348\n)\f)\16)\u034b\13)"+
+		"\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\3)\5)\u035c\n)\3*\3*\3*\3*"+
+		"\3*\5*\u0363\n*\3+\3+\3+\5+\u0368\n+\3,\3,\3,\5,\u036d\n,\3-\3-\3-\5-"+
+		"\u0372\n-\3.\3.\3.\3.\3.\5.\u0379\n.\3/\3/\3/\3/\3/\5/\u0380\n/\3\60\3"+
+		"\60\3\60\3\60\3\60\5\60\u0387\n\60\3\61\3\61\3\61\3\62\3\62\3\62\3\62"+
+		"\3\62\3\62\3\62\3\62\3\62\3\62\3\62\3\62\3\62\3\62\3\62\3\62\3\62\3\62"+
+		"\3\62\3\62\3\62\3\62\3\62\5\62\u03a3\n\62\3\63\3\63\3\63\3\63\3\63\3\63"+
+		"\3\63\3\63\3\63\3\63\7\63\u03af\n\63\f\63\16\63\u03b2\13\63\3\63\3\63"+
+		"\5\63\u03b6\n\63\3\64\3\64\3\64\3\65\3\65\3\65\3\65\3\65\5\65\u03c0\n"+
+		"\65\3\66\3\66\3\66\3\66\3\66\3\66\3\66\7\66\u03c9\n\66\f\66\16\66\u03cc"+
+		"\13\66\3\66\3\66\5\66\u03d0\n\66\3\67\3\67\3\67\3\67\3\67\5\67\u03d7\n"+
+		"\67\38\38\38\38\38\38\38\38\38\38\78\u03e3\n8\f8\168\u03e6\138\38\38\5"+
+		"8\u03ea\n8\39\39\39\39\39\59\u03f1\n9\3:\3:\3:\3:\3:\3:\3:\3:\3:\5:\u03fc"+
+		"\n:\3;\3;\3;\3;\3;\3;\3;\6;\u0405\n;\r;\16;\u0406\3;\3;\3;\3;\3;\6;\u040e"+
+		"\n;\r;\16;\u040f\3;\3;\5;\u0414\n;\3<\5<\u0417\n<\3<\3<\3<\3<\3<\5<\u041e"+
+		"\n<\3<\3<\3<\3<\3<\3<\3<\5<\u0427\n<\3<\3<\3<\3<\3<\3<\3<\3<\3<\3<\3<"+
+		"\3<\3<\3<\3<\3<\5<\u0439\n<\3=\3=\3=\3=\3>\3>\3>\3>\3>\5>\u0444\n>\3>"+
+		"\3>\3>\3>\3>\3>\3>\5>\u044d\n>\3>\3>\3>\5>\u0452\n>\3?\3?\3?\3?\3?\5?"+
+		"\u0459\n?\3@\3@\3@\3@\7@\u045f\n@\f@\16@\u0462\13@\3@\3@\3A\3A\5A\u0468"+
+		"\nA\3A\3A\3A\3A\3A\3A\3A\3A\5A\u0472\nA\3A\3A\3A\3A\3A\3A\3A\3A\3A\3A"+
+		"\3A\3A\3A\3A\3A\3A\3A\5A\u0485\nA\3A\3A\3A\5A\u048a\nA\3B\3B\3B\3B\3B"+
+		"\3B\3B\3B\3B\7B\u0495\nB\fB\16B\u0498\13B\3B\3B\3B\3B\3B\3B\3B\3B\3B\3"+
+		"B\3B\3B\7B\u04a6\nB\fB\16B\u04a9\13B\3B\3B\3B\3B\3B\3B\3B\3B\3B\3B\3B"+
+		"\3B\7B\u04b7\nB\fB\16B\u04ba\13B\3B\3B\3B\3B\3B\7B\u04c1\nB\fB\16B\u04c4"+
+		"\13B\3B\3B\3B\5B\u04c9\nB\3C\3C\3C\3C\3C\3C\5C\u04d1\nC\3D\3D\3D\3D\3"+
+		"D\3E\3E\3E\3E\3E\7E\u04dd\nE\fE\16E\u04e0\13E\3E\3E\3E\3F\3F\3F\3F\3F"+
+		"\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F"+
+		"\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\5F\u0510\nF\3F\3F\3F\3F"+
+		"\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F"+
+		"\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F"+
+		"\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F"+
+		"\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\3F\7F\u0566\nF\fF\16F\u0569\13F\3G\3G\3"+
+		"G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3"+
+		"G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\3G\5G\u0593\nG\3H\3H\3H\3H\3"+
+		"H\3H\7H\u059b\nH\fH\16H\u059e\13H\3H\3H\3H\3I\3I\3I\3I\3I\3I\3I\3I\3I"+
+		"\3I\3I\7I\u05ae\nI\fI\16I\u05b1\13I\3I\3I\3I\3J\3J\3J\3J\3J\3J\7J\u05bc"+
+		"\nJ\fJ\16J\u05bf\13J\3J\3J\3J\3K\3K\3K\3K\3K\3K\3K\3K\3K\3K\3K\7K\u05cf"+
+		"\nK\fK\16K\u05d2\13K\3K\3K\3K\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\6L\u05f5\nL\rL\16L\u05f6"+
+		"\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\6L\u0604\nL\rL\16L\u0605\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\7L\u061b\nL\fL\16L\u061e"+
+		"\13L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\7L\u0633"+
+		"\nL\fL\16L\u0636\13L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\6L\u06b1\nL\rL\16L\u06b2\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3"+
+		"L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\3L\5L\u07d8\nL\3M\3M\3M\3M\3M\3M\3"+
+		"M\3M\7M\u07e2\nM\fM\16M\u07e5\13M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\7M"+
+		"\u07f2\nM\fM\16M\u07f5\13M\3M\3M\3M\3M\3M\3M\3M\3M\3M\7M\u0800\nM\fM\16"+
+		"M\u0803\13M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3"+
+		"M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3"+
+		"M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\3M\5M\u083e\nM\3N\3N\3N\3N\6"+
+		"N\u0844\nN\rN\16N\u0845\3N\3N\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3"+
+		"O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\3O\5O\u086a\nO\3"+
+		"P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3"+
+		"P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\7P\u0893\nP\fP\16P\u0896"+
+		"\13P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\6P\u08a3\nP\rP\16P\u08a4\3P\3P\3"+
+		"P\3P\3P\3P\3P\3P\3P\3P\3P\6P\u08b2\nP\rP\16P\u08b3\3P\3P\3P\3P\3P\3P\3"+
+		"P\3P\3P\3P\3P\3P\6P\u08c2\nP\rP\16P\u08c3\3P\3P\3P\3P\3P\3P\3P\3P\3P\3"+
+		"P\6P\u08d0\nP\rP\16P\u08d1\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3P\3"+
+		"P\3P\3P\3P\3P\5P\u08e7\nP\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3"+
+		"Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3"+
+		"Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3"+
+		"Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3"+
+		"Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3"+
+		"Q\3Q\3Q\5Q\u0956\nQ\3Q\3Q\3Q\3Q\5Q\u095c\nQ\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3"+
+		"Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3"+
+		"Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3Q\3"+
+		"Q\3Q\3Q\3Q\3Q\5Q\u0999\nQ\3R\3R\3R\3R\3R\3R\5R\u09a1\nR\3R\3R\3R\3R\3"+
+		"R\3R\3R\3R\3R\5R\u09ac\nR\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\7S\u09bb"+
+		"\nS\fS\16S\u09be\13S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3"+
+		"S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3S\3"+
+		"S\5S\u09e8\nS\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3"+
+		"T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3"+
+		"T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3T\3"+
+		"T\3T\3T\3T\3T\3T\3T\5T\u0a31\nT\3U\3U\3U\3U\3U\3U\3U\3U\3U\3U\3U\3U\3"+
+		"U\3U\3U\3U\3U\3U\5U\u0a45\nU\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3"+
+		"V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3"+
+		"V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3"+
+		"V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3"+
+		"V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3"+
+		"V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3"+
+		"V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3"+
+		"V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3"+
+		"V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3"+
+		"V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\3V\5V\u0b19\nV\3W\3W\3W\3W\3W\3W\3"+
+		"W\3W\3W\3W\3W\3W\3W\3W\3W\3W\5W\u0b2b\nW\3X\3X\5X\u0b2f\nX\3X\3X\5X\u0b33"+
+		"\nX\3X\3X\3X\3Y\3Y\5Y\u0b3a\nY\3Y\3Y\3Y\3Z\3Z\3Z\3Z\3[\3[\3[\3[\3\\\3"+
+		"\\\3\\\3\\\3\\\5\\\u0b4c\n\\\3]\3]\3]\3]\3]\3]\3]\3]\3]\5]\u0b57\n]\3"+
+		"^\3^\3^\3^\3^\5^\u0b5e\n^\3_\3_\3_\3_\3_\5_\u0b65\n_\3`\3`\3`\2\3\u008a"+
+		"a\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62\64\668:<>@BDF"+
+		"HJLNPRTVXZ\\^`bdfhjlnprtvxz|~\u0080\u0082\u0084\u0086\u0088\u008a\u008c"+
+		"\u008e\u0090\u0092\u0094\u0096\u0098\u009a\u009c\u009e\u00a0\u00a2\u00a4"+
+		"\u00a6\u00a8\u00aa\u00ac\u00ae\u00b0\u00b2\u00b4\u00b6\u00b8\u00ba\u00bc"+
+		"\u00be\2\30\4\2\u0103\u0103\u021e\u021e\4\2..\67\67\5\2\u00a9\u00a9\u00e4"+
+		"\u00e4\u016a\u016a\6\2\u0139\u0139\u01ea\u01ea\u01ee\u01ee\u01fb\u01fc"+
+		"\5\2\4\4\u0207\u0207\u0211\u0211\4\2\u0203\u0203\u0219\u0219\3\2\5\b\3"+
+		"\2\u020d\u0210\4\2\t\t\u0209\u020c\4\2\u00e2\u00e2\u00f7\u00f7\3\2\u01a5"+
+		"\u01a6\4\2\u01c0\u01c0\u01c8\u01c8\5\2XX\u0105\u0105\u0186\u0187\3\2\u01de"+
+		"\u01e6\4\2\u0103\u0103\u010a\u010a\4\2\u019c\u019d\u01ff\u0201\4\2RRV"+
+		"W\3\2\u0157\u015f\3\2CD\3\2\65\66\3\2\u0140\u0141\6\2\f\f\u011b\u011b"+
+		"\u0203\u0203\u0219\u0219\2\u0c93\2\u00c0\3\2\2\2\4\u00c4\3\2\2\2\6\u00d4"+
+		"\3\2\2\2\b\u00fc\3\2\2\2\n\u012d\3\2\2\2\f\u012f\3\2\2\2\16\u0140\3\2"+
+		"\2\2\20\u0142\3\2\2\2\22\u0145\3\2\2\2\24\u0165\3\2\2\2\26\u0172\3\2\2"+
+		"\2\30\u0178\3\2\2\2\32\u017a\3\2\2\2\34\u018c\3\2\2\2\36\u0198\3\2\2\2"+
+		" \u01ae\3\2\2\2\"\u01c3\3\2\2\2$\u01ca\3\2\2\2&\u01de\3\2\2\2(\u0210\3"+
+		"\2\2\2*\u0217\3\2\2\2,\u021f\3\2\2\2.\u022e\3\2\2\2\60\u023e\3\2\2\2\62"+
+		"\u0247\3\2\2\2\64\u0250\3\2\2\2\66\u0258\3\2\2\28\u0260\3\2\2\2:\u0277"+
+		"\3\2\2\2<\u0279\3\2\2\2>\u028f\3\2\2\2@\u0295\3\2\2\2B\u02a6\3\2\2\2D"+
+		"\u02a8\3\2\2\2F\u02b2\3\2\2\2H\u02c2\3\2\2\2J\u02e4\3\2\2\2L\u0300\3\2"+
+		"\2\2N\u030c\3\2\2\2P\u035b\3\2\2\2R\u0362\3\2\2\2T\u0367\3\2\2\2V\u036c"+
+		"\3\2\2\2X\u0371\3\2\2\2Z\u0378\3\2\2\2\\\u037f\3\2\2\2^\u0386\3\2\2\2"+
+		"`\u0388\3\2\2\2b\u03a2\3\2\2\2d\u03b5\3\2\2\2f\u03b7\3\2\2\2h\u03bf\3"+
+		"\2\2\2j\u03cf\3\2\2\2l\u03d6\3\2\2\2n\u03e9\3\2\2\2p\u03f0\3\2\2\2r\u03fb"+
+		"\3\2\2\2t\u0413\3\2\2\2v\u0438\3\2\2\2x\u043a\3\2\2\2z\u0451\3\2\2\2|"+
+		"\u0458\3\2\2\2~\u045a\3\2\2\2\u0080\u0489\3\2\2\2\u0082\u04c8\3\2\2\2"+
+		"\u0084\u04d0\3\2\2\2\u0086\u04d2\3\2\2\2\u0088\u04d7\3\2\2\2\u008a\u050f"+
+		"\3\2\2\2\u008c\u0592\3\2\2\2\u008e\u0594\3\2\2\2\u0090\u05a2\3\2\2\2\u0092"+
+		"\u05b5\3\2\2\2\u0094\u05c3\3\2\2\2\u0096\u07d7\3\2\2\2\u0098\u083d\3\2"+
+		"\2\2\u009a\u083f\3\2\2\2\u009c\u0869\3\2\2\2\u009e\u08e6\3\2\2\2\u00a0"+
+		"\u0998\3\2\2\2\u00a2\u09ab\3\2\2\2\u00a4\u09e7\3\2\2\2\u00a6\u0a30\3\2"+
+		"\2\2\u00a8\u0a44\3\2\2\2\u00aa\u0b18\3\2\2\2\u00ac\u0b2a\3\2\2\2\u00ae"+
+		"\u0b2e\3\2\2\2\u00b0\u0b39\3\2\2\2\u00b2\u0b3e\3\2\2\2\u00b4\u0b42\3\2"+
+		"\2\2\u00b6\u0b4b\3\2\2\2\u00b8\u0b56\3\2\2\2\u00ba\u0b5d\3\2\2\2\u00bc"+
+		"\u0b64\3\2\2\2\u00be\u0b66\3\2\2\2\u00c0\u00c1\5\4\3\2\u00c1\u00c2\7\2"+
+		"\2\3\u00c2\u00c3\b\2\1\2\u00c3\3\3\2\2\2\u00c4\u00c8\b\3\1\2\u00c5\u00c6"+
+		"\5\16\b\2\u00c6\u00c7\7\u0218\2\2\u00c7\u00c9\3\2\2\2\u00c8\u00c5\3\2"+
+		"\2\2\u00c9\u00ca\3\2\2\2\u00ca\u00c8\3\2\2\2\u00ca\u00cb\3\2\2\2\u00cb"+
+		"\u00cc\3\2\2\2\u00cc\u00cd\b\3\1\2\u00cd\5\3\2\2\2\u00ce\u00cf\5\b\5\2"+
+		"\u00cf\u00d0\b\4\1\2\u00d0\u00d5\3\2\2\2\u00d1\u00d2\5\n\6\2\u00d2\u00d3"+
+		"\b\4\1\2\u00d3\u00d5\3\2\2\2\u00d4\u00ce\3\2\2\2\u00d4\u00d1\3\2\2\2\u00d5"+
+		"\7\3\2\2\2\u00d6\u00d7\7\u01b5\2\2\u00d7\u00fd\b\5\1\2\u00d8\u00d9\7\u0190"+
+		"\2\2\u00d9\u00fd\b\5\1\2\u00da\u00db\7\u00ca\2\2\u00db\u00fd\b\5\1\2\u00dc"+
+		"\u00dd\7%\2\2\u00dd\u00fd\b\5\1\2\u00de\u00df\7*\2\2\u00df\u00fd\b\5\1"+
+		"\2\u00e0\u00e1\7\u00a0\2\2\u00e1\u00fd\b\5\1\2\u00e2\u00e4\7\u0081\2\2"+
+		"\u00e3\u00e5\7\u0142\2\2\u00e4\u00e3\3\2\2\2\u00e4\u00e5\3\2\2\2\u00e5"+
+		"\u00e6\3\2\2\2\u00e6\u00fd\b\5\1\2\u00e7\u00e8\7\u01a1\2\2\u00e8\u00fd"+
+		"\b\5\1\2\u00e9\u00ea\7\'\2\2\u00ea\u00fd\b\5\1\2\u00eb\u00ec\7\u01b4\2"+
+		"\2\u00ec\u00fd\b\5\1\2\u00ed\u00ee\7l\2\2\u00ee\u00fd\b\5\1\2\u00ef\u00f0"+
+		"\7l\2\2\u00f0\u00f1\7\u0213\2\2\u00f1\u00f2\7\u021b\2\2\u00f2\u00f3\7"+
+		"\u0205\2\2\u00f3\u00f4\7\u021b\2\2\u00f4\u00f5\7\u0216\2\2\u00f5\u00fd"+
+		"\b\5\1\2\u00f6\u00f7\7c\2\2\u00f7\u00fd\b\5\1\2\u00f8\u00f9\7\u01cf\2"+
+		"\2\u00f9\u00fd\b\5\1\2\u00fa\u00fb\7\67\2\2\u00fb\u00fd\b\5\1\2\u00fc"+
+		"\u00d6\3\2\2\2\u00fc\u00d8\3\2\2\2\u00fc\u00da\3\2\2\2\u00fc\u00dc\3\2"+
+		"\2\2\u00fc\u00de\3\2\2\2\u00fc\u00e0\3\2\2\2\u00fc\u00e2\3\2\2\2\u00fc"+
+		"\u00e7\3\2\2\2\u00fc\u00e9\3\2\2\2\u00fc\u00eb\3\2\2\2\u00fc\u00ed\3\2"+
+		"\2\2\u00fc\u00ef\3\2\2\2\u00fc\u00f6\3\2\2\2\u00fc\u00f8\3\2\2\2\u00fc"+
+		"\u00fa\3\2\2\2\u00fd\t\3\2\2\2\u00fe\u00ff\7\27\2\2\u00ff\u0100\7\u020f"+
+		"\2\2\u0100\u0101\5\b\5\2\u0101\u0102\7\u020d\2\2\u0102\u0103\b\6\1\2\u0103"+
+		"\u012e\3\2\2\2\u0104\u0105\7\u00fb\2\2\u0105\u0106\7\u020f\2\2\u0106\u0107"+
+		"\5\b\5\2\u0107\u0108\7\u0205\2\2\u0108\u0109\5\6\4\2\u0109\u010a\7\u020d"+
+		"\2\2\u010a\u010b\b\6\1\2\u010b\u012e\3\2\2\2\u010c\u010d\b\6\1\2\u010d"+
+		"\u010e\7\u01a3\2\2\u010e\u010f\7\u020f\2\2\u010f\u0110\5f\64\2\u0110\u0111"+
+		"\7\u0204\2\2\u0111\u0119\5\6\4\2\u0112\u0113\7\u0205\2\2\u0113\u0114\5"+
+		"f\64\2\u0114\u0115\7\u0204\2\2\u0115\u0116\5\6\4\2\u0116\u0118\3\2\2\2"+
+		"\u0117\u0112\3\2\2\2\u0118\u011b\3\2\2\2\u0119\u0117\3\2\2\2\u0119\u011a"+
+		"\3\2\2\2\u011a\u011c\3\2\2\2\u011b\u0119\3\2\2\2\u011c\u011d\7\u020d\2"+
+		"\2\u011d\u011e\b\6\1\2\u011e\u012e\3\2\2\2\u011f\u0120\b\6\1\2\u0120\u0121"+
+		"\7\u01c4\2\2\u0121\u0122\7\u020f\2\2\u0122\u0127\5\6\4\2\u0123\u0124\7"+
+		"\u0205\2\2\u0124\u0126\5\6\4\2\u0125\u0123\3\2\2\2\u0126\u0129\3\2\2\2"+
+		"\u0127\u0125\3\2\2\2\u0127\u0128\3\2\2\2\u0128\u012a\3\2\2\2\u0129\u0127"+
+		"\3\2\2\2\u012a\u012b\7\u020d\2\2\u012b\u012c\b\6\1\2\u012c\u012e\3\2\2"+
+		"\2\u012d\u00fe\3\2\2\2\u012d\u0104\3\2\2\2\u012d\u010c\3\2\2\2\u012d\u011f"+
+		"\3\2\2\2\u012e\13\3\2\2\2\u012f\u0130\7\u0213\2\2\u0130\u0132\t\2\2\2"+
+		"\u0131\u0133\t\3\2\2\u0132\u0131\3\2\2\2\u0132\u0133\3\2\2\2\u0133\u0136"+
+		"\3\2\2\2\u0134\u0135\7\u0205\2\2\u0135\u0137\7\u021e\2\2\u0136\u0134\3"+
+		"\2\2\2\u0136\u0137\3\2\2\2\u0137\u0138\3\2\2\2\u0138\u0139\7\u0216\2\2"+
+		"\u0139\r\3\2\2\2\u013a\u013b\5`\61\2\u013b\u013c\b\b\1\2\u013c\u0141\3"+
+		"\2\2\2\u013d\u013e\5\20\t\2\u013e\u013f\b\b\1\2\u013f\u0141\3\2\2\2\u0140"+
+		"\u013a\3\2\2\2\u0140\u013d\3\2\2\2\u0141\17\3\2\2\2\u0142\u0143\5\22\n"+
+		"\2\u0143\u0144\b\t\1\2\u0144\21\3\2\2\2\u0145\u0146\7Y\2\2\u0146\u0147"+
+		"\5^\60\2\u0147\u0148\7\u01ab\2\2\u0148\u0149\5\\/\2\u0149\u014a\5\u00b0"+
+		"Y\2\u014a\u014b\5\24\13\2\u014b\u014c\5\26\f\2\u014c\u014d\5\30\r\2\u014d"+
+		"\u014e\5\34\17\2\u014e\u014f\5 \21\2\u014f\u0150\5&\24\2\u0150\u0151\5"+
+		",\27\2\u0151\u0152\5> \2\u0152\u0153\5@!\2\u0153\u0154\5B\"\2\u0154\u0155"+
+		"\5F$\2\u0155\u0156\b\n\1\2\u0156\23\3\2\2\2\u0157\u0166\b\13\1\2\u0158"+
+		"\u0159\b\13\1\2\u0159\u015a\7\u0213\2\2\u015a\u015f\5J&\2\u015b\u015c"+
+		"\7\u0205\2\2\u015c\u015e\5J&\2\u015d\u015b\3\2\2\2\u015e\u0161\3\2\2\2"+
+		"\u015f\u015d\3\2\2\2\u015f\u0160\3\2\2\2\u0160\u0162\3\2\2\2\u0161\u015f"+
+		"\3\2\2\2\u0162\u0163\7\u0216\2\2\u0163\u0164\b\13\1\2\u0164\u0166\3\2"+
+		"\2\2\u0165\u0157\3\2\2\2\u0165\u0158\3\2\2\2\u0166\25\3\2\2\2\u0167\u0173"+
+		"\b\f\1\2\u0168\u0169\b\f\1\2\u0169\u016d\5P)\2\u016a\u016c\5P)\2\u016b"+
+		"\u016a\3\2\2\2\u016c\u016f\3\2\2\2\u016d\u016b\3\2\2\2\u016d\u016e\3\2"+
+		"\2\2\u016e\u0170\3\2\2\2\u016f\u016d\3\2\2\2\u0170\u0171\b\f\1\2\u0171"+
+		"\u0173\3\2\2\2\u0172\u0167\3\2\2\2\u0172\u0168\3\2\2\2\u0173\27\3\2\2"+
+		"\2\u0174\u0179\b\r\1\2\u0175\u0176\7G\2\2\u0176\u0177\7\u021d\2\2\u0177"+
+		"\u0179\b\r\1\2\u0178\u0174\3\2\2\2\u0178\u0175\3\2\2\2\u0179\31\3\2\2"+
+		"\2\u017a\u017b\5\34\17\2\u017b\33\3\2\2\2\u017c\u018d\b\17\1\2\u017d\u017e"+
+		"\b\17\1\2\u017e\u017f\7\u0136\2\2\u017f\u0180\7-\2\2\u0180\u0181\7\u0213"+
+		"\2\2\u0181\u0186\5\36\20\2\u0182\u0183\7\u0205\2\2\u0183\u0185\5\36\20"+
+		"\2\u0184\u0182\3\2\2\2\u0185\u0188\3\2\2\2\u0186\u0184\3\2\2\2\u0186\u0187"+
+		"\3\2\2\2\u0187\u0189\3\2\2\2\u0188\u0186\3\2\2\2\u0189\u018a\7\u0216\2"+
+		"\2\u018a\u018b\b\17\1\2\u018b\u018d\3\2\2\2\u018c\u017c\3\2\2\2\u018c"+
+		"\u017d\3\2\2\2\u018d\35\3\2\2\2\u018e\u018f\5f\64\2\u018f\u0190\5\6\4"+
+		"\2\u0190\u0191\b\20\1\2\u0191\u0199\3\2\2\2\u0192\u0193\5f\64\2\u0193"+
+		"\u0194\5\6\4\2\u0194\u0195\7G\2\2\u0195\u0196\7\u021d\2\2\u0196\u0197"+
+		"\b\20\1\2\u0197\u0199\3\2\2\2\u0198\u018e\3\2\2\2\u0198\u0192\3\2\2\2"+
+		"\u0199\37\3\2\2\2\u019a\u01af\b\21\1\2\u019b\u019c\b\21\1\2\u019c\u019d"+
+		"\7?\2\2\u019d\u019e\7-\2\2\u019e\u019f\7\u0213\2\2\u019f\u01a4\5f\64\2"+
+		"\u01a0\u01a1\7\u0205\2\2\u01a1\u01a3\5f\64\2\u01a2\u01a0\3\2\2\2\u01a3"+
+		"\u01a6\3\2\2\2\u01a4\u01a2\3\2\2\2\u01a4\u01a5\3\2\2\2\u01a5\u01a7\3\2"+
+		"\2\2\u01a6\u01a4\3\2\2\2\u01a7\u01a8\7\u0216\2\2\u01a8\u01a9\5\"\22\2"+
+		"\u01a9\u01aa\7\u00d1\2\2\u01aa\u01ab\7\u021b\2\2\u01ab\u01ac\7,\2\2\u01ac"+
+		"\u01ad\b\21\1\2\u01ad\u01af\3\2\2\2\u01ae\u019a\3\2\2\2\u01ae\u019b\3"+
+		"\2\2\2\u01af!\3\2\2\2\u01b0\u01c4\b\22\1\2\u01b1\u01b2\b\22\1\2\u01b2"+
+		"\u01b3\7\u01a0\2\2\u01b3\u01b4\7-\2\2\u01b4\u01b5\7\u0213\2\2\u01b5\u01b6"+
+		"\5f\64\2\u01b6\u01bd\5$\23\2\u01b7\u01b8\7\u0205\2\2\u01b8\u01b9\5f\64"+
+		"\2\u01b9\u01ba\5$\23\2\u01ba\u01bc\3\2\2\2\u01bb\u01b7\3\2\2\2\u01bc\u01bf"+
+		"\3\2\2\2\u01bd\u01bb\3\2\2\2\u01bd\u01be\3\2\2\2\u01be\u01c0\3\2\2\2\u01bf"+
+		"\u01bd\3\2\2\2\u01c0\u01c1\7\u0216\2\2\u01c1\u01c2\b\22\1\2\u01c2\u01c4"+
+		"\3\2\2\2\u01c3\u01b0\3\2\2\2\u01c3\u01b1\3\2\2\2\u01c4#\3\2\2\2\u01c5"+
+		"\u01cb\b\23\1\2\u01c6\u01c7\7\31\2\2\u01c7\u01cb\b\23\1\2\u01c8\u01c9"+
+		"\7x\2\2\u01c9\u01cb\b\23\1\2\u01ca\u01c5\3\2\2\2\u01ca\u01c6\3\2\2\2\u01ca"+
+		"\u01c8\3\2\2\2\u01cb%\3\2\2\2\u01cc\u01df\b\24\1\2\u01cd\u01ce\b\24\1"+
+		"\2\u01ce\u01cf\7\u018e\2\2\u01cf\u01d0\7-\2\2\u01d0\u01d1\7\u0213\2\2"+
+		"\u01d1\u01d6\5f\64\2\u01d2\u01d3\7\u0205\2\2\u01d3\u01d5\5f\64\2\u01d4"+
+		"\u01d2\3\2\2\2\u01d5\u01d8\3\2\2\2\u01d6\u01d4\3\2\2\2\u01d6\u01d7\3\2"+
+		"\2\2\u01d7\u01d9\3\2\2\2\u01d8\u01d6\3\2\2\2\u01d9\u01da\5(\25\2\u01da"+
+		"\u01db\7\u0216\2\2\u01db\u01dc\5*\26\2\u01dc\u01dd\b\24\1\2\u01dd\u01df"+
+		"\3\2\2\2\u01de\u01cc\3\2\2\2\u01de\u01cd\3\2\2\2\u01df\'\3\2\2\2\u01e0"+
+		"\u0211\b\25\1\2\u01e1\u01e2\b\25\1\2\u01e2\u01e3\7\u0126\2\2\u01e3\u01e4"+
+		"\7\u0213\2\2\u01e4\u01e9\5\u00acW\2\u01e5\u01e6\7\u0205\2\2\u01e6\u01e8"+
+		"\5\u00acW\2\u01e7\u01e5\3\2\2\2\u01e8\u01eb\3\2\2\2\u01e9\u01e7\3\2\2"+
+		"\2\u01e9\u01ea\3\2\2\2\u01ea\u01ec\3\2\2\2\u01eb\u01e9\3\2\2\2\u01ec\u01ed"+
+		"\7\u0216\2\2\u01ed\u01ee\b\25\1\2\u01ee\u0211\3\2\2\2\u01ef\u01f0\b\25"+
+		"\1\2\u01f0\u01f1\7\u0126\2\2\u01f1\u01f2\7\u0213\2\2\u01f2\u01f3\7\u0213"+
+		"\2\2\u01f3\u01f8\5\u00acW\2\u01f4\u01f5\7\u0205\2\2\u01f5\u01f7\5\u00ac"+
+		"W\2\u01f6\u01f4\3\2\2\2\u01f7\u01fa\3\2\2\2\u01f8\u01f6\3\2\2\2\u01f8"+
+		"\u01f9\3\2\2\2\u01f9\u01fb\3\2\2\2\u01fa\u01f8\3\2\2\2\u01fb\u020a\7\u0216"+
+		"\2\2\u01fc\u01fd\7\u0205\2\2\u01fd\u01fe\7\u0213\2\2\u01fe\u0203\5\u00ac"+
+		"W\2\u01ff\u0200\7\u0205\2\2\u0200\u0202\5\u00acW\2\u0201\u01ff\3\2\2\2"+
+		"\u0202\u0205\3\2\2\2\u0203\u0201\3\2\2\2\u0203\u0204\3\2\2\2\u0204\u0206"+
+		"\3\2\2\2\u0205\u0203\3\2\2\2\u0206\u0207\7\u0216\2\2\u0207\u0209\3\2\2"+
+		"\2\u0208\u01fc\3\2\2\2\u0209\u020c\3\2\2\2\u020a\u0208\3\2\2\2\u020a\u020b"+
+		"\3\2\2\2\u020b\u020d\3\2\2\2\u020c\u020a\3\2\2\2\u020d\u020e\7\u0216\2"+
+		"\2\u020e\u020f\b\25\1\2\u020f\u0211\3\2\2\2\u0210\u01e0\3\2\2\2\u0210"+
+		"\u01e1\3\2\2\2\u0210\u01ef\3\2\2\2\u0211)\3\2\2\2\u0212\u0218\b\26\1\2"+
+		"\u0213\u0214\7\u01a0\2\2\u0214\u0215\7\30\2\2\u0215\u0216\7|\2\2\u0216"+
+		"\u0218\b\26\1\2\u0217\u0212\3\2\2\2\u0217\u0213\3\2\2\2\u0218+\3\2\2\2"+
+		"\u0219\u0220\b\27\1\2\u021a\u021b\7\u016f\2\2\u021b\u021c\7\u00a4\2\2"+
+		"\u021c\u021d\5.\30\2\u021d\u021e\b\27\1\2\u021e\u0220\3\2\2\2\u021f\u0219"+
+		"\3\2\2\2\u021f\u021a\3\2\2\2\u0220-\3\2\2\2\u0221\u0222\7v\2\2\u0222\u0223"+
+		"\5\60\31\2\u0223\u0224\5\62\32\2\u0224\u0225\5\64\33\2\u0225\u0226\5\66"+
+		"\34\2\u0226\u0227\58\35\2\u0227\u0228\b\30\1\2\u0228\u022f\3\2\2\2\u0229"+
+		"\u022a\7\u017d\2\2\u022a\u022b\7\u021d\2\2\u022b\u022c\5:\36\2\u022c\u022d"+
+		"\b\30\1\2\u022d\u022f\3\2\2\2\u022e\u0221\3\2\2\2\u022e\u0229\3\2\2\2"+
+		"\u022f/\3\2\2\2\u0230\u023f\b\31\1\2\u0231\u0232\7\u009c\2\2\u0232\u0233"+
+		"\7\u01b0\2\2\u0233\u0234\7-\2\2\u0234\u0235\7\u021d\2\2\u0235\u023f\b"+
+		"\31\1\2\u0236\u0237\7\u009c\2\2\u0237\u0238\7\u01b0\2\2\u0238\u0239\7"+
+		"-\2\2\u0239\u023a\7\u021d\2\2\u023a\u023b\7\u008c\2\2\u023b\u023c\7-\2"+
+		"\2\u023c\u023d\7\u021d\2\2\u023d\u023f\b\31\1\2\u023e\u0230\3\2\2\2\u023e"+
+		"\u0231\3\2\2\2\u023e\u0236\3\2\2\2\u023f\61\3\2\2\2\u0240\u0248\b\32\1"+
+		"\2\u0241\u0242\7E\2\2\u0242\u0243\7\u00d8\2\2\u0243\u0244\7\u01b0\2\2"+
+		"\u0244\u0245\7-\2\2\u0245\u0246\7\u021d\2\2\u0246\u0248\b\32\1\2\u0247"+
+		"\u0240\3\2\2\2\u0247\u0241\3\2\2\2\u0248\63\3\2\2\2\u0249\u0251\b\33\1"+
+		"\2\u024a\u024b\7\u00fb\2\2\u024b\u024c\7\u00de\2\2\u024c\u024d\7\u01b0"+
+		"\2\2\u024d\u024e\7-\2\2\u024e\u024f\7\u021d\2\2\u024f\u0251\b\33\1\2\u0250"+
+		"\u0249\3\2\2\2\u0250\u024a\3\2\2\2\u0251\65\3\2\2\2\u0252\u0259\b\34\1"+
+		"\2\u0253\u0254\7\u00e9\2\2\u0254\u0255\7\u01b0\2\2\u0255\u0256\7-\2\2"+
+		"\u0256\u0257\7\u021d\2\2\u0257\u0259\b\34\1\2\u0258\u0252\3\2\2\2\u0258"+
+		"\u0253\3\2\2\2\u0259\67\3\2\2\2\u025a\u0261\b\35\1\2\u025b\u025c\7\u011f"+
+		"\2\2\u025c\u025d\7q\2\2\u025d\u025e\7\30\2\2\u025e\u025f\7\u021d\2\2\u025f"+
+		"\u0261\b\35\1\2\u0260\u025a\3\2\2\2\u0260\u025b\3\2\2\2\u02619\3\2\2\2"+
+		"\u0262\u0278\b\36\1\2\u0263\u0264\b\36\1\2\u0264\u0265\7\u01d9\2\2\u0265"+
+		"\u0266\7\u017e\2\2\u0266\u0267\7\u0213\2\2\u0267\u0268\5<\37\2\u0268\u0269"+
+		"\7\u0209\2\2\u0269\u0271\5<\37\2\u026a\u026b\7\u0205\2\2\u026b\u026c\5"+
+		"<\37\2\u026c\u026d\7\u0209\2\2\u026d\u026e\5<\37\2\u026e\u0270\3\2\2\2"+
+		"\u026f\u026a\3\2\2\2\u0270\u0273\3\2\2\2\u0271\u026f\3\2\2\2\u0271\u0272"+
+		"\3\2\2\2\u0272\u0274\3\2\2\2\u0273\u0271\3\2\2\2\u0274\u0275\7\u0216\2"+
+		"\2\u0275\u0276\b\36\1\2\u0276\u0278\3\2\2\2\u0277\u0262\3\2\2\2\u0277"+
+		"\u0263\3\2\2\2\u0278;\3\2\2\2\u0279\u027a\7\u021d\2\2\u027a\u027b\b\37"+
+		"\1\2\u027b=\3\2\2\2\u027c\u0290\b \1\2\u027d\u027e\7\u01a0\2\2\u027e\u027f"+
+		"\7\30\2\2\u027f\u0280\5H%\2\u0280\u0281\b \1\2\u0281\u0290\3\2\2\2\u0282"+
+		"\u0283\7\u01a0\2\2\u0283\u0284\7\30\2\2\u0284\u0285\7\u00c7\2\2\u0285"+
+		"\u0286\7\u021d\2\2\u0286\u0287\7\u012e\2\2\u0287\u0288\7\u021d\2\2\u0288"+
+		"\u0290\b \1\2\u0289\u028a\7\u01a0\2\2\u028a\u028b\7-\2\2\u028b\u028c\7"+
+		"\u021d\2\2\u028c\u028d\5:\36\2\u028d\u028e\b \1\2\u028e\u0290\3\2\2\2"+
+		"\u028f\u027c\3\2\2\2\u028f\u027d\3\2\2\2\u028f\u0282\3\2\2\2\u028f\u0289"+
+		"\3\2\2\2\u0290?\3\2\2\2\u0291\u0296\b!\1\2\u0292\u0293\7\u00ec\2\2\u0293"+
+		"\u0294\7\u021d\2\2\u0294\u0296\b!\1\2\u0295\u0291\3\2\2\2\u0295\u0292"+
+		"\3\2\2\2\u0296A\3\2\2\2\u0297\u02a7\b\"\1\2\u0298\u0299\b\"\1\2\u0299"+
+		"\u029a\7\u01ae\2\2\u029a\u029b\7\u0213\2\2\u029b\u029c\5D#\2\u029c\u029d"+
+		"\7\u0209\2\2\u029d\u029e\5D#\2\u029e\u029f\7\u0205\2\2\u029f\u02a0\5D"+
+		"#\2\u02a0\u02a1\7\u0209\2\2\u02a1\u02a2\5D#\2\u02a2\u02a3\3\2\2\2\u02a3"+
+		"\u02a4\7\u0216\2\2\u02a4\u02a5\b\"\1\2\u02a5\u02a7\3\2\2\2\u02a6\u0297"+
+		"\3\2\2\2\u02a6\u0298\3\2\2\2\u02a7C\3\2\2\2\u02a8\u02a9\7\u021d\2\2\u02a9"+
+		"\u02aa\b#\1\2\u02aaE\3\2\2\2\u02ab\u02b3\b$\1\2\u02ac\u02ad\7\30\2\2\u02ad"+
+		"\u02ae\7\u0213\2\2\u02ae\u02af\5b\62\2\u02af\u02b0\7\u0216\2\2\u02b0\u02b1"+
+		"\b$\1\2\u02b1\u02b3\3\2\2\2\u02b2\u02ab\3\2\2\2\u02b2\u02ac\3\2\2\2\u02b3"+
+		"G\3\2\2\2\u02b4\u02b5\7\u0182\2\2\u02b5\u02c3\b%\1\2\u02b6\u02b7\7\u01b1"+
+		"\2\2\u02b7\u02c3\b%\1\2\u02b8\u02b9\7\u0150\2\2\u02b9\u02c3\b%\1\2\u02ba"+
+		"\u02bb\7\u012a\2\2\u02bb\u02c3\b%\1\2\u02bc\u02bd\7\u0133\2\2\u02bd\u02c3"+
+		"\b%\1\2\u02be\u02bf\7!\2\2\u02bf\u02c3\b%\1\2\u02c0\u02c1\7\u00db\2\2"+
+		"\u02c1\u02c3\b%\1\2\u02c2\u02b4\3\2\2\2\u02c2\u02b6\3\2\2\2\u02c2\u02b8"+
+		"\3\2\2\2\u02c2\u02ba\3\2\2\2\u02c2\u02bc\3\2\2\2\u02c2\u02be\3\2\2\2\u02c2"+
+		"\u02c0\3\2\2\2\u02c3I\3\2\2\2\u02c4\u02c5\5f\64\2\u02c5\u02c6\5\6\4\2"+
+		"\u02c6\u02c7\b&\1\2\u02c7\u02e5\3\2\2\2\u02c8\u02c9\5f\64\2\u02c9\u02ca"+
+		"\5\6\4\2\u02ca\u02cb\7G\2\2\u02cb\u02cc\7\u021d\2\2\u02cc\u02cd\b&\1\2"+
+		"\u02cd\u02e5\3\2\2\2\u02ce\u02cf\b&\1\2\u02cf\u02d0\5f\64\2\u02d0\u02d2"+
+		"\5\6\4\2\u02d1\u02d3\5L\'\2\u02d2\u02d1\3\2\2\2\u02d3\u02d4\3\2\2\2\u02d4"+
+		"\u02d2\3\2\2\2\u02d4\u02d5\3\2\2\2\u02d5\u02d6\3\2\2\2\u02d6\u02d7\7G"+
+		"\2\2\u02d7\u02d8\7\u021d\2\2\u02d8\u02d9\b&\1\2\u02d9\u02e5\3\2\2\2\u02da"+
+		"\u02db\b&\1\2\u02db\u02dc\5f\64\2\u02dc\u02de\5\6\4\2\u02dd\u02df\5L\'"+
+		"\2\u02de\u02dd\3\2\2\2\u02df\u02e0\3\2\2\2\u02e0\u02de\3\2\2\2\u02e0\u02e1"+
+		"\3\2\2\2\u02e1\u02e2\3\2\2\2\u02e2\u02e3\b&\1\2\u02e3\u02e5\3\2\2\2\u02e4"+
+		"\u02c4\3\2\2\2\u02e4\u02c8\3\2\2\2\u02e4\u02ce\3\2\2\2\u02e4\u02da\3\2"+
+		"\2\2\u02e5K\3\2\2\2\u02e6\u02e7\7\u0144\2\2\u02e7\u02e8\7\u00dd\2\2\u02e8"+
+		"\u0301\b\'\1\2\u02e9\u02ea\7\u01c5\2\2\u02ea\u0301\b\'\1\2\u02eb\u02ec"+
+		"\7\u011b\2\2\u02ec\u02ed\7\u011f\2\2\u02ed\u0301\b\'\1\2\u02ee\u02ef\7"+
+		"o\2\2\u02ef\u02f0\5N(\2\u02f0\u02f1\b\'\1\2\u02f1\u0301\3\2\2\2\u02f2"+
+		"\u02f3\7;\2\2\u02f3\u02f4\5\u008aF\2\u02f4\u02f5\b\'\1\2\u02f5\u0301\3"+
+		"\2\2\2\u02f6\u02f7\7\u0088\2\2\u02f7\u0301\b\'\1\2\u02f8\u02f9\7}\2\2"+
+		"\u02f9\u0301\b\'\1\2\u02fa\u02fb\7\u011d\2\2\u02fb\u0301\b\'\1\2\u02fc"+
+		"\u02fd\7\u0160\2\2\u02fd\u0301\b\'\1\2\u02fe\u02ff\7\u011a\2\2\u02ff\u0301"+
+		"\b\'\1\2\u0300\u02e6\3\2\2\2\u0300\u02e9\3\2\2\2\u0300\u02eb\3\2\2\2\u0300"+
+		"\u02ee\3\2\2\2\u0300\u02f2\3\2\2\2\u0300\u02f6\3\2\2\2\u0300\u02f8\3\2"+
+		"\2\2\u0300\u02fa\3\2\2\2\u0300\u02fc\3\2\2\2\u0300\u02fe\3\2\2\2\u0301"+
+		"M\3\2\2\2\u0302\u030d\5\u00acW\2\u0303\u0304\7\u01ed\2\2\u0304\u0305\7"+
+		"\u0213\2\2\u0305\u030d\7\u0216\2\2\u0306\u0307\7\u01eb\2\2\u0307\u0308"+
+		"\7\u0213\2\2\u0308\u030d\7\u0216\2\2\u0309\u030a\7\u01ec\2\2\u030a\u030b"+
+		"\7\u0213\2\2\u030b\u030d\7\u0216\2\2\u030c\u0302\3\2\2\2\u030c\u0303\3"+
+		"\2\2\2\u030c\u0306\3\2\2\2\u030c\u0309\3\2\2\2\u030dO\3\2\2\2\u030e\u030f"+
+		"\b)\1\2\u030f\u0310\7\u0144\2\2\u0310\u0311\7\u00dd\2\2\u0311\u0312\7"+
+		"\u0213\2\2\u0312\u0317\5f\64\2\u0313\u0314\7\u0205\2\2\u0314\u0316\5f"+
+		"\64\2\u0315\u0313\3\2\2\2\u0316\u0319\3\2\2\2\u0317\u0315\3\2\2\2\u0317"+
+		"\u0318\3\2\2\2\u0318\u031a\3\2\2\2\u0319\u0317\3\2\2\2\u031a\u031b\7\u0216"+
+		"\2\2\u031b\u031c\5V,\2\u031c\u031d\5X-\2\u031d\u031e\5Z.\2\u031e\u031f"+
+		"\b)\1\2\u031f\u035c\3\2\2\2\u0320\u0321\b)\1\2\u0321\u0322\7N\2\2\u0322"+
+		"\u0323\7\u021a\2\2\u0323\u0324\7\u00a3\2\2\u0324\u0325\7\u00dd\2\2\u0325"+
+		"\u0326\7\u0213\2\2\u0326\u032b\5f\64\2\u0327\u0328\7\u0205\2\2\u0328\u032a"+
+		"\5f\64\2\u0329\u0327\3\2\2\2\u032a\u032d\3\2\2\2\u032b\u0329\3\2\2\2\u032b"+
+		"\u032c\3\2\2\2\u032c\u032e\3\2\2\2\u032d\u032b\3\2\2\2\u032e\u032f\7\u0216"+
+		"\2\2\u032f\u0330\7\u0152\2\2\u0330\u0331\5\u00b0Y\2\u0331\u0332\7\u0213"+
+		"\2\2\u0332\u0337\5f\64\2\u0333\u0334\7\u0205\2\2\u0334\u0336\5f\64\2\u0335"+
+		"\u0333\3\2\2\2\u0336\u0339\3\2\2\2\u0337\u0335\3\2\2\2\u0337\u0338\3\2"+
+		"\2\2\u0338\u033a\3\2\2\2\u0339\u0337\3\2\2\2\u033a\u033b\7\u0216\2\2\u033b"+
+		"\u033c\5V,\2\u033c\u033d\5X-\2\u033d\u033e\b)\1\2\u033e\u035c\3\2\2\2"+
+		"\u033f\u0340\b)\1\2\u0340\u0341\7N\2\2\u0341\u0342\7\u021a\2\2\u0342\u0343"+
+		"\7\u01c5\2\2\u0343\u0344\7\u0213\2\2\u0344\u0349\5f\64\2\u0345\u0346\7"+
+		"\u0205\2\2\u0346\u0348\5f\64\2\u0347\u0345\3\2\2\2\u0348\u034b\3\2\2\2"+
+		"\u0349\u0347\3\2\2\2\u0349\u034a\3\2\2\2\u034a\u034c\3\2\2\2\u034b\u0349"+
+		"\3\2\2\2\u034c\u034d\7\u0216\2\2\u034d\u034e\5V,\2\u034e\u034f\5X-\2\u034f"+
+		"\u0350\5Z.\2\u0350\u0351\b)\1\2\u0351\u035c\3\2\2\2\u0352\u0353\7N\2\2"+
+		"\u0353\u0354\7\u021a\2\2\u0354\u0355\7;\2\2\u0355\u0356\5\u008aF\2\u0356"+
+		"\u0357\5R*\2\u0357\u0358\5X-\2\u0358\u0359\5Z.\2\u0359\u035a\b)\1\2\u035a"+
+		"\u035c\3\2\2\2\u035b\u030e\3\2\2\2\u035b\u0320\3\2\2\2\u035b\u033f\3\2"+
+		"\2\2\u035b\u0352\3\2\2\2\u035cQ\3\2\2\2\u035d\u0363\b*\1\2\u035e\u035f"+
+		"\7\u0088\2\2\u035f\u0363\b*\1\2\u0360\u0361\7}\2\2\u0361\u0363\b*\1\2"+
+		"\u0362\u035d\3\2\2\2\u0362\u035e\3\2\2\2\u0362\u0360\3\2\2\2\u0363S\3"+
+		"\2\2\2\u0364\u0368\b+\1\2\u0365\u0366\7\u0088\2\2\u0366\u0368\b+\1\2\u0367"+
+		"\u0364\3\2\2\2\u0367\u0365\3\2\2\2\u0368U\3\2\2\2\u0369\u036d\b,\1\2\u036a"+
+		"\u036b\7}\2\2\u036b\u036d\b,\1\2\u036c\u0369\3\2\2\2\u036c\u036a\3\2\2"+
+		"\2\u036dW\3\2\2\2\u036e\u0372\b-\1\2\u036f\u0370\7\u011d\2\2\u0370\u0372"+
+		"\b-\1\2\u0371\u036e\3\2\2\2\u0371\u036f\3\2\2\2\u0372Y\3\2\2\2\u0373\u0379"+
+		"\b.\1\2\u0374\u0375\7\u0160\2\2\u0375\u0379\b.\1\2\u0376\u0377\7\u011a"+
+		"\2\2\u0377\u0379\b.\1\2\u0378\u0373\3\2\2\2\u0378\u0374\3\2\2\2\u0378"+
+		"\u0376\3\2\2\2\u0379[\3\2\2\2\u037a\u0380\b/\1\2\u037b\u037c\7\u00bb\2"+
+		"\2\u037c\u037d\7\u011b\2\2\u037d\u037e\7\u0092\2\2\u037e\u0380\b/\1\2"+
+		"\u037f\u037a\3\2\2\2\u037f\u037b\3\2\2\2\u0380]\3\2\2\2\u0381\u0387\b"+
+		"\60\1\2\u0382\u0383\7\u0096\2\2\u0383\u0387\b\60\1\2\u0384\u0385\7\u01af"+
+		"\2\2\u0385\u0387\b\60\1\2\u0386\u0381\3\2\2\2\u0386\u0382\3\2\2\2\u0386"+
+		"\u0384\3\2\2\2\u0387_\3\2\2\2\u0388\u0389\5b\62\2\u0389\u038a\b\61\1\2"+
+		"\u038aa\3\2\2\2\u038b\u038c\7\u0181\2\2\u038c\u038d\5|?\2\u038d\u038e"+
+		"\5~@\2\u038e\u038f\b\62\1\2\u038f\u03a3\3\2\2\2\u0390\u0391\7\u0181\2"+
+		"\2\u0391\u0392\5|?\2\u0392\u0393\5\u00a8U\2\u0393\u0394\b\62\1\2\u0394"+
+		"\u03a3\3\2\2\2\u0395\u0396\7\u0181\2\2\u0396\u0397\5|?\2\u0397\u0398\5"+
+		"~@\2\u0398\u0399\7\u00a7\2\2\u0399\u039a\5t;\2\u039a\u039b\5d\63\2\u039b"+
+		"\u039c\5h\65\2\u039c\u039d\5j\66\2\u039d\u039e\5l\67\2\u039e\u039f\5n"+
+		"8\2\u039f\u03a0\5r:\2\u03a0\u03a1\b\62\1\2\u03a1\u03a3\3\2\2\2\u03a2\u038b"+
+		"\3\2\2\2\u03a2\u0390\3\2\2\2\u03a2\u0395\3\2\2\2\u03a3c\3\2\2\2\u03a4"+
+		"\u03b6\b\63\1\2\u03a5\u03a6\b\63\1\2\u03a6\u03a7\7\u00e1\2\2\u03a7\u03a8"+
+		"\7\u01d3\2\2\u03a8\u03a9\5\u00a8U\2\u03a9\u03aa\5f\64\2\u03aa\u03ab\7"+
+		"\30\2\2\u03ab\u03b0\5f\64\2\u03ac\u03ad\7\u0205\2\2\u03ad\u03af\5f\64"+
+		"\2\u03ae\u03ac\3\2\2\2\u03af\u03b2\3\2\2\2\u03b0\u03ae\3\2\2\2\u03b0\u03b1"+
+		"\3\2\2\2\u03b1\u03b3\3\2\2\2\u03b2\u03b0\3\2\2\2\u03b3\u03b4\b\63\1\2"+
+		"\u03b4\u03b6\3\2\2\2\u03b5\u03a4\3\2\2\2\u03b5\u03a5\3\2\2\2\u03b6e\3"+
+		"\2\2\2\u03b7\u03b8\7\u021a\2\2\u03b8\u03b9\b\64\1\2\u03b9g\3\2\2\2\u03ba"+
+		"\u03c0\b\65\1\2\u03bb\u03bc\7\u01d7\2\2\u03bc\u03bd\5\u008aF\2\u03bd\u03be"+
+		"\b\65\1\2\u03be\u03c0\3\2\2\2\u03bf\u03ba\3\2\2\2\u03bf\u03bb\3\2\2\2"+
+		"\u03c0i\3\2\2\2\u03c1\u03d0\b\66\1\2\u03c2\u03c3\b\66\1\2\u03c3\u03c4"+
+		"\7\u00b0\2\2\u03c4\u03c5\7-\2\2\u03c5\u03ca\5\u008aF\2\u03c6\u03c7\7\u0205"+
+		"\2\2\u03c7\u03c9\5\u008aF\2\u03c8\u03c6\3\2\2\2\u03c9\u03cc\3\2\2\2\u03ca"+
+		"\u03c8\3\2\2\2\u03ca\u03cb\3\2\2\2\u03cb\u03cd\3\2\2\2\u03cc\u03ca\3\2"+
+		"\2\2\u03cd\u03ce\b\66\1\2\u03ce\u03d0\3\2\2\2\u03cf\u03c1\3\2\2\2\u03cf"+
+		"\u03c2\3\2\2\2\u03d0k\3\2\2\2\u03d1\u03d7\b\67\1\2\u03d2\u03d3\7\u00b3"+
+		"\2\2\u03d3\u03d4\5\u008aF\2\u03d4\u03d5\b\67\1\2\u03d5\u03d7\3\2\2\2\u03d6"+
+		"\u03d1\3\2\2\2\u03d6\u03d2\3\2\2\2\u03d7m\3\2\2\2\u03d8\u03ea\b8\1\2\u03d9"+
+		"\u03da\b8\1\2\u03da\u03db\7\u012b\2\2\u03db\u03dc\7-\2\2\u03dc\u03dd\5"+
+		"\u00aeX\2\u03dd\u03e4\5p9\2\u03de\u03df\7\u0205\2\2\u03df\u03e0\5\u00ae"+
+		"X\2\u03e0\u03e1\5p9\2\u03e1\u03e3\3\2\2\2\u03e2\u03de\3\2\2\2\u03e3\u03e6"+
+		"\3\2\2\2\u03e4\u03e2\3\2\2\2\u03e4\u03e5\3\2\2\2\u03e5\u03e7\3\2\2\2\u03e6"+
+		"\u03e4\3\2\2\2\u03e7\u03e8\b8\1\2\u03e8\u03ea\3\2\2\2\u03e9\u03d8\3\2"+
+		"\2\2\u03e9\u03d9\3\2\2\2\u03eao\3\2\2\2\u03eb\u03f1\b9\1\2\u03ec\u03ed"+
+		"\7\31\2\2\u03ed\u03f1\b9\1\2\u03ee\u03ef\7x\2\2\u03ef\u03f1\b9\1\2\u03f0"+
+		"\u03eb\3\2\2\2\u03f0\u03ec\3\2\2\2\u03f0\u03ee\3\2\2\2\u03f1q\3\2\2\2"+
+		"\u03f2\u03fc\b:\1\2\u03f3\u03f4\7\u00e8\2\2\u03f4\u03f5\7\u021b\2\2\u03f5"+
+		"\u03fc\b:\1\2\u03f6\u03f7\7\u00e8\2\2\u03f7\u03f8\7\u021b\2\2\u03f8\u03f9"+
+		"\7\u0205\2\2\u03f9\u03fa\7\u021b\2\2\u03fa\u03fc\b:\1\2\u03fb\u03f2\3"+
+		"\2\2\2\u03fb\u03f3\3\2\2\2\u03fb\u03f6\3\2\2\2\u03fcs\3\2\2\2\u03fd\u03fe"+
+		"\5z>\2\u03fe\u03ff\b;\1\2\u03ff\u0414\3\2\2\2\u0400\u0401\b;\1\2\u0401"+
+		"\u0404\5z>\2\u0402\u0403\7\u0205\2\2\u0403\u0405\5z>\2\u0404\u0402\3\2"+
+		"\2\2\u0405\u0406\3\2\2\2\u0406\u0404\3\2\2\2\u0406\u0407\3\2\2\2\u0407"+
+		"\u0408\3\2\2\2\u0408\u0409\b;\1\2\u0409\u0414\3\2\2\2\u040a\u040b\b;\1"+
+		"\2\u040b\u040d\5z>\2\u040c\u040e\5v<\2\u040d\u040c\3\2\2\2\u040e\u040f"+
+		"\3\2\2\2\u040f\u040d\3\2\2\2\u040f\u0410\3\2\2\2\u0410\u0411\3\2\2\2\u0411"+
+		"\u0412\b;\1\2\u0412\u0414\3\2\2\2\u0413\u03fd\3\2\2\2\u0413\u0400\3\2"+
+		"\2\2\u0413\u040a\3\2\2\2\u0414u\3\2\2\2\u0415\u0417\7\u00c5\2\2\u0416"+
+		"\u0415\3\2\2\2\u0416\u0417\3\2\2\2\u0417\u0418\3\2\2\2\u0418\u0419\7\u00da"+
+		"\2\2\u0419\u041a\5z>\2\u041a\u041b\b<\1\2\u041b\u0439\3\2\2\2\u041c\u041e"+
+		"\7\u00c5\2\2\u041d\u041c\3\2\2\2\u041d\u041e\3\2\2\2\u041e\u041f\3\2\2"+
+		"\2\u041f\u0420\7\u00da\2\2\u0420\u0421\5z>\2\u0421\u0422\5x=\2\u0422\u0423"+
+		"\b<\1\2\u0423\u0439\3\2\2\2\u0424\u0426\t\4\2\2\u0425\u0427\7\u012d\2"+
+		"\2\u0426\u0425\3\2\2\2\u0426\u0427\3\2\2\2\u0427\u0428\3\2\2\2\u0428\u0429"+
+		"\7\u00da\2\2\u0429\u042a\5z>\2\u042a\u042b\5x=\2\u042b\u042c\b<\1\2\u042c"+
+		"\u0439\3\2\2\2\u042d\u042e\7\\\2\2\u042e\u042f\7\u00da\2\2\u042f\u0430"+
+		"\5z>\2\u0430\u0431\b<\1\2\u0431\u0439\3\2\2\2\u0432\u0433\7\\\2\2\u0433"+
+		"\u0434\7\u00da\2\2\u0434\u0435\5z>\2\u0435\u0436\5x=\2\u0436\u0437\b<"+
+		"\1\2\u0437\u0439\3\2\2\2\u0438\u0416\3\2\2\2\u0438\u041d\3\2\2\2\u0438"+
+		"\u0424\3\2\2\2\u0438\u042d\3\2\2\2\u0438\u0432\3\2\2\2\u0439w\3\2\2\2"+
+		"\u043a\u043b\7\u0126\2\2\u043b\u043c\5\u008aF\2\u043c\u043d\b=\1\2\u043d"+
+		"y\3\2\2\2\u043e\u043f\5\u00b0Y\2\u043f\u0440\b>\1\2\u0440\u0452\3\2\2"+
+		"\2\u0441\u0443\5\u00b0Y\2\u0442\u0444\7\30\2\2\u0443\u0442\3\2\2\2\u0443"+
+		"\u0444\3\2\2\2\u0444\u0445\3\2\2\2\u0445\u0446\7\u021a\2\2\u0446\u0447"+
+		"\b>\1\2\u0447\u0452\3\2\2\2\u0448\u0449\7\u0213\2\2\u0449\u044a\5b\62"+
+		"\2\u044a\u044c\7\u0216\2\2\u044b\u044d\7\30\2\2\u044c\u044b\3\2\2\2\u044c"+
+		"\u044d\3\2\2\2\u044d\u044e\3\2\2\2\u044e\u044f\7\u021a\2\2\u044f\u0450"+
+		"\b>\1\2\u0450\u0452\3\2\2\2\u0451\u043e\3\2\2\2\u0451\u0441\3\2\2\2\u0451"+
+		"\u0448\3\2\2\2\u0452{\3\2\2\2\u0453\u0459\b?\1\2\u0454\u0455\7\24\2\2"+
+		"\u0455\u0459\b?\1\2\u0456\u0457\7~\2\2\u0457\u0459\b?\1\2\u0458\u0453"+
+		"\3\2\2\2\u0458\u0454\3\2\2\2\u0458\u0456\3\2\2\2\u0459}\3\2\2\2\u045a"+
+		"\u045b\b@\1\2\u045b\u0460\5\u0080A\2\u045c\u045d\7\u0205\2\2\u045d\u045f"+
+		"\5\u0080A\2\u045e\u045c\3\2\2\2\u045f\u0462\3\2\2\2\u0460\u045e\3\2\2"+
+		"\2\u0460\u0461\3\2\2\2\u0461\u0463\3\2\2\2\u0462\u0460\3\2\2\2\u0463\u0464"+
+		"\b@\1\2\u0464\177\3\2\2\2\u0465\u0467\5\u008aF\2\u0466\u0468\7\30\2\2"+
+		"\u0467\u0466\3\2\2\2\u0467\u0468\3\2\2\2\u0468\u0469\3\2\2\2\u0469\u046a"+
+		"\7\u021a\2\2\u046a\u046b\bA\1\2\u046b\u048a\3\2\2\2\u046c\u046d\5\u008a"+
+		"F\2\u046d\u046e\bA\1\2\u046e\u048a\3\2\2\2\u046f\u0471\5\u008aF\2\u0470"+
+		"\u0472\7\30\2\2\u0471\u0470\3\2\2\2\u0471\u0472\3\2\2\2\u0472\u0473\3"+
+		"\2\2\2\u0473\u0474\7\u021a\2\2\u0474\u0475\bA\1\2\u0475\u048a\3\2\2\2"+
+		"\u0476\u0477\5\u008aF\2\u0477\u0478\bA\1\2\u0478\u048a\3\2\2\2\u0479\u047a"+
+		"\7\u0211\2\2\u047a\u048a\bA\1\2\u047b\u047c\7\u021a\2\2\u047c\u047d\7"+
+		"\3\2\2\u047d\u047e\7\u0211\2\2\u047e\u048a\bA\1\2\u047f\u0480\5\u0082"+
+		"B\2\u0480\u0481\bA\1\2\u0481\u048a\3\2\2\2\u0482\u0484\5\u0082B\2\u0483"+
+		"\u0485\7\30\2\2\u0484\u0483\3\2\2\2\u0484\u0485\3\2\2\2\u0485\u0486\3"+
+		"\2\2\2\u0486\u0487\7\u021a\2\2\u0487\u0488\bA\1\2\u0488\u048a\3\2\2\2"+
+		"\u0489\u0465\3\2\2\2\u0489\u046c\3\2\2\2\u0489\u046f\3\2\2\2\u0489\u0476"+
+		"\3\2\2\2\u0489\u0479\3\2\2\2\u0489\u047b\3\2\2\2\u0489\u047f\3\2\2\2\u0489"+
+		"\u0482\3\2\2\2\u048a\u0081\3\2\2\2\u048b\u048c\bB\1\2\u048c\u048d\5\u0084"+
+		"C\2\u048d\u048e\7\u012f\2\2\u048e\u048f\7\u0213\2\2\u048f\u0490\7\u0135"+
+		"\2\2\u0490\u0491\7-\2\2\u0491\u0496\5\u00aeX\2\u0492\u0493\7\u0205\2\2"+
+		"\u0493\u0495\5\u00aeX\2\u0494\u0492\3\2\2\2\u0495\u0498\3\2\2\2\u0496"+
+		"\u0494\3\2\2\2\u0496\u0497\3\2\2\2\u0497\u0499\3\2\2\2\u0498\u0496\3\2"+
+		"\2\2\u0499\u049a\7\u0216\2\2\u049a\u049b\bB\1\2\u049b\u04c9\3\2\2\2\u049c"+
+		"\u049d\bB\1\2\u049d\u049e\5\u0084C\2\u049e\u049f\7\u012f\2\2\u049f\u04a0"+
+		"\7\u0213\2\2\u04a0\u04a1\7\u012b\2\2\u04a1\u04a2\7-\2\2\u04a2\u04a7\5"+
+		"\u00aeX\2\u04a3\u04a4\7\u0205\2\2\u04a4\u04a6\5\u00aeX\2\u04a5\u04a3\3"+
+		"\2\2\2\u04a6\u04a9\3\2\2\2\u04a7\u04a5\3\2\2\2\u04a7\u04a8\3\2\2\2\u04a8"+
+		"\u04aa\3\2\2\2\u04a9\u04a7\3\2\2\2\u04aa\u04ab\7\u0216\2\2\u04ab\u04ac"+
+		"\bB\1\2\u04ac\u04c9\3\2\2\2\u04ad\u04ae\bB\1\2\u04ae\u04af\5\u0084C\2"+
+		"\u04af\u04b0\7\u012f\2\2\u04b0\u04b1\7\u0213\2\2\u04b1\u04b2\7\u0135\2"+
+		"\2\u04b2\u04b3\7-\2\2\u04b3\u04b8\5\u00aeX\2\u04b4\u04b5\7\u0205\2\2\u04b5"+
+		"\u04b7\5\u00aeX\2\u04b6\u04b4\3\2\2\2\u04b7\u04ba\3\2\2\2\u04b8\u04b6"+
+		"\3\2\2\2\u04b8\u04b9\3\2\2\2\u04b9\u04bb\3\2\2\2\u04ba\u04b8\3\2\2\2\u04bb"+
+		"\u04bc\7\u012b\2\2\u04bc\u04bd\7-\2\2\u04bd\u04c2\5\u00aeX\2\u04be\u04bf"+
+		"\7\u0205\2\2\u04bf\u04c1\5\u00aeX\2\u04c0\u04be\3\2\2\2\u04c1\u04c4\3"+
+		"\2\2\2\u04c2\u04c0\3\2\2\2\u04c2\u04c3\3\2\2\2\u04c3\u04c5\3\2\2\2\u04c4"+
+		"\u04c2\3\2\2\2\u04c5\u04c6\7\u0216\2\2\u04c6\u04c7\bB\1\2\u04c7\u04c9"+
+		"\3\2\2\2\u04c8\u048b\3\2\2\2\u04c8\u049c\3\2\2\2\u04c8\u04ad\3\2\2\2\u04c9"+
+		"\u0083\3\2\2\2\u04ca\u04cb\5\u00a4S\2\u04cb\u04cc\bC\1\2\u04cc\u04d1\3"+
+		"\2\2\2\u04cd\u04ce\5\u0086D\2\u04ce\u04cf\bC\1\2\u04cf\u04d1\3\2\2\2\u04d0"+
+		"\u04ca\3\2\2\2\u04d0\u04cd\3\2\2\2\u04d1\u0085\3\2\2\2\u04d2\u04d3\t\5"+
+		"\2\2\u04d3\u04d4\7\u0213\2\2\u04d4\u04d5\7\u0216\2\2\u04d5\u04d6\bD\1"+
+		"\2\u04d6\u0087\3\2\2\2\u04d7\u04d8\bE\1\2\u04d8\u04d9\7\u0213\2\2\u04d9"+
+		"\u04de\5\u008aF\2\u04da\u04db\7\u0205\2\2\u04db\u04dd\5\u008aF\2\u04dc"+
+		"\u04da\3\2\2\2\u04dd\u04e0\3\2\2\2\u04de\u04dc\3\2\2\2\u04de\u04df\3\2"+
+		"\2\2\u04df\u04e1\3\2\2\2\u04e0\u04de\3\2\2\2\u04e1\u04e2\7\u0216\2\2\u04e2"+
+		"\u04e3\bE\1\2\u04e3\u0089\3\2\2\2\u04e4\u04e5\bF\1\2\u04e5\u04e6\5\u00ac"+
+		"W\2\u04e6\u04e7\bF\1\2\u04e7\u0510\3\2\2\2\u04e8\u04e9\5\u00aeX\2\u04e9"+
+		"\u04ea\bF\1\2\u04ea\u0510\3\2\2\2\u04eb\u04ec\5\u00be`\2\u04ec\u04ed\5"+
+		"\u008aF\r\u04ed\u04ee\bF\1\2\u04ee\u0510\3\2\2\2\u04ef\u04f0\7\u0213\2"+
+		"\2\u04f0\u04f1\5\u008aF\2\u04f1\u04f2\7\u0216\2\2\u04f2\u04f3\bF\1\2\u04f3"+
+		"\u0510\3\2\2\2\u04f4\u04f5\5\u00a2R\2\u04f5\u04f6\bF\1\2\u04f6\u0510\3"+
+		"\2\2\2\u04f7\u04f8\5\u00aaV\2\u04f8\u04f9\bF\1\2\u04f9\u0510\3\2\2\2\u04fa"+
+		"\u04fb\5\u00a0Q\2\u04fb\u04fc\bF\1\2\u04fc\u0510\3\2\2\2\u04fd\u04fe\5"+
+		"\u009eP\2\u04fe\u04ff\bF\1\2\u04ff\u0510\3\2\2\2\u0500\u0501\5\u0096L"+
+		"\2\u0501\u0502\bF\1\2\u0502\u0510\3\2\2\2\u0503\u0504\5\u009aN\2\u0504"+
+		"\u0505\bF\1\2\u0505\u0510\3\2\2\2\u0506\u0507\5\u0098M\2\u0507\u0508\b"+
+		"F\1\2\u0508\u0510\3\2\2\2\u0509\u050a\5\u00a6T\2\u050a\u050b\bF\1\2\u050b"+
+		"\u0510\3\2\2\2\u050c\u050d\5\u008cG\2\u050d\u050e\bF\1\2\u050e\u0510\3"+
+		"\2\2\2\u050f\u04e4\3\2\2\2\u050f\u04e8\3\2\2\2\u050f\u04eb\3\2\2\2\u050f"+
+		"\u04ef\3\2\2\2\u050f\u04f4\3\2\2\2\u050f\u04f7\3\2\2\2\u050f\u04fa\3\2"+
+		"\2\2\u050f\u04fd\3\2\2\2\u050f\u0500\3\2\2\2\u050f\u0503\3\2\2\2\u050f"+
+		"\u0506\3\2\2\2\u050f\u0509\3\2\2\2\u050f\u050c\3\2\2\2\u0510\u0567\3\2"+
+		"\2\2\u0511\u0512\f\36\2\2\u0512\u0513\t\6\2\2\u0513\u0514\5\u008aF\37"+
+		"\u0514\u0515\bF\1\2\u0515\u0566\3\2\2\2\u0516\u0517\f\35\2\2\u0517\u0518"+
+		"\t\7\2\2\u0518\u0519\5\u008aF\36\u0519\u051a\bF\1\2\u051a\u0566\3\2\2"+
+		"\2\u051b\u051c\f\34\2\2\u051c\u051d\t\b\2\2\u051d\u051e\5\u008aF\35\u051e"+
+		"\u051f\bF\1\2\u051f\u0566\3\2\2\2\u0520\u0521\f\33\2\2\u0521\u0522\t\t"+
+		"\2\2\u0522\u0523\5\u008aF\34\u0523\u0524\bF\1\2\u0524\u0566\3\2\2\2\u0525"+
+		"\u0526\f\32\2\2\u0526\u0527\t\n\2\2\u0527\u0528\5\u008aF\33\u0528\u0529"+
+		"\bF\1\2\u0529\u0566\3\2\2\2\u052a\u052b\f\31\2\2\u052b\u052c\7\26\2\2"+
+		"\u052c\u052d\5\u008aF\32\u052d\u052e\bF\1\2\u052e\u0566\3\2\2\2\u052f"+
+		"\u0530\f\30\2\2\u0530\u0531\7\u0129\2\2\u0531\u0532\5\u008aF\31\u0532"+
+		"\u0533\bF\1\2\u0533\u0566\3\2\2\2\u0534\u0535\f\25\2\2\u0535\u0536\7$"+
+		"\2\2\u0536\u0537\5\u008aF\2\u0537\u0538\7\26\2\2\u0538\u0539\5\u008aF"+
+		"\26\u0539\u053a\bF\1\2\u053a\u0566\3\2\2\2\u053b\u053c\f\24\2\2\u053c"+
+		"\u053d\7\u011b\2\2\u053d\u053e\7$\2\2\u053e\u053f\5\u008aF\2\u053f\u0540"+
+		"\7\26\2\2\u0540\u0541\5\u008aF\25\u0541\u0542\bF\1\2\u0542\u0566\3\2\2"+
+		"\2\u0543\u0544\f\20\2\2\u0544\u0545\5\u00b8]\2\u0545\u0546\5\u008aF\21"+
+		"\u0546\u0547\bF\1\2\u0547\u0566\3\2\2\2\u0548\u0549\f\27\2\2\u0549\u054a"+
+		"\5\u00b6\\\2\u054a\u054b\7\16\2\2\u054b\u054c\bF\1\2\u054c\u0566\3\2\2"+
+		"\2\u054d\u054e\f\26\2\2\u054e\u054f\5\u00b6\\\2\u054f\u0550\7\r\2\2\u0550"+
+		"\u0551\bF\1\2\u0551\u0566\3\2\2\2\u0552\u0553\f\23\2\2\u0553\u0554\5\u00ba"+
+		"^\2\u0554\u0555\5\u0088E\2\u0555\u0556\bF\1\2\u0556\u0566\3\2\2\2\u0557"+
+		"\u0558\f\22\2\2\u0558\u0559\5\u00ba^\2\u0559\u055a\7\u0213\2\2\u055a\u055b"+
+		"\5b\62\2\u055b\u055c\7\u0216\2\2\u055c\u055d\bF\1\2\u055d\u0566\3\2\2"+
+		"\2\u055e\u055f\f\21\2\2\u055f\u0560\5\u00bc_\2\u0560\u0561\7\u0213\2\2"+
+		"\u0561\u0562\5b\62\2\u0562\u0563\7\u0216\2\2\u0563\u0564\bF\1\2\u0564"+
+		"\u0566\3\2\2\2\u0565\u0511\3\2\2\2\u0565\u0516\3\2\2\2\u0565\u051b\3\2"+
+		"\2\2\u0565\u0520\3\2\2\2\u0565\u0525\3\2\2\2\u0565\u052a\3\2\2\2\u0565"+
+		"\u052f\3\2\2\2\u0565\u0534\3\2\2\2\u0565\u053b\3\2\2\2\u0565\u0543\3\2"+
+		"\2\2\u0565\u0548\3\2\2\2\u0565\u054d\3\2\2\2\u0565\u0552\3\2\2\2\u0565"+
+		"\u0557\3\2\2\2\u0565\u055e\3\2\2\2\u0566\u0569\3\2\2\2\u0567\u0565\3\2"+
+		"\2\2\u0567\u0568\3\2\2\2\u0568\u008b\3\2\2\2\u0569\u0567\3\2\2\2\u056a"+
+		"\u056b\5\u008eH\2\u056b\u056c\bG\1\2\u056c\u0593\3\2\2\2\u056d\u056e\5"+
+		"\u0090I\2\u056e\u056f\bG\1\2\u056f\u0593\3\2\2\2\u0570\u0571\5\u0092J"+
+		"\2\u0571\u0572\bG\1\2\u0572\u0593\3\2\2\2\u0573\u0574\5\u0094K\2\u0574"+
+		"\u0575\bG\1\2\u0575\u0593\3\2\2\2\u0576\u0577\5\u00aeX\2\u0577\u0578\7"+
+		"\u0214\2\2\u0578\u0579\5\u008aF\2\u0579\u057a\7\u0217\2\2\u057a\u057b"+
+		"\bG\1\2\u057b\u0593\3\2\2\2\u057c\u057d\5\u008eH\2\u057d\u057e\7\u0214"+
+		"\2\2\u057e\u057f\5\u008aF\2\u057f\u0580\7\u0217\2\2\u0580\u0581\bG\1\2"+
+		"\u0581\u0593\3\2\2\2\u0582\u0583\5\u0090I\2\u0583\u0584\7\u0214\2\2\u0584"+
+		"\u0585\5\u008aF\2\u0585\u0586\7\u0217\2\2\u0586\u0587\bG\1\2\u0587\u0593"+
+		"\3\2\2\2\u0588\u0589\5\u00aeX\2\u0589\u058a\7\3\2\2\u058a\u058b\5\u008a"+
+		"F\2\u058b\u058c\bG\1\2\u058c\u0593\3\2\2\2\u058d\u058e\5\u0092J\2\u058e"+
+		"\u058f\7\3\2\2\u058f\u0590\5\u008aF\2\u0590\u0591\bG\1\2\u0591\u0593\3"+
+		"\2\2\2\u0592\u056a\3\2\2\2\u0592\u056d\3\2\2\2\u0592\u0570\3\2\2\2\u0592"+
+		"\u0573\3\2\2\2\u0592\u0576\3\2\2\2\u0592\u057c\3\2\2\2\u0592\u0582\3\2"+
+		"\2\2\u0592\u0588\3\2\2\2\u0592\u058d\3\2\2\2\u0593\u008d\3\2\2\2\u0594"+
+		"\u0595\bH\1\2\u0595\u0596\7\27\2\2\u0596\u0597\7\u0213\2\2\u0597\u059c"+
+		"\5\u008aF\2\u0598\u0599\7\u0205\2\2\u0599\u059b\5\u008aF\2\u059a\u0598"+
+		"\3\2\2\2\u059b\u059e\3\2\2\2\u059c\u059a\3\2\2\2\u059c\u059d\3\2\2\2\u059d"+
+		"\u059f\3\2\2\2\u059e\u059c\3\2\2\2\u059f\u05a0\7\u0216\2\2\u05a0\u05a1"+
+		"\bH\1\2\u05a1\u008f\3\2\2\2\u05a2\u05a3\bI\1\2\u05a3\u05a4\7\u00fb\2\2"+
+		"\u05a4\u05a5\7\u0213\2\2\u05a5\u05a6\5\u008aF\2\u05a6\u05a7\7\u0205\2"+
+		"\2\u05a7\u05af\5\u008aF\2\u05a8\u05a9\7\u0205\2\2\u05a9\u05aa\5\u008a"+
+		"F\2\u05aa\u05ab\7\u0205\2\2\u05ab\u05ac\5\u008aF\2\u05ac\u05ae\3\2\2\2"+
+		"\u05ad\u05a8\3\2\2\2\u05ae\u05b1\3\2\2\2\u05af\u05ad\3\2\2\2\u05af\u05b0"+
+		"\3\2\2\2\u05b0\u05b2\3\2\2\2\u05b1\u05af\3\2\2\2\u05b2\u05b3\7\u0216\2"+
+		"\2\u05b3\u05b4\bI\1\2\u05b4\u0091\3\2\2\2\u05b5\u05b6\bJ\1\2\u05b6\u05b7"+
+		"\7\u01a3\2\2\u05b7\u05b8\7\u0213\2\2\u05b8\u05bd\5\u008aF\2\u05b9\u05ba"+
+		"\7\u0205\2\2\u05ba\u05bc\5\u008aF\2\u05bb\u05b9\3\2\2\2\u05bc\u05bf\3"+
+		"\2\2\2\u05bd\u05bb\3\2\2\2\u05bd\u05be\3\2\2\2\u05be\u05c0\3\2\2\2\u05bf"+
+		"\u05bd\3\2\2\2\u05c0\u05c1\7\u0216\2\2\u05c1\u05c2\bJ\1\2\u05c2\u0093"+
+		"\3\2\2\2\u05c3\u05c4\bK\1\2\u05c4\u05c5\7\u010f\2\2\u05c5\u05c6\7\u0213"+
+		"\2\2\u05c6\u05c7\5\u008aF\2\u05c7\u05c8\7\u0205\2\2\u05c8\u05d0\5\u008a"+
+		"F\2\u05c9\u05ca\7\u0205\2\2\u05ca\u05cb\5\u008aF\2\u05cb\u05cc\7\u0205"+
+		"\2\2\u05cc\u05cd\5\u008aF\2\u05cd\u05cf\3\2\2\2\u05ce\u05c9\3\2\2\2\u05cf"+
+		"\u05d2\3\2\2\2\u05d0\u05ce\3\2\2\2\u05d0\u05d1\3\2\2\2\u05d1\u05d3\3\2"+
+		"\2\2\u05d2\u05d0\3\2\2\2\u05d3\u05d4\7\u0216\2\2\u05d4\u05d5\bK\1\2\u05d5"+
+		"\u0095\3\2\2\2\u05d6\u05d7\7\32\2\2\u05d7\u05d8\7\u0213\2\2\u05d8\u05d9"+
+		"\5\u008aF\2\u05d9\u05da\7\u0216\2\2\u05da\u05db\bL\1\2\u05db\u07d8\3\2"+
+		"\2\2\u05dc\u05dd\7\"\2\2\u05dd\u05de\7\u0213\2\2\u05de\u05df\5\u008aF"+
+		"\2\u05df\u05e0\7\u0216\2\2\u05e0\u05e1\bL\1\2\u05e1\u07d8\3\2\2\2\u05e2"+
+		"\u05e3\79\2\2\u05e3\u05e4\7\u0213\2\2\u05e4\u05e5\5\u008aF\2\u05e5\u05e6"+
+		"\7\u0216\2\2\u05e6\u05e7\bL\1\2\u05e7\u07d8\3\2\2\2\u05e8\u05e9\7<\2\2"+
+		"\u05e9\u05ea\7\u0213\2\2\u05ea\u05eb\5\u008aF\2\u05eb\u05ec\7\u0216\2"+
+		"\2\u05ec\u05ed\bL\1\2\u05ed\u07d8\3\2\2\2\u05ee\u05ef\bL\1\2\u05ef\u05f0"+
+		"\7K\2\2\u05f0\u05f1\7\u0213\2\2\u05f1\u05f4\5\u008aF\2\u05f2\u05f3\7\u0205"+
+		"\2\2\u05f3\u05f5\5\u008aF\2\u05f4\u05f2\3\2\2\2\u05f5\u05f6\3\2\2\2\u05f6"+
+		"\u05f4\3\2\2\2\u05f6\u05f7\3\2\2\2\u05f7\u05f8\3\2\2\2\u05f8\u05f9\7\u0216"+
+		"\2\2\u05f9\u05fa\bL\1\2\u05fa\u07d8\3\2\2\2\u05fb\u05fc\bL\1\2\u05fc\u05fd"+
+		"\7L\2\2\u05fd\u05fe\7\u0213\2\2\u05fe\u05ff\5\u008aF\2\u05ff\u0600\7\u0205"+
+		"\2\2\u0600\u0603\5\u008aF\2\u0601\u0602\7\u0205\2\2\u0602\u0604\5\u008a"+
+		"F\2\u0603\u0601\3\2\2\2\u0604\u0605\3\2\2\2\u0605\u0603\3\2\2\2\u0605"+
+		"\u0606\3\2\2\2\u0606\u0607\3\2\2\2\u0607\u0608\7\u0216\2\2\u0608\u0609"+
+		"\bL\1\2\u0609\u07d8\3\2\2\2\u060a\u060b\7m\2\2\u060b\u060c\7\u0213\2\2"+
+		"\u060c\u060d\5\u008aF\2\u060d\u060e\7\u0205\2\2\u060e\u060f\5\u008aF\2"+
+		"\u060f\u0610\7\u0216\2\2\u0610\u0611\bL\1\2\u0611\u07d8\3\2\2\2\u0612"+
+		"\u0613\bL\1\2\u0613\u0614\7\u0087\2\2\u0614\u0615\7\u0213\2\2\u0615\u0616"+
+		"\5\u008aF\2\u0616\u0617\7\u0205\2\2\u0617\u061c\5\u008aF\2\u0618\u0619"+
+		"\7\u0205\2\2\u0619\u061b\5\u008aF\2\u061a\u0618\3\2\2\2\u061b\u061e\3"+
+		"\2\2\2\u061c\u061a\3\2\2\2\u061c\u061d\3\2\2\2\u061d\u061f\3\2\2\2\u061e"+
+		"\u061c\3\2\2\2\u061f\u0620\7\u0216\2\2\u0620\u0621\bL\1\2\u0621\u07d8"+
+		"\3\2\2\2\u0622\u0623\7\u0089\2\2\u0623\u0624\7\u0213\2\2\u0624\u0625\5"+
+		"\u008aF\2\u0625\u0626\7\u0205\2\2\u0626\u0627\5\u008aF\2\u0627\u0628\7"+
+		"\u0216\2\2\u0628\u0629\bL\1\2\u0629\u07d8\3\2\2\2\u062a\u062b\bL\1\2\u062b"+
+		"\u062c\7\u009b\2\2\u062c\u062d\7\u0213\2\2\u062d\u062e\5\u008aF\2\u062e"+
+		"\u062f\7\u0205\2\2\u062f\u0634\5\u008aF\2\u0630\u0631\7\u0205\2\2\u0631"+
+		"\u0633\5\u008aF\2\u0632\u0630\3\2\2\2\u0633\u0636\3\2\2\2\u0634\u0632"+
+		"\3\2\2\2\u0634\u0635\3\2\2\2\u0635\u0637\3\2\2\2\u0636\u0634\3\2\2\2\u0637"+
+		"\u0638\7\u0216\2\2\u0638\u0639\bL\1\2\u0639\u07d8\3\2\2\2\u063a\u063b"+
+		"\7\u009d\2\2\u063b\u063c\7\u0213\2\2\u063c\u063d\5\u008aF\2\u063d\u063e"+
+		"\7\u0205\2\2\u063e\u063f\5\u008aF\2\u063f\u0640\7\u0216\2\2\u0640\u0641"+
+		"\bL\1\2\u0641\u07d8\3\2\2\2\u0642\u0643\7\u00a5\2\2\u0643\u0644\7\u0213"+
+		"\2\2\u0644\u0645\5\u008aF\2\u0645\u0646\7\u0205\2\2\u0646\u0647\5\u008a"+
+		"F\2\u0647\u0648\7\u0216\2\2\u0648\u0649\bL\1\2\u0649\u07d8\3\2\2\2\u064a"+
+		"\u064b\7\u00ac\2\2\u064b\u064c\7\u0213\2\2\u064c\u064d\5\u008aF\2\u064d"+
+		"\u064e\7\u0205\2\2\u064e\u064f\5\u008aF\2\u064f\u0650\7\u0216\2\2\u0650"+
+		"\u0651\bL\1\2\u0651\u07d8\3\2\2\2\u0652\u0653\7\u00c1\2\2\u0653\u0654"+
+		"\7\u0213\2\2\u0654\u0655\5\u008aF\2\u0655\u0656\7\u0205\2\2\u0656\u0657"+
+		"\5\u008aF\2\u0657\u0658\7\u0216\2\2\u0658\u0659\bL\1\2\u0659\u07d8\3\2"+
+		"\2\2\u065a\u065b\7\u00c9\2\2\u065b\u065c\7\u0213\2\2\u065c\u065d\5\u008a"+
+		"F\2\u065d\u065e\7\u0205\2\2\u065e\u065f\5\u008aF\2\u065f\u0660\7\u0216"+
+		"\2\2\u0660\u0661\bL\1\2\u0661\u07d8\3\2\2\2\u0662\u0663\7\u00e5\2\2\u0663"+
+		"\u0664\7\u0213\2\2\u0664\u0665\5\u008aF\2\u0665\u0666\7\u0216\2\2\u0666"+
+		"\u0667\bL\1\2\u0667\u07d8\3\2\2\2\u0668\u0669\7\u00eb\2\2\u0669\u066a"+
+		"\7\u0213\2\2\u066a\u066b\5\u008aF\2\u066b\u066c\7\u0205\2\2\u066c\u066d"+
+		"\5\u008aF\2\u066d\u066e\7\u0216\2\2\u066e\u066f\bL\1\2\u066f\u07d8\3\2"+
+		"\2\2\u0670\u0671\7\u00eb\2\2\u0671\u0672\7\u0213\2\2\u0672\u0673\5\u008a"+
+		"F\2\u0673\u0674\7\u0205\2\2\u0674\u0675\5\u008aF\2\u0675\u0676\7\u0205"+
+		"\2\2\u0676\u0677\5\u008aF\2\u0677\u0678\7\u0216\2\2\u0678\u0679\bL\1\2"+
+		"\u0679\u07d8\3\2\2\2\u067a\u067b\t\13\2\2\u067b\u067c\7\u0213\2\2\u067c"+
+		"\u067d\5\u008aF\2\u067d\u067e\7\u0216\2\2\u067e\u067f\bL\1\2\u067f\u07d8"+
+		"\3\2\2\2\u0680\u0681\7\u00f8\2\2\u0681\u0682\7\u0213\2\2\u0682\u0683\5"+
+		"\u008aF\2\u0683\u0684\7\u0205\2\2\u0684\u0685\5\u008aF\2\u0685\u0686\7"+
+		"\u0205\2\2\u0686\u0687\5\u008aF\2\u0687\u0688\7\u0216\2\2\u0688\u0689"+
+		"\bL\1\2\u0689\u07d8\3\2\2\2\u068a\u068b\7\u00fa\2\2\u068b\u068c\7\u0213"+
+		"\2\2\u068c\u068d\5\u008aF\2\u068d\u068e\7\u0216\2\2\u068e\u068f\bL\1\2"+
+		"\u068f\u07d8\3\2\2\2\u0690\u0691\7\u0124\2\2\u0691\u0692\7\u0213\2\2\u0692"+
+		"\u0693\5\u008aF\2\u0693\u0694\7\u0216\2\2\u0694\u0695\bL\1\2\u0695\u07d8"+
+		"\3\2\2\2\u0696\u0697\7\u0134\2\2\u0697\u0698\7\u0213\2\2\u0698\u0699\5"+
+		"\u008aF\2\u0699\u069a\7\u0205\2\2\u069a\u069b\5\u008aF\2\u069b\u069c\7"+
+		"\u0216\2\2\u069c\u069d\bL\1\2\u069d\u07d8\3\2\2\2\u069e\u069f\7\u0134"+
+		"\2\2\u069f\u06a0\7\u0213\2\2\u06a0\u06a1\5\u008aF\2\u06a1\u06a2\7\u0205"+
+		"\2\2\u06a2\u06a3\5\u008aF\2\u06a3\u06a4\7\u0205\2\2\u06a4\u06a5\5\u008a"+
+		"F\2\u06a5\u06a6\7\u0216\2\2\u06a6\u06a7\bL\1\2\u06a7\u07d8\3\2\2\2\u06a8"+
+		"\u06a9\bL\1\2\u06a9\u06aa\7\u0145\2\2\u06aa\u06ab\7\u0213\2\2\u06ab\u06ac"+
+		"\5\u008aF\2\u06ac\u06ad\7\u0205\2\2\u06ad\u06b0\5\u008aF\2\u06ae\u06af"+
+		"\7\u0205\2\2\u06af\u06b1\5\u008aF\2\u06b0\u06ae\3\2\2\2\u06b1\u06b2\3"+
+		"\2\2\2\u06b2\u06b0\3\2\2\2\u06b2\u06b3\3\2\2\2\u06b3\u06b4\3\2\2\2\u06b4"+
+		"\u06b5\7\u0216\2\2\u06b5\u06b6\bL\1\2\u06b6\u07d8\3\2\2\2\u06b7\u06b8"+
+		"\7\u014c\2\2\u06b8\u06b9\7\u0213\2\2\u06b9\u06ba\5\u008aF\2\u06ba\u06bb"+
+		"\7\u0216\2\2\u06bb\u06bc\bL\1\2\u06bc\u07d8\3\2\2\2\u06bd\u06be\7\u0155"+
+		"\2\2\u06be\u06bf\7\u0213\2\2\u06bf\u06c0\5\u008aF\2\u06c0\u06c1\7\u0205"+
+		"\2\2\u06c1\u06c2\5\u008aF\2\u06c2\u06c3\7\u0205\2\2\u06c3\u06c4\5\u008a"+
+		"F\2\u06c4\u06c5\7\u0216\2\2\u06c5\u06c6\bL\1\2\u06c6\u07d8\3\2\2\2\u06c7"+
+		"\u06c8\7\u0156\2\2\u06c8\u06c9\7\u0213\2\2\u06c9\u06ca\5\u008aF\2\u06ca"+
+		"\u06cb\7\u0205\2\2\u06cb\u06cc\5\u008aF\2\u06cc\u06cd\7\u0205\2\2\u06cd"+
+		"\u06ce\5\u008aF\2\u06ce\u06cf\7\u0216\2\2\u06cf\u06d0\bL\1\2\u06d0\u07d8"+
+		"\3\2\2\2\u06d1\u06d2\7\u0161\2\2\u06d2\u06d3\7\u0213\2\2\u06d3\u06d4\5"+
+		"\u008aF\2\u06d4\u06d5\7\u0205\2\2\u06d5\u06d6\5\u008aF\2\u06d6\u06d7\7"+
+		"\u0216\2\2\u06d7\u06d8\bL\1\2\u06d8\u07d8\3\2\2\2\u06d9\u06da\7\u0162"+
+		"\2\2\u06da\u06db\7\u0213\2\2\u06db\u06dc\5\u008aF\2\u06dc\u06dd\7\u0205"+
+		"\2\2\u06dd\u06de\5\u008aF\2\u06de\u06df\7\u0205\2\2\u06df\u06e0\5\u008a"+
+		"F\2\u06e0\u06e1\7\u0216\2\2\u06e1\u06e2\bL\1\2\u06e2\u07d8\3\2\2\2\u06e3"+
+		"\u06e4\7\u0169\2\2\u06e4\u06e5\7\u0213\2\2\u06e5\u06e6\5\u008aF\2\u06e6"+
+		"\u06e7\7\u0216\2\2\u06e7\u06e8\bL\1\2\u06e8\u07d8\3\2\2\2\u06e9\u06ea"+
+		"\7\u0173\2\2\u06ea\u06eb\7\u0213\2\2\u06eb\u06ec\5\u008aF\2\u06ec\u06ed"+
+		"\7\u0205\2\2\u06ed\u06ee\5\u008aF\2\u06ee\u06ef\7\u0205\2\2\u06ef\u06f0"+
+		"\5\u008aF\2\u06f0\u06f1\7\u0216\2\2\u06f1\u06f2\bL\1\2\u06f2\u07d8\3\2"+
+		"\2\2\u06f3\u06f4\7\u0176\2\2\u06f4\u06f5\7\u0213\2\2\u06f5\u06f6\5\u008a"+
+		"F\2\u06f6\u06f7\7\u0216\2\2\u06f7\u06f8\bL\1\2\u06f8\u07d8\3\2\2\2\u06f9"+
+		"\u06fa\7\u0183\2\2\u06fa\u06fb\7\u0213\2\2\u06fb\u06fc\5\u008aF\2\u06fc"+
+		"\u06fd\7\u0205\2\2\u06fd\u06fe\5\u008aF\2\u06fe\u06ff\7\u0205\2\2\u06ff"+
+		"\u0700\5\u008aF\2\u0700\u0701\7\u0216\2\2\u0701\u0702\bL\1\2\u0702\u07d8"+
+		"\3\2\2\2\u0703\u0704\7\u0192\2\2\u0704\u0705\7\u0213\2\2\u0705\u0706\5"+
+		"\u008aF\2\u0706\u0707\7\u0216\2\2\u0707\u0708\bL\1\2\u0708\u07d8\3\2\2"+
+		"\2\u0709\u070a\7\u0193\2\2\u070a\u070b\7\u0213\2\2\u070b\u070c\5\u008a"+
+		"F\2\u070c\u070d\7\u0205\2\2\u070d\u070e\5\u008aF\2\u070e\u070f\7\u0216"+
+		"\2\2\u070f\u0710\bL\1\2\u0710\u07d8\3\2\2\2\u0711\u0712\7\u01a2\2\2\u0712"+
+		"\u0713\7\u0213\2\2\u0713\u0714\5\u008aF\2\u0714\u0715\7\u0216\2\2\u0715"+
+		"\u0716\bL\1\2\u0716\u07d8\3\2\2\2\u0717\u0718\7\u01a2\2\2\u0718\u0719"+
+		"\7\u0213\2\2\u0719\u071a\5\u008aF\2\u071a\u071b\7\u0205\2\2\u071b\u071c"+
+		"\5\u008aF\2\u071c\u071d\7\u0216\2\2\u071d\u071e\bL\1\2\u071e\u07d8\3\2"+
+		"\2\2\u071f\u0720\7\u01a2\2\2\u0720\u0721\7\u0213\2\2\u0721\u0722\5\u008a"+
+		"F\2\u0722\u0723\7\u0205\2\2\u0723\u0724\5\u008aF\2\u0724\u0725\7\u0205"+
+		"\2\2\u0725\u0726\5\u008aF\2\u0726\u0727\7\u0216\2\2\u0727\u0728\bL\1\2"+
+		"\u0728\u07d8\3\2\2\2\u0729\u072a\t\f\2\2\u072a\u072b\7\u0213\2\2\u072b"+
+		"\u072c\5\u008aF\2\u072c\u072d\7\u0205\2\2\u072d\u072e\5\u008aF\2\u072e"+
+		"\u072f\7\u0216\2\2\u072f\u0730\bL\1\2\u0730\u07d8\3\2\2\2\u0731\u0732"+
+		"\t\f\2\2\u0732\u0733\7\u0213\2\2\u0733\u0734\5\u008aF\2\u0734\u0735\7"+
+		"\u0205\2\2\u0735\u0736\5\u008aF\2\u0736\u0737\7\u0205\2\2\u0737\u0738"+
+		"\5\u008aF\2\u0738\u0739\7\u0216\2\2\u0739\u073a\bL\1\2\u073a\u07d8\3\2"+
+		"\2\2\u073b\u073c\7\u01a7\2\2\u073c\u073d\7\u0213\2\2\u073d\u073e\5\u008a"+
+		"F\2\u073e\u073f\7\u0205\2\2\u073f\u0740\5\u008aF\2\u0740\u0741\7\u0205"+
+		"\2\2\u0741\u0742\5\u008aF\2\u0742\u0743\7\u0216\2\2\u0743\u0744\bL\1\2"+
+		"\u0744\u07d8\3\2\2\2\u0745\u0746\7\u01bb\2\2\u0746\u0747\7\u0213\2\2\u0747"+
+		"\u0748\5\u008aF\2\u0748\u0749\7\u0205\2\2\u0749\u074a\5\u008aF\2\u074a"+
+		"\u074b\7\u0205\2\2\u074b\u074c\5\u008aF\2\u074c\u074d\7\u0216\2\2\u074d"+
+		"\u074e\bL\1\2\u074e\u07d8\3\2\2\2\u074f\u0750\7\u0178\2\2\u0750\u0751"+
+		"\7\u0213\2\2\u0751\u0752\5\u008aF\2\u0752\u0753\7\u0216\2\2\u0753\u0754"+
+		"\bL\1\2\u0754\u07d8\3\2\2\2\u0755\u0756\7\u01c1\2\2\u0756\u0757\7\u0213"+
+		"\2\2\u0757\u0758\5\u008aF\2\u0758\u0759\7\u0216\2\2\u0759\u075a\bL\1\2"+
+		"\u075a\u07d8\3\2\2\2\u075b\u075c\t\r\2\2\u075c\u075d\7\u0213\2\2\u075d"+
+		"\u075e\5\u008aF\2\u075e\u075f\7\u0216\2\2\u075f\u0760\bL\1\2\u0760\u07d8"+
+		"\3\2\2\2\u0761\u0762\7\u00c2\2\2\u0762\u0763\7\u0213\2\2\u0763\u0764\5"+
+		"\u008aF\2\u0764\u0765\7\u0216\2\2\u0765\u0766\bL\1\2\u0766\u07d8\3\2\2"+
+		"\2\u0767\u0768\7\u00e6\2\2\u0768\u0769\7\u0213\2\2\u0769\u076a\5\u008a"+
+		"F\2\u076a\u076b\7\u0205\2\2\u076b\u076c\5\u008aF\2\u076c\u076d\7\u0216"+
+		"\2\2\u076d\u076e\bL\1\2\u076e\u07d8\3\2\2\2\u076f\u0770\7\u0191\2\2\u0770"+
+		"\u0771\7\u0213\2\2\u0771\u0772\5\u008aF\2\u0772\u0773\7\u0216\2\2\u0773"+
+		"\u0774\bL\1\2\u0774\u07d8\3\2\2\2\u0775\u0776\7\u00fc\2\2\u0776\u0777"+
+		"\7\u0213\2\2\u0777\u0778\5\u008aF\2\u0778\u0779\7\u0216\2\2\u0779\u077a"+
+		"\bL\1\2\u077a\u07d8\3\2\2\2\u077b\u077c\7\u00fc\2\2\u077c\u077d\7\u0213"+
+		"\2\2\u077d\u077e\5\u008aF\2\u077e\u077f\7\u0205\2\2\u077f\u0780\5\u008a"+
+		"F\2\u0780\u0781\7\u0216\2\2\u0781\u0782\bL\1\2\u0782\u07d8\3\2\2\2\u0783"+
+		"\u0784\7\u00fc\2\2\u0784\u0785\7\u0213\2\2\u0785\u0786\5\u008aF\2\u0786"+
+		"\u0787\7\u0205\2\2\u0787\u0788\5\u008aF\2\u0788\u0789\7\u0205\2\2\u0789"+
+		"\u078a\5\u008aF\2\u078a\u078b\7\u0216\2\2\u078b\u078c\bL\1\2\u078c\u07d8"+
+		"\3\2\2\2\u078d\u078e\7\u00fc\2\2\u078e\u078f\7\u0213\2\2\u078f\u0790\5"+
+		"\u008aF\2\u0790\u0791\7\u0205\2\2\u0791\u0792\5\u008aF\2\u0792\u0793\7"+
+		"\u0205\2\2\u0793\u0794\5\u008aF\2\u0794\u0795\7\u0205\2\2\u0795\u0796"+
+		"\5\u008aF\2\u0796\u0797\7\u0216\2\2\u0797\u0798\bL\1\2\u0798\u07d8\3\2"+
+		"\2\2\u0799\u079a\7\u00fd\2\2\u079a\u079b\7\u0213\2\2\u079b\u079c\5\u008a"+
+		"F\2\u079c\u079d\7\u0216\2\2\u079d\u079e\bL\1\2\u079e\u07d8\3\2\2\2\u079f"+
+		"\u07a0\7\u00fd\2\2\u07a0\u07a1\7\u0213\2\2\u07a1\u07a2\5\u008aF\2\u07a2"+
+		"\u07a3\7\u0205\2\2\u07a3\u07a4\5\u008aF\2\u07a4\u07a5\7\u0216\2\2\u07a5"+
+		"\u07a6\bL\1\2\u07a6\u07d8\3\2\2\2\u07a7\u07a8\7\u00ff\2\2\u07a8\u07a9"+
+		"\7\u0213\2\2\u07a9\u07aa\5\u008aF\2\u07aa\u07ab\7\u0216\2\2\u07ab\u07ac"+
+		"\bL\1\2\u07ac\u07d8\3\2\2\2\u07ad\u07ae\7\u00ff\2\2\u07ae\u07af\7\u0213"+
+		"\2\2\u07af\u07b0\5\u008aF\2\u07b0\u07b1\7\u0205\2\2\u07b1\u07b2\5\u008a"+
+		"F\2\u07b2\u07b3\7\u0216\2\2\u07b3\u07b4\bL\1\2\u07b4\u07d8\3\2\2\2\u07b5"+
+		"\u07b6\7\u0100\2\2\u07b6\u07b7\7\u0213\2\2\u07b7\u07b8\5\u008aF\2\u07b8"+
+		"\u07b9\7\u0216\2\2\u07b9\u07ba\bL\1\2\u07ba\u07d8\3\2\2\2\u07bb\u07bc"+
+		"\7\u0100\2\2\u07bc\u07bd\7\u0213\2\2\u07bd\u07be\5\u008aF\2\u07be\u07bf"+
+		"\7\u0205\2\2\u07bf\u07c0\5\u008aF\2\u07c0\u07c1\7\u0216\2\2\u07c1\u07c2"+
+		"\bL\1\2\u07c2\u07d8\3\2\2\2\u07c3\u07c4\7\u0101\2\2\u07c4\u07c5\7\u0213"+
+		"\2\2\u07c5\u07c6\5\u008aF\2\u07c6\u07c7\7\u0216\2\2\u07c7\u07c8\bL\1\2"+
+		"\u07c8\u07d8\3\2\2\2\u07c9\u07ca\7\u0101\2\2\u07ca\u07cb\7\u0213\2\2\u07cb"+
+		"\u07cc\5\u008aF\2\u07cc\u07cd\7\u0205\2\2\u07cd\u07ce\5\u008aF\2\u07ce"+
+		"\u07cf\7\u0216\2\2\u07cf\u07d0\bL\1\2\u07d0\u07d8\3\2\2\2\u07d1\u07d2"+
+		"\7\u00fe\2\2\u07d2\u07d3\7\u0213\2\2\u07d3\u07d4\5\u008aF\2\u07d4\u07d5"+
+		"\7\u0216\2\2\u07d5\u07d6\bL\1\2\u07d6\u07d8\3\2\2\2\u07d7\u05d6\3\2\2"+
+		"\2\u07d7\u05dc\3\2\2\2\u07d7\u05e2\3\2\2\2\u07d7\u05e8\3\2\2\2\u07d7\u05ee"+
+		"\3\2\2\2\u07d7\u05fb\3\2\2\2\u07d7\u060a\3\2\2\2\u07d7\u0612\3\2\2\2\u07d7"+
+		"\u0622\3\2\2\2\u07d7\u062a\3\2\2\2\u07d7\u063a\3\2\2\2\u07d7\u0642\3\2"+
+		"\2\2\u07d7\u064a\3\2\2\2\u07d7\u0652\3\2\2\2\u07d7\u065a\3\2\2\2\u07d7"+
+		"\u0662\3\2\2\2\u07d7\u0668\3\2\2\2\u07d7\u0670\3\2\2\2\u07d7\u067a\3\2"+
+		"\2\2\u07d7\u0680\3\2\2\2\u07d7\u068a\3\2\2\2\u07d7\u0690\3\2\2\2\u07d7"+
+		"\u0696\3\2\2\2\u07d7\u069e\3\2\2\2\u07d7\u06a8\3\2\2\2\u07d7\u06b7\3\2"+
+		"\2\2\u07d7\u06bd\3\2\2\2\u07d7\u06c7\3\2\2\2\u07d7\u06d1\3\2\2\2\u07d7"+
+		"\u06d9\3\2\2\2\u07d7\u06e3\3\2\2\2\u07d7\u06e9\3\2\2\2\u07d7\u06f3\3\2"+
+		"\2\2\u07d7\u06f9\3\2\2\2\u07d7\u0703\3\2\2\2\u07d7\u0709\3\2\2\2\u07d7"+
+		"\u0711\3\2\2\2\u07d7\u0717\3\2\2\2\u07d7\u071f\3\2\2\2\u07d7\u0729\3\2"+
+		"\2\2\u07d7\u0731\3\2\2\2\u07d7\u073b\3\2\2\2\u07d7\u0745\3\2\2\2\u07d7"+
+		"\u074f\3\2\2\2\u07d7\u0755\3\2\2\2\u07d7\u075b\3\2\2\2\u07d7\u0761\3\2"+
+		"\2\2\u07d7\u0767\3\2\2\2\u07d7\u076f\3\2\2\2\u07d7\u0775\3\2\2\2\u07d7"+
+		"\u077b\3\2\2\2\u07d7\u0783\3\2\2\2\u07d7\u078d\3\2\2\2\u07d7\u0799\3\2"+
+		"\2\2\u07d7\u079f\3\2\2\2\u07d7\u07a7\3\2\2\2\u07d7\u07ad\3\2\2\2\u07d7"+
+		"\u07b5\3\2\2\2\u07d7\u07bb\3\2\2\2\u07d7\u07c3\3\2\2\2\u07d7\u07c9\3\2"+
+		"\2\2\u07d7\u07d1\3\2\2\2\u07d8\u0097\3\2\2\2\u07d9\u07da\bM\1\2\u07da"+
+		"\u07db\7\u00d9\2\2\u07db\u07dc\7\u0213\2\2\u07dc\u07dd\5\u008aF\2\u07dd"+
+		"\u07de\7\u0205\2\2\u07de\u07e3\5\u008aF\2\u07df\u07e0\7\u0205\2\2\u07e0"+
+		"\u07e2\5\u008aF\2\u07e1\u07df\3\2\2\2\u07e2\u07e5\3\2\2\2\u07e3\u07e1"+
+		"\3\2\2\2\u07e3\u07e4\3\2\2\2\u07e4\u07e6\3\2\2\2\u07e5\u07e3\3\2\2\2\u07e6"+
+		"\u07e7\7\u0216\2\2\u07e7\u07e8\bM\1\2\u07e8\u083e\3\2\2\2\u07e9\u07ea"+
+		"\bM\1\2\u07ea\u07eb\7\u0153\2\2\u07eb\u07ec\7\u0213\2\2\u07ec\u07ed\5"+
+		"\u008aF\2\u07ed\u07ee\7\u0205\2\2\u07ee\u07f3\5\u008aF\2\u07ef\u07f0\7"+
+		"\u0205\2\2\u07f0\u07f2\5\u008aF\2\u07f1\u07ef\3\2\2\2\u07f2\u07f5\3\2"+
+		"\2\2\u07f3\u07f1\3\2\2\2\u07f3\u07f4\3\2\2\2\u07f4\u07f6\3\2\2\2\u07f5"+
+		"\u07f3\3\2\2\2\u07f6\u07f7\7\u0216\2\2\u07f7\u07f8\bM\1\2\u07f8\u083e"+
+		"\3\2\2\2\u07f9\u07fa\bM\1\2\u07fa\u07fb\7\u00b2\2\2\u07fb\u07fc\7\u0213"+
+		"\2\2\u07fc\u0801\5\u008aF\2\u07fd\u07fe\7\u0205\2\2\u07fe\u0800\5\u008a"+
+		"F\2\u07ff\u07fd\3\2\2\2\u0800\u0803\3\2\2\2\u0801\u07ff\3\2\2\2\u0801"+
+		"\u0802\3\2\2\2\u0802\u0804\3\2\2\2\u0803\u0801\3\2\2\2\u0804\u0805\7\u0216"+
+		"\2\2\u0805\u0806\bM\1\2\u0806\u083e\3\2\2\2\u0807\u0808\7\u01ed\2\2\u0808"+
+		"\u0809\7\u0213\2\2\u0809\u080a\7\u0216\2\2\u080a\u083e\bM\1\2\u080b\u080c"+
+		"\7\u00f4\2\2\u080c\u080d\7\u0213\2\2\u080d\u080e\7\u0216\2\2\u080e\u083e"+
+		"\bM\1\2\u080f\u0810\7`\2\2\u0810\u0811\7\u0213\2\2\u0811\u0812\7\u0216"+
+		"\2\2\u0812\u083e\bM\1\2\u0813\u0814\t\16\2\2\u0814\u0815\7\u0213\2\2\u0815"+
+		"\u0816\5\u008aF\2\u0816\u0817\7\u0216\2\2\u0817\u0818\bM\1\2\u0818\u083e"+
+		"\3\2\2\2\u0819\u081a\7\u0188\2\2\u081a\u081b\7\u0213\2\2\u081b\u081c\5"+
+		"\u008aF\2\u081c\u081d\7\u0205\2\2\u081d\u081e\5\u008aF\2\u081e\u081f\7"+
+		"\u0216\2\2\u081f\u0820\bM\1\2\u0820\u083e\3\2\2\2\u0821\u0822\7\22\2\2"+
+		"\u0822\u0823\7\u0213\2\2\u0823\u0824\5\u008aF\2\u0824\u0825\7\u0205\2"+
+		"\2\u0825\u0826\5\u008aF\2\u0826\u0827\7\u0216\2\2\u0827\u0828\bM\1\2\u0828"+
+		"\u083e\3\2\2\2\u0829\u082a\7\23\2\2\u082a\u082b\7\u0213\2\2\u082b\u082c"+
+		"\5\u008aF\2\u082c\u082d\7\u0205\2\2\u082d\u082e\5\u008aF\2\u082e\u082f"+
+		"\7\u0216\2\2\u082f\u0830\bM\1\2\u0830\u083e\3\2\2\2\u0831\u0832\7\u01d2"+
+		"\2\2\u0832\u0833\7\u0213\2\2\u0833\u0834\7\u0216\2\2\u0834\u083e\bM\1"+
+		"\2\u0835\u0836\t\17\2\2\u0836\u0837\7\u0213\2\2\u0837\u0838\5\u008aF\2"+
+		"\u0838\u0839\7\u0205\2\2\u0839\u083a\5\u008aF\2\u083a\u083b\7\u0216\2"+
+		"\2\u083b\u083c\bM\1\2\u083c\u083e\3\2\2\2\u083d\u07d9\3\2\2\2\u083d\u07e9"+
+		"\3\2\2\2\u083d\u07f9\3\2\2\2\u083d\u0807\3\2\2\2\u083d\u080b\3\2\2\2\u083d"+
+		"\u080f\3\2\2\2\u083d\u0813\3\2\2\2\u083d\u0819\3\2\2\2\u083d\u0821\3\2"+
+		"\2\2\u083d\u0829\3\2\2\2\u083d\u0831\3\2\2\2\u083d\u0835\3\2\2\2\u083e"+
+		"\u0099\3\2\2\2\u083f\u0840\bN\1\2\u0840\u0843\5\u009cO\2\u0841\u0842\7"+
+		"\u0206\2\2\u0842\u0844\5\u009cO\2\u0843\u0841\3\2\2\2\u0844\u0845\3\2"+
+		"\2\2\u0845\u0843\3\2\2\2\u0845\u0846\3\2\2\2\u0846\u0847\3\2\2\2\u0847"+
+		"\u0848\bN\1\2\u0848\u009b\3\2\2\2\u0849\u084a\5\u00acW\2\u084a\u084b\b"+
+		"O\1\2\u084b\u086a\3\2\2\2\u084c\u084d\5\u00aeX\2\u084d\u084e\bO\1\2\u084e"+
+		"\u086a\3\2\2\2\u084f\u0850\7\u0213\2\2\u0850\u0851\5\u008aF\2\u0851\u0852"+
+		"\7\u0216\2\2\u0852\u0853\bO\1\2\u0853\u086a\3\2\2\2\u0854\u0855\5\u00a2"+
+		"R\2\u0855\u0856\bO\1\2\u0856\u086a\3\2\2\2\u0857\u0858\5\u00aaV\2\u0858"+
+		"\u0859\bO\1\2\u0859\u086a\3\2\2\2\u085a\u085b\5\u00a0Q\2\u085b\u085c\b"+
+		"O\1\2\u085c\u086a\3\2\2\2\u085d\u085e\5\u009eP\2\u085e\u085f\bO\1\2\u085f"+
+		"\u086a\3\2\2\2\u0860\u0861\5\u0096L\2\u0861\u0862\bO\1\2\u0862\u086a\3"+
+		"\2\2\2\u0863\u0864\5\u0098M\2\u0864\u0865\bO\1\2\u0865\u086a\3\2\2\2\u0866"+
+		"\u0867\5\u00a6T\2\u0867\u0868\bO\1\2\u0868\u086a\3\2\2\2\u0869\u0849\3"+
+		"\2\2\2\u0869\u084c\3\2\2\2\u0869\u084f\3\2\2\2\u0869\u0854\3\2\2\2\u0869"+
+		"\u0857\3\2\2\2\u0869\u085a\3\2\2\2\u0869\u085d\3\2\2\2\u0869\u0860\3\2"+
+		"\2\2\u0869\u0863\3\2\2\2\u0869\u0866\3\2\2\2\u086a\u009d\3\2\2\2\u086b"+
+		"\u086c\7\u00bb\2\2\u086c\u086d\7\u0213\2\2\u086d\u086e\5\u008aF\2\u086e"+
+		"\u086f\7\u0205\2\2\u086f\u0870\5\u008aF\2\u0870\u0871\7\u0205\2\2\u0871"+
+		"\u0872\5\u008aF\2\u0872\u0873\7\u0216\2\2\u0873\u0874\bP\1\2\u0874\u08e7"+
+		"\3\2\2\2\u0875\u0876\7\u00d5\2\2\u0876\u0877\7\u0213\2\2\u0877\u0878\5"+
+		"\u008aF\2\u0878\u0879\7\u0216\2\2\u0879\u087a\bP\1\2\u087a\u08e7\3\2\2"+
+		"\2\u087b\u087c\7\u00d4\2\2\u087c\u087d\7\u0213\2\2\u087d\u087e\5\u008a"+
+		"F\2\u087e\u087f\7\u0216\2\2\u087f\u0880\bP\1\2\u0880\u08e7\3\2\2\2\u0881"+
+		"\u0882\7\u00d6\2\2\u0882\u0883\7\u0213\2\2\u0883\u0884\5\u008aF\2\u0884"+
+		"\u0885\7\u0205\2\2\u0885\u0886\5\u008aF\2\u0886\u0887\7\u0216\2\2\u0887"+
+		"\u0888\bP\1\2\u0888\u08e7\3\2\2\2\u0889\u088a\bP\1\2\u088a\u088b\7A\2"+
+		"\2\u088b\u088c\7\u0213\2\2\u088c\u088d\5\u008aF\2\u088d\u088e\7\u0205"+
+		"\2\2\u088e\u088f\5\u008aF\2\u088f\u0894\3\2\2\2\u0890\u0891\7\u0205\2"+
+		"\2\u0891\u0893\5\u008aF\2\u0892\u0890\3\2\2\2\u0893\u0896\3\2\2\2\u0894"+
+		"\u0892\3\2\2\2\u0894\u0895\3\2\2\2\u0895\u0897\3\2\2\2\u0896\u0894\3\2"+
+		"\2\2\u0897\u0898\7\u0216\2\2\u0898\u0899\bP\1\2\u0899\u08e7\3\2\2\2\u089a"+
+		"\u089b\bP\1\2\u089b\u089c\7\62\2\2\u089c\u08a2\5\u008aF\2\u089d\u089e"+
+		"\7\u01d6\2\2\u089e\u089f\5\u008aF\2\u089f\u08a0\7\u01b3\2\2\u08a0\u08a1"+
+		"\5\u008aF\2\u08a1\u08a3\3\2\2\2\u08a2\u089d\3\2\2\2\u08a3\u08a4\3\2\2"+
+		"\2\u08a4\u08a2\3\2\2\2\u08a4\u08a5\3\2\2\2\u08a5\u08a6\3\2\2\2\u08a6\u08a7"+
+		"\7\u008a\2\2\u08a7\u08a8\bP\1\2\u08a8\u08e7\3\2\2\2\u08a9\u08aa\bP\1\2"+
+		"\u08aa\u08ab\7\62\2\2\u08ab\u08b1\5\u008aF\2\u08ac\u08ad\7\u01d6\2\2\u08ad"+
+		"\u08ae\5\u008aF\2\u08ae\u08af\7\u01b3\2\2\u08af\u08b0\5\u008aF\2\u08b0"+
+		"\u08b2\3\2\2\2\u08b1\u08ac\3\2\2\2\u08b2\u08b3\3\2\2\2\u08b3\u08b1\3\2"+
+		"\2\2\u08b3\u08b4\3\2\2\2\u08b4\u08b5\3\2\2\2\u08b5\u08b6\7\u0084\2\2\u08b6"+
+		"\u08b7\5\u008aF\2\u08b7\u08b8\7\u008a\2\2\u08b8\u08b9\bP\1\2\u08b9\u08e7"+
+		"\3\2\2\2\u08ba\u08bb\bP\1\2\u08bb\u08c1\7\62\2\2\u08bc\u08bd\7\u01d6\2"+
+		"\2\u08bd\u08be\5\u008aF\2\u08be\u08bf\7\u01b3\2\2\u08bf\u08c0\5\u008a"+
+		"F\2\u08c0\u08c2\3\2\2\2\u08c1\u08bc\3\2\2\2\u08c2\u08c3\3\2\2\2\u08c3"+
+		"\u08c1\3\2\2\2\u08c3\u08c4\3\2\2\2\u08c4\u08c5\3\2\2\2\u08c5\u08c6\7\u008a"+
+		"\2\2\u08c6\u08c7\bP\1\2\u08c7\u08e7\3\2\2\2\u08c8\u08c9\bP\1\2\u08c9\u08cf"+
+		"\7\62\2\2\u08ca\u08cb\7\u01d6\2\2\u08cb\u08cc\5\u008aF\2\u08cc\u08cd\7"+
+		"\u01b3\2\2\u08cd\u08ce\5\u008aF\2\u08ce\u08d0\3\2\2\2\u08cf\u08ca\3\2"+
+		"\2\2\u08d0\u08d1\3\2\2\2\u08d1\u08cf\3\2\2\2\u08d1\u08d2\3\2\2\2\u08d2"+
+		"\u08d3\3\2\2\2\u08d3\u08d4\7\u0084\2\2\u08d4\u08d5\5\u008aF\2\u08d5\u08d6"+
+		"\7\u008a\2\2\u08d6\u08d7\bP\1\2\u08d7\u08e7\3\2\2\2\u08d8\u08d9\7\u0120"+
+		"\2\2\u08d9\u08da\7\u0213\2\2\u08da\u08db\5\u008aF\2\u08db\u08dc\7\u0205"+
+		"\2\2\u08dc\u08dd\5\u008aF\2\u08dd\u08de\7\u0216\2\2\u08de\u08df\bP\1\2"+
+		"\u08df\u08e7\3\2\2\2\u08e0\u08e1\7\34\2\2\u08e1\u08e2\7\u0213\2\2\u08e2"+
+		"\u08e3\5\u008aF\2\u08e3\u08e4\7\u0216\2\2\u08e4\u08e5\bP\1\2\u08e5\u08e7"+
+		"\3\2\2\2\u08e6\u086b\3\2\2\2\u08e6\u0875\3\2\2\2\u08e6\u087b\3\2\2\2\u08e6"+
+		"\u0881\3\2\2\2\u08e6\u0889\3\2\2\2\u08e6\u089a\3\2\2\2\u08e6\u08a9\3\2"+
+		"\2\2\u08e6\u08ba\3\2\2\2\u08e6\u08c8\3\2\2\2\u08e6\u08d8\3\2\2\2\u08e6"+
+		"\u08e0\3\2\2\2\u08e7\u009f\3\2\2\2\u08e8\u08e9\7\u01c6\2\2\u08e9\u08ea"+
+		"\7\u0213\2\2\u08ea\u08eb\7\u0216\2\2\u08eb\u0999\bQ\1\2\u08ec\u08ed\7"+
+		"\u01c6\2\2\u08ed\u08ee\7\u0213\2\2\u08ee\u08ef\5\u008aF\2\u08ef\u08f0"+
+		"\7\u0216\2\2\u08f0\u08f1\bQ\1\2\u08f1\u0999\3\2\2\2\u08f2\u08f3\7\u01c6"+
+		"\2\2\u08f3\u08f4\7\u0213\2\2\u08f4\u08f5\5\u008aF\2\u08f5\u08f6\7\u0205"+
+		"\2\2\u08f6\u08f7\5\u008aF\2\u08f7\u08f8\7\u0216\2\2\u08f8\u08f9\bQ\1\2"+
+		"\u08f9\u0999\3\2\2\2\u08fa\u08fb\7\u01e7\2\2\u08fb\u08fc\7\u0213\2\2\u08fc"+
+		"\u08fd\5\u008aF\2\u08fd\u08fe\7\u0216\2\2\u08fe\u08ff\bQ\1\2\u08ff\u0999"+
+		"\3\2\2\2\u0900\u0901\7\u0149\2\2\u0901\u0902\7\u0213\2\2\u0902\u0903\5"+
+		"\u008aF\2\u0903\u0904\7\u0216\2\2\u0904\u0905\bQ\1\2\u0905\u0999\3\2\2"+
+		"\2\u0906\u0907\7\u010c\2\2\u0907\u0908\7\u0213\2\2\u0908\u0909\5\u008a"+
+		"F\2\u0909\u090a\7\u0216\2\2\u090a\u090b\bQ\1\2\u090b\u0999\3\2\2\2\u090c"+
+		"\u090d\7i\2\2\u090d\u090e\7\u0213\2\2\u090e\u090f\5\u008aF\2\u090f\u0910"+
+		"\7\u0216\2\2\u0910\u0911\bQ\1\2\u0911\u0999\3\2\2\2\u0912\u0913\7\u00b9"+
+		"\2\2\u0913\u0914\7\u0213\2\2\u0914\u0915\5\u008aF\2\u0915\u0916\7\u0216"+
+		"\2\2\u0916\u0917\bQ\1\2\u0917\u0999\3\2\2\2\u0918\u0919\7\u010b\2\2\u0919"+
+		"\u091a\7\u0213\2\2\u091a\u091b\5\u008aF\2\u091b\u091c\7\u0216\2\2\u091c"+
+		"\u091d\bQ\1\2\u091d\u0999\3\2\2\2\u091e\u091f\7\u017a\2\2\u091f\u0920"+
+		"\7\u0213\2\2\u0920\u0921\5\u008aF\2\u0921\u0922\7\u0216\2\2\u0922\u0923"+
+		"\bQ\1\2\u0923\u0999\3\2\2\2\u0924\u0925\7\u01d5\2\2\u0925\u0926\7\u0213"+
+		"\2\2\u0926\u0927\5\u008aF\2\u0927\u0928\7\u0216\2\2\u0928\u0929\bQ\1\2"+
+		"\u0929\u0999\3\2\2\2\u092a\u092b\7e\2\2\u092b\u092c\7\u0213\2\2\u092c"+
+		"\u092d\5\u008aF\2\u092d\u092e\7\u0205\2\2\u092e\u092f\5\u008aF\2\u092f"+
+		"\u0930\7\u0216\2\2\u0930\u0931\bQ\1\2\u0931\u0999\3\2\2\2\u0932\u0933"+
+		"\7d\2\2\u0933\u0934\7\u0213\2\2\u0934\u0935\5\u008aF\2\u0935\u0936\7\u0205"+
+		"\2\2\u0936\u0937\5\u008aF\2\u0937\u0938\7\u0216\2\2\u0938\u0939\bQ\1\2"+
+		"\u0939\u0999\3\2\2\2\u093a\u093b\7g\2\2\u093b\u093c\7\u0213\2\2\u093c"+
+		"\u093d\5\u008aF\2\u093d\u093e\7\u0205\2\2\u093e\u093f\5\u008aF\2\u093f"+
+		"\u0940\7\u0216\2\2\u0940\u0941\bQ\1\2\u0941\u0999\3\2\2\2\u0942\u0943"+
+		"\7\u01b9\2\2\u0943\u0944\7\u0213\2\2\u0944\u0945\5\u008aF\2\u0945\u0946"+
+		"\7\u0205\2\2\u0946\u0947\5\u008aF\2\u0947\u0948\7\u0216\2\2\u0948\u0949"+
+		"\bQ\1\2\u0949\u0999\3\2\2\2\u094a\u094b\7\u00a8\2\2\u094b\u094c\7\u0213"+
+		"\2\2\u094c\u094d\5\u008aF\2\u094d\u094e\7\u0205\2\2\u094e\u094f\5\u008a"+
+		"F\2\u094f\u0950\7\u0216\2\2\u0950\u0951\bQ\1\2\u0951\u0999\3\2\2\2\u0952"+
+		"\u0955\7\u01eb\2\2\u0953\u0954\7\u0213\2\2\u0954\u0956\7\u0216\2\2\u0955"+
+		"\u0953\3\2\2\2\u0955\u0956\3\2\2\2\u0956\u0957\3\2\2\2\u0957\u0999\bQ"+
+		"\1\2\u0958\u095b\7\u01ec\2\2\u0959\u095a";
+	private static final String _serializedATNSegment1 =
+		"\7\u0213\2\2\u095a\u095c\7\u0216\2\2\u095b\u0959\3\2\2\2\u095b\u095c\3"+
+		"\2\2\2\u095c\u095d\3\2\2\2\u095d\u0999\bQ\1\2\u095e\u095f\7\21\2\2\u095f"+
+		"\u0960\7\u0213\2\2\u0960\u0961\5\u008aF\2\u0961\u0962\7\u0205\2\2\u0962"+
+		"\u0963\5\u008aF\2\u0963\u0964\7\u0216\2\2\u0964\u0965\bQ\1\2\u0965\u0999"+
+		"\3\2\2\2\u0966\u0967\7\21\2\2\u0967\u0968\7\u0213\2\2\u0968\u0969\5\u008a"+
+		"F\2\u0969\u096a\7\u0205\2\2\u096a\u096b\5\u008aF\2\u096b\u096c\7\u0205"+
+		"\2\2\u096c\u096d\5\u008aF\2\u096d\u096e\7\u0216\2\2\u096e\u096f\bQ\1\2"+
+		"\u096f\u0999\3\2\2\2\u0970\u0971\7\u00e0\2\2\u0971\u0972\7\u0213\2\2\u0972"+
+		"\u0973\5\u008aF\2\u0973\u0974\7\u0216\2\2\u0974\u0975\bQ\1\2\u0975\u0999"+
+		"\3\2\2\2\u0976\u0977\7\u0112\2\2\u0977\u0978\7\u0213\2\2\u0978\u0979\5"+
+		"\u008aF\2\u0979\u097a\7\u0205\2\2\u097a\u097b\5\u008aF\2\u097b\u097c\7"+
+		"\u0216\2\2\u097c\u097d\bQ\1\2\u097d\u0999\3\2\2\2\u097e\u097f\7\u01be"+
+		"\2\2\u097f\u0980\7\u0213\2\2\u0980\u0981\5\u008aF\2\u0981\u0982\7\u0205"+
+		"\2\2\u0982\u0983\5\u008aF\2\u0983\u0984\7\u0216\2\2\u0984\u0985\bQ\1\2"+
+		"\u0985\u0999\3\2\2\2\u0986\u0987\7\u010d\2\2\u0987\u0988\7\u0213\2\2\u0988"+
+		"\u0989\5\u008aF\2\u0989\u098a\7\u0205\2\2\u098a\u098b\5\u008aF\2\u098b"+
+		"\u098c\7\u0216\2\2\u098c\u098d\bQ\1\2\u098d\u0999\3\2\2\2\u098e\u098f"+
+		"\7f\2\2\u098f\u0990\7\u0213\2\2\u0990\u0991\5\u008aF\2\u0991\u0992\7\u0205"+
+		"\2\2\u0992\u0993\5\u008aF\2\u0993\u0994\7\u0216\2\2\u0994\u0995\bQ\1\2"+
+		"\u0995\u0999\3\2\2\2\u0996\u0997\7\u01fe\2\2\u0997\u0999\bQ\1\2\u0998"+
+		"\u08e8\3\2\2\2\u0998\u08ec\3\2\2\2\u0998\u08f2\3\2\2\2\u0998\u08fa\3\2"+
+		"\2\2\u0998\u0900\3\2\2\2\u0998\u0906\3\2\2\2\u0998\u090c\3\2\2\2\u0998"+
+		"\u0912\3\2\2\2\u0998\u0918\3\2\2\2\u0998\u091e\3\2\2\2\u0998\u0924\3\2"+
+		"\2\2\u0998\u092a\3\2\2\2\u0998\u0932\3\2\2\2\u0998\u093a\3\2\2\2\u0998"+
+		"\u0942\3\2\2\2\u0998\u094a\3\2\2\2\u0998\u0952\3\2\2\2\u0998\u0958\3\2"+
+		"\2\2\u0998\u095e\3\2\2\2\u0998\u0966\3\2\2\2\u0998\u0970\3\2\2\2\u0998"+
+		"\u0976\3\2\2\2\u0998\u097e\3\2\2\2\u0998\u0986\3\2\2\2\u0998\u098e\3\2"+
+		"\2\2\u0998\u0996\3\2\2\2\u0999\u00a1\3\2\2\2\u099a\u099b\7\63\2\2\u099b"+
+		"\u099c\7\u0213\2\2\u099c\u099d\5\u008aF\2\u099d\u099e\7\30\2\2\u099e\u09a0"+
+		"\5\b\5\2\u099f\u09a1\5\f\7\2\u09a0\u099f\3\2\2\2\u09a0\u09a1\3\2\2\2\u09a1"+
+		"\u09a2\3\2\2\2\u09a2\u09a3\7\u0216\2\2\u09a3\u09a4\bR\1\2\u09a4\u09ac"+
+		"\3\2\2\2\u09a5\u09a6\7\'\2\2\u09a6\u09a7\7\u0213\2\2\u09a7\u09a8\5\u008a"+
+		"F\2\u09a8\u09a9\7\u0216\2\2\u09a9\u09aa\bR\1\2\u09aa\u09ac\3\2\2\2\u09ab"+
+		"\u099a\3\2\2\2\u09ab\u09a5\3\2\2\2\u09ac\u00a3\3\2\2\2\u09ad\u09ae\7T"+
+		"\2\2\u09ae\u09af\7\u0213\2\2\u09af\u09b0\5\u008aF\2\u09b0\u09b1\7\u0216"+
+		"\2\2\u09b1\u09b2\bS\1\2\u09b2\u09e8\3\2\2\2\u09b3\u09b4\bS\1\2\u09b4\u09b5"+
+		"\7T\2\2\u09b5\u09b6\7\u0213\2\2\u09b6\u09b7\7~\2\2\u09b7\u09bc\5\u008a"+
+		"F\2\u09b8\u09b9\7\u0205\2\2\u09b9\u09bb\5\u008aF\2\u09ba\u09b8\3\2\2\2"+
+		"\u09bb\u09be\3\2\2\2\u09bc\u09ba\3\2\2\2\u09bc\u09bd\3\2\2\2\u09bd\u09bf"+
+		"\3\2\2\2\u09be\u09bc\3\2\2\2\u09bf\u09c0\7\u0216\2\2\u09c0\u09c1\bS\1"+
+		"\2\u09c1\u09e8\3\2\2\2\u09c2\u09c3\7T\2\2\u09c3\u09c4\7\u0213\2\2\u09c4"+
+		"\u09c5\7\u0211\2\2\u09c5\u09c6\7\u0216\2\2\u09c6\u09e8\bS\1\2\u09c7\u09c8"+
+		"\7\u01a8\2\2\u09c8\u09c9\7\u0213\2\2\u09c9\u09ca\5\u008aF\2\u09ca\u09cb"+
+		"\7\u0216\2\2\u09cb\u09cc\bS\1\2\u09cc\u09e8\3\2\2\2\u09cd\u09ce\7\u01a8"+
+		"\2\2\u09ce\u09cf\7\u0213\2\2\u09cf\u09d0\7~\2\2\u09d0\u09d1\5\u008aF\2"+
+		"\u09d1\u09d2\7\u0216\2\2\u09d2\u09d3\bS\1\2\u09d3\u09e8\3\2\2\2\u09d4"+
+		"\u09d5\7 \2\2\u09d5\u09d6\7\u0213\2\2\u09d6\u09d7\5\u008aF\2\u09d7\u09d8"+
+		"\7\u0216\2\2\u09d8\u09d9\bS\1\2\u09d9\u09e8\3\2\2\2\u09da\u09db\7 \2\2"+
+		"\u09db\u09dc\7\u0213\2\2\u09dc\u09dd\7~\2\2\u09dd\u09de\5\u008aF\2\u09de"+
+		"\u09df\7\u0216\2\2\u09df\u09e0\bS\1\2\u09e0\u09e8\3\2\2\2\u09e1\u09e2"+
+		"\t\20\2\2\u09e2\u09e3\7\u0213\2\2\u09e3\u09e4\5\u008aF\2\u09e4\u09e5\7"+
+		"\u0216\2\2\u09e5\u09e6\bS\1\2\u09e6\u09e8\3\2\2\2\u09e7\u09ad\3\2\2\2"+
+		"\u09e7\u09b3\3\2\2\2\u09e7\u09c2\3\2\2\2\u09e7\u09c7\3\2\2\2\u09e7\u09cd"+
+		"\3\2\2\2\u09e7\u09d4\3\2\2\2\u09e7\u09da\3\2\2\2\u09e7\u09e1\3\2\2\2\u09e8"+
+		"\u00a5\3\2\2\2\u09e9\u09ea\5\u00a4S\2\u09ea\u09eb\bT\1\2\u09eb\u0a31\3"+
+		"\2\2\2\u09ec\u09ed\t\21\2\2\u09ed\u09ee\7\u0213\2\2\u09ee\u09ef\5\u008a"+
+		"F\2\u09ef\u09f0\7\u0216\2\2\u09f0\u09f1\bT\1\2\u09f1\u0a31\3\2\2\2\u09f2"+
+		"\u09f3\t\22\2\2\u09f3\u09f4\7\u0213\2\2\u09f4\u09f5\5\u008aF\2\u09f5\u09f6"+
+		"\7\u0205\2\2\u09f6\u09f7\5\u008aF\2\u09f7\u09f8\7\u0216\2\2\u09f8\u09f9"+
+		"\bT\1\2\u09f9\u0a31\3\2\2\2\u09fa\u09fb\7\u013a\2\2\u09fb\u09fc\7\u0213"+
+		"\2\2\u09fc\u09fd\5\u008aF\2\u09fd\u09fe\7\u0205\2\2\u09fe\u09ff\5\u008a"+
+		"F\2\u09ff\u0a00\7\u0216\2\2\u0a00\u0a01\bT\1\2\u0a01\u0a31\3\2\2\2\u0a02"+
+		"\u0a03\7\u013b\2\2\u0a03\u0a04\7\u0213\2\2\u0a04\u0a05\5\u008aF\2\u0a05"+
+		"\u0a06\7\u0205\2\2\u0a06\u0a07\5\u008aF\2\u0a07\u0a08\7\u0216\2\2\u0a08"+
+		"\u0a09\bT\1\2\u0a09\u0a31\3\2\2\2\u0a0a\u0a0b\7\u013b\2\2\u0a0b\u0a0c"+
+		"\7\u0213\2\2\u0a0c\u0a0d\5\u008aF\2\u0a0d\u0a0e\7\u0205\2\2\u0a0e\u0a0f"+
+		"\5\u008aF\2\u0a0f\u0a10\7\u0205\2\2\u0a10\u0a11\5\u008aF\2\u0a11\u0a12"+
+		"\7\u0216\2\2\u0a12\u0a13\bT\1\2\u0a13\u0a31\3\2\2\2\u0a14\u0a15\t\23\2"+
+		"\2\u0a15\u0a16\7\u0213\2\2\u0a16\u0a17\5\u008aF\2\u0a17\u0a18\7\u0205"+
+		"\2\2\u0a18\u0a19\5\u008aF\2\u0a19\u0a1a\7\u0216\2\2\u0a1a\u0a1b\bT\1\2"+
+		"\u0a1b\u0a31\3\2\2\2\u0a1c\u0a1d\7\u00b6\2\2\u0a1d\u0a1e\7\u0213\2\2\u0a1e"+
+		"\u0a1f\5\u008aF\2\u0a1f\u0a20\7\u0205\2\2\u0a20\u0a21\5\u008aF\2\u0a21"+
+		"\u0a22\7\u0216\2\2\u0a22\u0a23\bT\1\2\u0a23\u0a31\3\2\2\2\u0a24\u0a25"+
+		"\t\24\2\2\u0a25\u0a26\7\u0213\2\2\u0a26\u0a27\5\u008aF\2\u0a27\u0a28\7"+
+		"\u0216\2\2\u0a28\u0a29\bT\1\2\u0a29\u0a31\3\2\2\2\u0a2a\u0a2b\7\u011e"+
+		"\2\2\u0a2b\u0a2c\7\u0213\2\2\u0a2c\u0a2d\5\u008aF\2\u0a2d\u0a2e\7\u0216"+
+		"\2\2\u0a2e\u0a2f\bT\1\2\u0a2f\u0a31\3\2\2\2\u0a30\u09e9\3\2\2\2\u0a30"+
+		"\u09ec\3\2\2\2\u0a30\u09f2\3\2\2\2\u0a30\u09fa\3\2\2\2\u0a30\u0a02\3\2"+
+		"\2\2\u0a30\u0a0a\3\2\2\2\u0a30\u0a14\3\2\2\2\u0a30\u0a1c\3\2\2\2\u0a30"+
+		"\u0a24\3\2\2\2\u0a30\u0a2a\3\2\2\2\u0a31\u00a7\3\2\2\2\u0a32\u0a33\7\u0095"+
+		"\2\2\u0a33\u0a34\7\u0213\2\2\u0a34\u0a35\5\u008aF\2\u0a35\u0a36\7\u0216"+
+		"\2\2\u0a36\u0a37\bU\1\2\u0a37\u0a45\3\2\2\2\u0a38\u0a39\7\u013f\2\2\u0a39"+
+		"\u0a3a\7\u0213\2\2\u0a3a\u0a3b\5\u008aF\2\u0a3b\u0a3c\7\u0216\2\2\u0a3c"+
+		"\u0a3d\bU\1\2\u0a3d\u0a45\3\2\2\2\u0a3e\u0a3f\7\u00c4\2\2\u0a3f\u0a40"+
+		"\7\u0213\2\2\u0a40\u0a41\5\u008aF\2\u0a41\u0a42\7\u0216\2\2\u0a42\u0a43"+
+		"\bU\1\2\u0a43\u0a45\3\2\2\2\u0a44\u0a32\3\2\2\2\u0a44\u0a38\3\2\2\2\u0a44"+
+		"\u0a3e\3\2\2\2\u0a45\u00a9\3\2\2\2\u0a46\u0a47\7\u016e\2\2\u0a47\u0a48"+
+		"\7\u0213\2\2\u0a48\u0a49\5\u008aF\2\u0a49\u0a4a\7\u0216\2\2\u0a4a\u0a4b"+
+		"\bV\1\2\u0a4b\u0b19\3\2\2\2\u0a4c\u0a4d\7\u016e\2\2\u0a4d\u0a4e\7\u0213"+
+		"\2\2\u0a4e\u0a4f\5\u008aF\2\u0a4f\u0a50\7\u0205\2\2\u0a50\u0a51\5\u008a"+
+		"F\2\u0a51\u0a52\7\u0216\2\2\u0a52\u0a53\bV\1\2\u0a53\u0b19\3\2\2\2\u0a54"+
+		"\u0a55\7\u00a1\2\2\u0a55\u0a56\7\u0213\2\2\u0a56\u0a57\5\u008aF\2\u0a57"+
+		"\u0a58\7\u0216\2\2\u0a58\u0a59\bV\1\2\u0a59\u0b19\3\2\2\2\u0a5a\u0a5b"+
+		"\t\25\2\2\u0a5b\u0a5c\7\u0213\2\2\u0a5c\u0a5d\5\u008aF\2\u0a5d\u0a5e\7"+
+		"\u0216\2\2\u0a5e\u0a5f\bV\1\2\u0a5f\u0b19\3\2\2\2\u0a60\u0a61\7\u014f"+
+		"\2\2\u0a61\u0a62\7\u0213\2\2\u0a62\u0a63\7\u0216\2\2\u0a63\u0b19\bV\1"+
+		"\2\u0a64\u0a65\7\u014f\2\2\u0a65\u0a66\7\u0213\2\2\u0a66\u0a67\5\u008a"+
+		"F\2\u0a67\u0a68\7\u0216\2\2\u0a68\u0a69\bV\1\2\u0a69\u0b19\3\2\2\2\u0a6a"+
+		"\u0a6b\7\u0094\2\2\u0a6b\u0a6c\7\u0213\2\2\u0a6c\u0a6d\5\u008aF\2\u0a6d"+
+		"\u0a6e\7\u0216\2\2\u0a6e\u0a6f\bV\1\2\u0a6f\u0b19\3\2\2\2\u0a70\u0a71"+
+		"\7\u00f9\2\2\u0a71\u0a72\7\u0213\2\2\u0a72\u0a73\5\u008aF\2\u0a73\u0a74"+
+		"\7\u0216\2\2\u0a74\u0a75\bV\1\2\u0a75\u0b19\3\2\2\2\u0a76\u0a77\7\u00f1"+
+		"\2\2\u0a77\u0a78\7\u0213\2\2\u0a78\u0a79\5\u008aF\2\u0a79\u0a7a\7\u0216"+
+		"\2\2\u0a7a\u0a7b\bV\1\2\u0a7b\u0b19\3\2\2\2\u0a7c\u0a7d\7\u00f2\2\2\u0a7d"+
+		"\u0a7e\7\u0213\2\2\u0a7e\u0a7f\5\u008aF\2\u0a7f\u0a80\7\u0216\2\2\u0a80"+
+		"\u0a81\bV\1\2\u0a81\u0b19\3\2\2\2\u0a82\u0a83\7\u00f0\2\2\u0a83\u0a84"+
+		"\7\u0213\2\2\u0a84\u0a85\5\u008aF\2\u0a85\u0a86\7\u0205\2\2\u0a86\u0a87"+
+		"\5\u008aF\2\u0a87\u0a88\7\u0216\2\2\u0a88\u0a89\bV\1\2\u0a89\u0b19\3\2"+
+		"\2\2\u0a8a\u0a8b\t\26\2\2\u0a8b\u0a8c\7\u0213\2\2\u0a8c\u0a8d\5\u008a"+
+		"F\2\u0a8d\u0a8e\7\u0205\2\2\u0a8e\u0a8f\5\u008aF\2\u0a8f\u0a90\7\u0216"+
+		"\2\2\u0a90\u0a91\bV\1\2\u0a91\u0b19\3\2\2\2\u0a92\u0a93\7\u0199\2\2\u0a93"+
+		"\u0a94\7\u0213\2\2\u0a94\u0a95\5\u008aF\2\u0a95\u0a96\7\u0216\2\2\u0a96"+
+		"\u0a97\bV\1\2\u0a97\u0b19\3\2\2\2\u0a98\u0a99\7&\2\2\u0a99\u0a9a\7\u0213"+
+		"\2\2\u0a9a\u0a9b\5\u008aF\2\u0a9b\u0a9c\7\u0216\2\2\u0a9c\u0a9d\bV\1\2"+
+		"\u0a9d\u0b19\3\2\2\2\u0a9e\u0a9f\7\u00b5\2\2\u0a9f\u0aa0\7\u0213\2\2\u0aa0"+
+		"\u0aa1\5\u008aF\2\u0aa1\u0aa2\7\u0216\2\2\u0aa2\u0aa3\bV\1\2\u0aa3\u0b19"+
+		"\3\2\2\2\u0aa4\u0aa5\7\u01c2\2\2\u0aa5\u0aa6\7\u0213\2\2\u0aa6\u0aa7\5"+
+		"\u008aF\2\u0aa7\u0aa8\7\u0216\2\2\u0aa8\u0aa9\bV\1\2\u0aa9\u0b19\3\2\2"+
+		"\2\u0aaa\u0aab\7P\2\2\u0aab\u0aac\7\u0213\2\2\u0aac\u0aad\5\u008aF\2\u0aad"+
+		"\u0aae\7\u0205\2\2\u0aae\u0aaf\5\u008aF\2\u0aaf\u0ab0\7\u0205\2\2\u0ab0"+
+		"\u0ab1\5\u008aF\2\u0ab1\u0ab2\7\u0216\2\2\u0ab2\u0ab3\bV\1\2\u0ab3\u0b19"+
+		"\3\2\2\2\u0ab4\u0ab5\7\17\2\2\u0ab5\u0ab6\7\u0213\2\2\u0ab6\u0ab7\5\u008a"+
+		"F\2\u0ab7\u0ab8\7\u0216\2\2\u0ab8\u0ab9\bV\1\2\u0ab9\u0b19\3\2\2\2\u0aba"+
+		"\u0abb\7\u013d\2\2\u0abb\u0abc\7\u0213\2\2\u0abc\u0abd\5\u008aF\2\u0abd"+
+		"\u0abe\7\u0205\2\2\u0abe\u0abf\5\u008aF\2\u0abf\u0ac0\7\u0216\2\2\u0ac0"+
+		"\u0ac1\bV\1\2\u0ac1\u0b19\3\2\2\2\u0ac2\u0ac3\7\u018a\2\2\u0ac3\u0ac4"+
+		"\7\u0213\2\2\u0ac4\u0ac5\5\u008aF\2\u0ac5\u0ac6\7\u0216\2\2\u0ac6\u0ac7"+
+		"\bV\1\2\u0ac7\u0b19\3\2\2\2\u0ac8\u0ac9\7\33\2\2\u0ac9\u0aca\7\u0213\2"+
+		"\2\u0aca\u0acb\5\u008aF\2\u0acb\u0acc\7\u0216\2\2\u0acc\u0acd\bV\1\2\u0acd"+
+		"\u0b19\3\2\2\2\u0ace\u0acf\7S\2\2\u0acf\u0ad0\7\u0213\2\2\u0ad0\u0ad1"+
+		"\5\u008aF\2\u0ad1\u0ad2\7\u0216\2\2\u0ad2\u0ad3\bV\1\2\u0ad3\u0b19\3\2"+
+		"\2\2\u0ad4\u0ad5\7\20\2\2\u0ad5\u0ad6\7\u0213\2\2\u0ad6\u0ad7\5\u008a"+
+		"F\2\u0ad7\u0ad8\7\u0216\2\2\u0ad8\u0ad9\bV\1\2\u0ad9\u0b19\3\2\2\2\u0ada"+
+		"\u0adb\7\u01ad\2\2\u0adb\u0adc\7\u0213\2\2\u0adc\u0add\5\u008aF\2\u0add"+
+		"\u0ade\7\u0216\2\2\u0ade\u0adf\bV\1\2\u0adf\u0b19\3\2\2\2\u0ae0\u0ae1"+
+		"\7\36\2\2\u0ae1\u0ae2\7\u0213\2\2\u0ae2\u0ae3\5\u008aF\2\u0ae3\u0ae4\7"+
+		"\u0216\2\2\u0ae4\u0ae5\bV\1\2\u0ae5\u0b19\3\2\2\2\u0ae6\u0ae7\7t\2\2\u0ae7"+
+		"\u0ae8\7\u0213\2\2\u0ae8\u0ae9\5\u008aF\2\u0ae9\u0aea\7\u0216\2\2\u0aea"+
+		"\u0aeb\bV\1\2\u0aeb\u0b19\3\2\2\2\u0aec\u0aed\7\u014d\2\2\u0aed\u0aee"+
+		"\7\u0213\2\2\u0aee\u0aef\5\u008aF\2\u0aef\u0af0\7\u0216\2\2\u0af0\u0af1"+
+		"\bV\1\2\u0af1\u0b19\3\2\2\2\u0af2\u0af3\7\u013e\2\2\u0af3\u0af4\7\u0213"+
+		"\2\2\u0af4\u0af5\5\u008aF\2\u0af5\u0af6\7\u0216\2\2\u0af6\u0af7\bV\1\2"+
+		"\u0af7\u0b19\3\2\2\2\u0af8\u0af9\7\u0111\2\2\u0af9\u0afa\7\u0213\2\2\u0afa"+
+		"\u0afb\5\u008aF\2\u0afb\u0afc\7\u0216\2\2\u0afc\u0afd\bV\1\2\u0afd\u0b19"+
+		"\3\2\2\2\u0afe\u0aff\7\u0189\2\2\u0aff\u0b00\7\u0213\2\2\u0b00\u0b01\5"+
+		"\u008aF\2\u0b01\u0b02\7\u0216\2\2\u0b02\u0b03\bV\1\2\u0b03\u0b19\3\2\2"+
+		"\2\u0b04\u0b05\7\n\2\2\u0b05\u0b06\7\u0213\2\2\u0b06\u0b07\7\u0216\2\2"+
+		"\u0b07\u0b19\bV\1\2\u0b08\u0b09\7\13\2\2\u0b09\u0b0a\7\u0213\2\2\u0b0a"+
+		"\u0b0b\7\u0216\2\2\u0b0b\u0b19\bV\1\2\u0b0c\u0b0d\7\u0097\2\2\u0b0d\u0b0e"+
+		"\7\u0213\2\2\u0b0e\u0b0f\5\u008aF\2\u0b0f\u0b10\7\u0216\2\2\u0b10\u0b11"+
+		"\bV\1\2\u0b11\u0b19\3\2\2\2\u0b12\u0b13\7\64\2\2\u0b13\u0b14\7\u0213\2"+
+		"\2\u0b14\u0b15\5\u008aF\2\u0b15\u0b16\7\u0216\2\2\u0b16\u0b17\bV\1\2\u0b17"+
+		"\u0b19\3\2\2\2\u0b18\u0a46\3\2\2\2\u0b18\u0a4c\3\2\2\2\u0b18\u0a54\3\2"+
+		"\2\2\u0b18\u0a5a\3\2\2\2\u0b18\u0a60\3\2\2\2\u0b18\u0a64\3\2\2\2\u0b18"+
+		"\u0a6a\3\2\2\2\u0b18\u0a70\3\2\2\2\u0b18\u0a76\3\2\2\2\u0b18\u0a7c\3\2"+
+		"\2\2\u0b18\u0a82\3\2\2\2\u0b18\u0a8a\3\2\2\2\u0b18\u0a92\3\2\2\2\u0b18"+
+		"\u0a98\3\2\2\2\u0b18\u0a9e\3\2\2\2\u0b18\u0aa4\3\2\2\2\u0b18\u0aaa\3\2"+
+		"\2\2\u0b18\u0ab4\3\2\2\2\u0b18\u0aba\3\2\2\2\u0b18\u0ac2\3\2\2\2\u0b18"+
+		"\u0ac8\3\2\2\2\u0b18\u0ace\3\2\2\2\u0b18\u0ad4\3\2\2\2\u0b18\u0ada\3\2"+
+		"\2\2\u0b18\u0ae0\3\2\2\2\u0b18\u0ae6\3\2\2\2\u0b18\u0aec\3\2\2\2\u0b18"+
+		"\u0af2\3\2\2\2\u0b18\u0af8\3\2\2\2\u0b18\u0afe\3\2\2\2\u0b18\u0b04\3\2"+
+		"\2\2\u0b18\u0b08\3\2\2\2\u0b18\u0b0c\3\2\2\2\u0b18\u0b12\3\2\2\2\u0b19"+
+		"\u00ab\3\2\2\2\u0b1a\u0b1b\7\u021d\2\2\u0b1b\u0b2b\bW\1\2\u0b1c\u0b1d"+
+		"\7\u021c\2\2\u0b1d\u0b2b\bW\1\2\u0b1e\u0b1f\7\u021b\2\2\u0b1f\u0b2b\b"+
+		"W\1\2\u0b20\u0b21\7\16\2\2\u0b21\u0b2b\bW\1\2\u0b22\u0b23\7\r\2\2\u0b23"+
+		"\u0b2b\bW\1\2\u0b24\u0b25\5\u00b2Z\2\u0b25\u0b26\bW\1\2\u0b26\u0b2b\3"+
+		"\2\2\2\u0b27\u0b28\5\u00b4[\2\u0b28\u0b29\bW\1\2\u0b29\u0b2b\3\2\2\2\u0b2a"+
+		"\u0b1a\3\2\2\2\u0b2a\u0b1c\3\2\2\2\u0b2a\u0b1e\3\2\2\2\u0b2a\u0b20\3\2"+
+		"\2\2\u0b2a\u0b22\3\2\2\2\u0b2a\u0b24\3\2\2\2\u0b2a\u0b27\3\2\2\2\u0b2b"+
+		"\u00ad\3\2\2\2\u0b2c\u0b2d\7\u021a\2\2\u0b2d\u0b2f\7\3\2\2\u0b2e\u0b2c"+
+		"\3\2\2\2\u0b2e\u0b2f\3\2\2\2\u0b2f\u0b32\3\2\2\2\u0b30\u0b31\7\u021a\2"+
+		"\2\u0b31\u0b33\7\3\2\2\u0b32\u0b30\3\2\2\2\u0b32\u0b33\3\2\2\2\u0b33\u0b34"+
+		"\3\2\2\2\u0b34\u0b35\7\u021a\2\2\u0b35\u0b36\bX\1\2\u0b36\u00af\3\2\2"+
+		"\2\u0b37\u0b38\7\u021a\2\2\u0b38\u0b3a\7\3\2\2\u0b39\u0b37\3\2\2\2\u0b39"+
+		"\u0b3a\3\2\2\2\u0b3a\u0b3b\3\2\2\2\u0b3b\u0b3c\7\u021a\2\2\u0b3c\u0b3d"+
+		"\bY\1\2\u0b3d\u00b1\3\2\2\2\u0b3e\u0b3f\7c\2\2\u0b3f\u0b40\7\u021d\2\2"+
+		"\u0b40\u0b41\bZ\1\2\u0b41\u00b3\3\2\2\2\u0b42\u0b43\7\u01b4\2\2\u0b43"+
+		"\u0b44\7\u021d\2\2\u0b44\u0b45\b[\1\2\u0b45\u00b5\3\2\2\2\u0b46\u0b47"+
+		"\7\u00d3\2\2\u0b47\u0b4c\b\\\1\2\u0b48\u0b49\7\u00d3\2\2\u0b49\u0b4a\7"+
+		"\u011b\2\2\u0b4a\u0b4c\b\\\1\2\u0b4b\u0b46\3\2\2\2\u0b4b\u0b48\3\2\2\2"+
+		"\u0b4c\u00b7\3\2\2\2\u0b4d\u0b4e\7\u00e7\2\2\u0b4e\u0b57\b]\1\2\u0b4f"+
+		"\u0b50\7\u011b\2\2\u0b50\u0b51\7\u00e7\2\2\u0b51\u0b57\b]\1\2\u0b52\u0b53"+
+		"\7\u016b\2\2\u0b53\u0b57\b]\1\2\u0b54\u0b55\7\u0154\2\2\u0b55\u0b57\b"+
+		"]\1\2\u0b56\u0b4d\3\2\2\2\u0b56\u0b4f\3\2\2\2\u0b56\u0b52\3\2\2\2\u0b56"+
+		"\u0b54\3\2\2\2\u0b57\u00b9\3\2\2\2\u0b58\u0b59\7\u00be\2\2\u0b59\u0b5e"+
+		"\b^\1\2\u0b5a\u0b5b\7\u011b\2\2\u0b5b\u0b5c\7\u00be\2\2\u0b5c\u0b5e\b"+
+		"^\1\2\u0b5d\u0b58\3\2\2\2\u0b5d\u0b5a\3\2\2\2\u0b5e\u00bb\3\2\2\2\u0b5f"+
+		"\u0b60\7\u0092\2\2\u0b60\u0b65\b_\1\2\u0b61\u0b62\7\u011b\2\2\u0b62\u0b63"+
+		"\7\u0092\2\2\u0b63\u0b65\b_\1\2\u0b64\u0b5f\3\2\2\2\u0b64\u0b61\3\2\2"+
+		"\2\u0b65\u00bd\3\2\2\2\u0b66\u0b67\t\27\2\2\u0b67\u00bf\3\2\2\2\u008e"+
+		"\u00ca\u00d4\u00e4\u00fc\u0119\u0127\u012d\u0132\u0136\u0140\u015f\u0165"+
+		"\u016d\u0172\u0178\u0186\u018c\u0198\u01a4\u01ae\u01bd\u01c3\u01ca\u01d6"+
+		"\u01de\u01e9\u01f8\u0203\u020a\u0210\u0217\u021f\u022e\u023e\u0247\u0250"+
+		"\u0258\u0260\u0271\u0277\u028f\u0295\u02a6\u02b2\u02c2\u02d4\u02e0\u02e4"+
+		"\u0300\u030c\u0317\u032b\u0337\u0349\u035b\u0362\u0367\u036c\u0371\u0378"+
+		"\u037f\u0386\u03a2\u03b0\u03b5\u03bf\u03ca\u03cf\u03d6\u03e4\u03e9\u03f0"+
+		"\u03fb\u0406\u040f\u0413\u0416\u041d\u0426\u0438\u0443\u044c\u0451\u0458"+
+		"\u0460\u0467\u0471\u0484\u0489\u0496\u04a7\u04b8\u04c2\u04c8\u04d0\u04de"+
+		"\u050f\u0565\u0567\u0592\u059c\u05af\u05bd\u05d0\u05f6\u0605\u061c\u0634"+
+		"\u06b2\u07d7\u07e3\u07f3\u0801\u083d\u0845\u0869\u0894\u08a4\u08b3\u08c3"+
+		"\u08d1\u08e6\u0955\u095b\u0998\u09a0\u09ab\u09bc\u09e7\u0a30\u0a44\u0b18"+
+		"\u0b2a\u0b2e\u0b32\u0b39\u0b4b\u0b56\u0b5d\u0b64";
+	public static final String _serializedATN = Utils.join(
+		new String[] {
+			_serializedATNSegment0,
+			_serializedATNSegment1
+		},
+		""
+	);
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

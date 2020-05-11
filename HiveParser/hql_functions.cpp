@@ -157,3 +157,10 @@ json hql_double_param_list_func(string func_name,
 	j[list_name] = expr_list;
 	return j;
 }
+
+std::string remove_quotes(std::string in)
+{
+	in.erase(std::remove(in.begin(), in.end(), '\''), in.end());
+	in.erase(std::remove(in.begin(), in.end(), '"'), in.end());
+	return in;
+}

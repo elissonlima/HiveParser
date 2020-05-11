@@ -42,3 +42,11 @@ std::string recur_list(std::string left_val, std::string right_val)
 
     return js_template.str();
 }
+
+
+std::string remove_quotes(std::string in)
+{
+    in.erase(std::remove(in.begin(), in.end(), '\''), in.end());
+    in.erase(std::remove(in.begin(), in.end(), '"'), in.end());
+    return in;
+}

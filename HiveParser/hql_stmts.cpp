@@ -97,3 +97,38 @@ json hql_stmt_join_table(string join_type, json right_table_expr, json join_cond
 	return j;
 }
 
+json hql_stmt_create_table(string table_type, bool if_not_exists_flag, json table_identifier, vector<json> column_specs,
+	vector<json> constraints, string table_comment, vector<json> partitions_fields,
+	json clustered_by, json skewed_by, json row_format, json stored_as,
+	string location, vector<json> table_properties, json select_stmt)
+{
+	json j;
+	j["type"] = "CREATE_TABLE_STMT";
+	j["table_type"] = table_type;
+	j["if_not_exists_flag"] = if_not_exists_flag;
+	j["table_name"] = table_identifier;
+	if (!column_specs.empty())
+		j["column_specs"] = column_specs;
+	if (!constraints.empty())
+		j["constraints"] = constraints;
+	if (!table_comment.empty())
+		j["table_comment"] = table_comment;
+	if (!partitions_fields.empty())
+		j["partition_field_list"] = partitions_fields;
+	if (!clustered_by.empty())
+		j["clustered_by"] = clustered_by;
+	if (!skewed_by.empty())
+		j["skewed_by"] = skewed_by;
+	if (!row_format.empty())
+		j["row_format"] = row_format;
+	if (!stored_as.empty())
+		j["stored_as"] = stored_as;
+	if (!location.empty())
+		j["location"] = location;
+	if (!table_properties.empty())
+		j["table_properties"] = table_properties;
+	if (!select_stmt.empty())
+		j["select_stmt"] = select_stmt;
+
+	return j;
+}

@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 11)
 add_definitions(-DANTLR4CPP_STATIC)
 
 # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
-set(ANTLR4_WITH_STATIC_CRT ON)
+set(ANTLR4_WITH_STATIC_CRT OFF)
 # add external build for antlrcpp
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
@@ -52,7 +52,7 @@ add_executable(hiveparser main.cpp hql_types.cpp hql_exprs.cpp hql_stmts.cpp hql
 #               ${ANTLR_HiveLexer_CXX_OUTPUTS}
                ${ANTLR_HiveParser_CXX_OUTPUTS})
 
-target_link_libraries(hiveparser PRIVATE antlr4_static PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(hiveparser antlr4_static nlohmann_json::nlohmann_json)
 # target_link_libraries(hiveparser antlr4_shared)
 #add_custom_command(TARGET hiveparser
 #                   POST_BUILD

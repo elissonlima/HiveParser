@@ -21,3 +21,7 @@ json hql_stmt_list(vector<json> stmt_list);
 json hql_stmt_table_ref(json tab_ref, string table_alias);
 json hql_stmt_join_table(string join_type, json right_table_expr);
 json hql_stmt_join_table(string join_type, json right_table_expr, json join_condition);
+json hql_stmt_create_table(string table_type, bool if_not_exists_flag, json table_identifier, vector<json> column_specs, 
+							vector<json> constraints, string table_comment, vector<json> partitions_fields, 
+							json clustered_by, json skewed_by, json row_format, json stored_as, 
+						    string location, vector<json> table_properties, json select_stmt);

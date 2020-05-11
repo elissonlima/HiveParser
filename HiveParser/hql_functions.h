@@ -5,6 +5,7 @@
 #include "nlohmann/json.hpp"
 
 
+
 using namespace std;
 using json = nlohmann::json;
 
@@ -27,3 +28,4 @@ json hql_double_param_list_func(string func_name,
 	string fst_param_name, json fst_param,
 	string snd_param_name, json snd_param,
 	string list_name, vector<json> expr_list);
+std::string remove_quotes(std::string in);

@@ -4,6 +4,7 @@
 #include <sstream>
 #include <algorithm>
 #include <vector>
+#include <cstdarg>
 
 std::string aux_return_list(std::string arg, ...);
 const std::vector<std::string> explode(const std::string& s, const char& c);

@@ -9,6 +9,7 @@ grammar Hive;
     #include "hql_exprs.h"
     #include "hql_stmts.h"
     #include "hql_functions.h"
+    #include "utils.h"
 
     using namespace std;
     using json = nlohmann::json;
@@ -29,46 +30,50 @@ stmt_list returns [json res]
         $res = hql_stmt_list(stmt_list); }
     ;
 
-dtype returns [std::string res]  // Data types
-     : T_CHAR { $res = "CHAR"; }
-     | T_CHARACTER { $res = "CHAR"; }
-     | T_BIGINT { $res = "BIGINT"; }
-    //  | T_BINARY_DOUBLE { $res = "BINARY_DOUBLE"; }
-    //  | T_BINARY_FLOAT { $res = "BINARY_FLOAT"; }
-    //  | T_BINARY_INTEGER { $res = "BINARY_INT"; }
-     | T_BIT { $res = "BIT"; }
-     | T_DATE { $res = "DATE"; }
-     | T_DATETIME { $res = "DATETIME"; }
-     | T_DEC { $res = "DECIMAL"; }
-     | T_DECIMAL { $res = "DECIMAL"; }
-     | T_DOUBLE T_PRECISION? { $res = "DOUBLE"; }
-     | T_FLOAT { $res = "FLOAT"; }
-     | T_INT { $res = "INT"; }
-     | T_INT2 { $res = "TINYINT"; }
-     | T_INT4 { $res = "SMALLINT"; }
-     | T_INT8 { $res = "INT"; }
-     | T_INTEGER { $res = "INT"; }
-     | T_NCHAR { $res = "NCHAR"; }
-     | T_NVARCHAR { $res = "NVARCHAR"; }
-     | T_NUMBER { $res = "NUMBER"; }
-     | T_NUMERIC { $res = "NUMERIC"; }
-     | T_PLS_INTEGER { $res = "PLS_INTEGER"; }
-     | T_REAL { $res = "REAL"; }
-     | T_RESULT_SET_LOCATOR T_VARYING { $res = "RESULT_SET_LOCATOR"; }
-     | T_SIMPLE_FLOAT { $res = "SIMPLE_FLOAT"; }
-     | T_SIMPLE_DOUBLE { $res = "SIMPLE_DOUBLE"; }
-     | T_SIMPLE_INTEGER { $res = "SIMPLE_INTEGER"; }
-     | T_SMALLINT { $res = "SMALLINT"; }
-     | T_SMALLDATETIME { $res = "SMALLDATETIME"; }
-     | T_STRING { $res = "STRING"; }
-     | T_SYS_REFCURSOR { $res = "SYS_REFCURSOR"; }
-     | T_TIMESTAMP { $res = "TIMESTAMP"; }
-     | T_TINYINT { $res = "TINYINT"; }
-     | T_VARCHAR { $res = "VARCHAR"; }
-     | T_VARCHAR2 { $res = "VARCHAR2"; }
-     | T_XML { $res = "XML"; }
-     | ident ('%' (T_TYPE | T_ROWTYPE))?  { $res = $ident.text; } // User-defined or derived data type
-     ;
+data_type returns [json res]
+    : primitive_type { $res = hql_primitive_type_spec($primitive_type.res); }
+    | complex_type { $res = $complex_type.res; }
+    ;
+
+primitive_type returns [std::string res]
+    : T_TINYINT { $res = "TINYINT"; }
+    | T_SMALLINT { $res = "SMALLINT"; }
+    | T_INT { $res = "INT"; }
+    | T_BIGINT { $res = "BIGINT"; }
+    | T_BOOLEAN { $res = "BOOLEAN"; } 
+    | T_FLOAT { $res = "FLOAT"; } 
+    | T_DOUBLE T_PRECISION? { $res = "DOUBLE"; }
+    | T_STRING { $res = "STRING"; } 
+    | T_BINARY { $res = "BINARY"; } 
+    | T_TIMESTAMP { $res = "TIMESTAMP"; } 
+    | T_DECIMAL { $res = "DECIMAL"; } 
+    | T_DECIMAL '(' precision=INT_LITERAL ',' scale=INT_LITERAL ')' { $res = "DECIMAL"; } 
+    | T_DATE { $res = "DATE"; } 
+    | T_VARCHAR { $res = "VARCHAR"; } 
+    | T_CHAR { $res = "CHAR"; } 
+    ;
+
+complex_type returns [json res]
+    : T_ARRAY '<' primitive_type '>' { $res = hql_array_type_spec($primitive_type.res); }
+    | T_MAP '<' primitive_type ',' data_type '>' { $res = hql_map_type_spec($primitive_type.res, $data_type.res); }
+    | { vector<Column_identifierContext*> column_list; vector<Data_typeContext*> data_type_list; } T_STRUCT '<' column_list+=column_identifier ':' data_type_list+=data_type ( ',' column_list+=column_identifier ':' data_type_list+=data_type )* '>' {
+        vector<string> column_json_list; vector<json> data_type_json_list;
+        for(int i = 0 ; i < $column_list.size(); i++)
+        {
+            column_json_list.push_back($column_list[i]->res);
+            data_type_json_list.push_back($data_type_list[i]->res);
+        }
+        $res = hql_struct_type_spec(column_json_list, data_type_json_list);
+    }
+    | { vector<Data_typeContext*> data_type_list; } T_UNIONTYPE '<' data_type_list+=data_type ( ','  data_type_list+=data_type )* '>' {
+        vector<json> data_type_json_list;
+        for(Data_typeContext* dtyp:$data_type_list)
+        {
+            data_type_json_list.push_back(dtyp->res);
+        }
+        $res = hql_uniontype_type_spec(data_type_json_list);
+    }
+    ;
 
 dtype_len : // Data type length or size specification
        T_OPEN_P size=(L_INT | T_MAX) (T_CHAR | T_BYTE)? (T_COMMA L_INT)? T_CLOSE_P
@@ -76,6 +81,337 @@ dtype_len : // Data type length or size specification
 
 stmt returns [json res]
     : query_stmt { $res = $query_stmt.res; }
+    | ddl_stmt { $res = $ddl_stmt.res; }
+    ;
+
+ddl_stmt returns [json res]
+    : create_table_stmt { $res = $create_table_stmt.res; }
+    ;
+
+create_table_stmt returns [json res]
+    : T_CREATE table_type T_TABLE opt_if_not_exists_flag tab_ident 
+        opt_column_specs opt_constraint_specification
+        opt_comment opt_partitioned_table opt_clustered_by_table 
+        opt_skewed_by_table opt_row_formated opt_stored_as opt_location
+        opt_table_properties opt_as_select {
+            $res = hql_stmt_create_table($table_type.res, $opt_if_not_exists_flag.res, $tab_ident.res, 
+                $opt_column_specs.res, $opt_constraint_specification.res, $opt_comment.res, 
+                $opt_partitioned_table.res, $opt_clustered_by_table.res, $opt_skewed_by_table.res,
+                $opt_row_formated.res, $opt_stored_as.res, $opt_location.res, 
+                $opt_table_properties.res, $opt_as_select.res);
+        }
+    ;
+
+opt_column_specs returns [vector<json> res]
+    : { $res = vector<json>(); }
+    | {vector<Column_definitionContext*> column_def_list; } T_OPEN_P column_def_list+=column_definition  ( ',' column_def_list+=column_definition )* T_CLOSE_P {
+        vector<json> column_def_json_list;
+        for(Column_definitionContext* column_ctxt:$column_def_list)
+        {
+            column_def_json_list.push_back(column_ctxt->res);
+        }
+        $res = column_def_json_list;
+    }
+    ;
+
+opt_constraint_specification returns [vector<json> res]
+    : { $res = vector<json>(); }
+    | { vector<Constraint_specificationContext*> constraint_list; } constraint_list+=constraint_specification constraint_list+=constraint_specification* {
+        vector<json> contraint_json_list;
+        for(Constraint_specificationContext* contraint_ctxt:$constraint_list)
+            contraint_json_list.push_back(contraint_ctxt->res);
+        $res = contraint_json_list;
+    }
+    ;
+
+opt_comment returns [string res]
+    : { $res = string(); }
+    | T_COMMENT table_comment=STRING_LITERAL { $res = remove_quotes($table_comment.text);}
+    ;
+
+table_options returns [json res]
+    : opt_partitioned_table 
+    ;
+
+opt_partitioned_table returns [vector<json> res]
+    : { $res = vector<json>(); }
+    | { vector<Partition_specContext*> partition_field_list; } T_PARTITIONED T_BY T_OPEN_P partition_field_list+=partition_spec  ( ',' partition_field_list+=partition_spec )* T_CLOSE_P {
+        vector<json> partition_json_list;
+        for(Partition_specContext* part_cxt:$partition_field_list)
+        {
+            partition_json_list.push_back(part_cxt->res);
+        }
+        $res = partition_json_list;
+    }
+    ;
+
+partition_spec returns [json res]
+    : column_identifier data_type { $res = hql_column_definition($column_identifier.res, $data_type.res); }
+    | column_identifier data_type T_COMMENT STRING_LITERAL { $res = hql_column_definition($column_identifier.res, $data_type.res, $STRING_LITERAL.text); }
+    ;
+
+opt_clustered_by_table returns [json res]
+    : { $res = json(); }
+    | { vector<Column_identifierContext*> column_list; } T_CLUSTERED T_BY T_OPEN_P column_list+=column_identifier ( ',' column_list+=column_identifier )*  T_CLOSE_P opt_sorted_by_table T_INTO INT_LITERAL T_BUCKETS {
+        vector<string> column_str_list;
+        for(Column_identifierContext* column_ctxt:$column_list)
+            column_str_list.push_back(column_ctxt->res);
+        $res = hql_clustered_by_expr(column_str_list, $opt_sorted_by_table.res, $INT_LITERAL.text);
+    }
+    ;
+
+opt_sorted_by_table returns [vector<json> res]
+    : { $res = vector<json>(); }
+    | { vector<string> column_list; vector<string> sort_type_list; } T_STORED T_BY T_OPEN_P column_list+=column_identifier sort_type_list+=opt_sorted_by_asc_desc ( ',' column_list+=column_identifier sort_type_list+=opt_sorted_by_asc_desc )* T_CLOSE_P {
+        vector<json> result_list;
+        for(int i = 0 ; i < $column_list.size() ; i++)
+        {
+            json tmp;
+            tmp["column"] = $column_list[i]->res;
+            tmp["sort_type"] = $sort_type_list[i]->res;
+            result_list.push_back(tmp);
+        }
+        $res = result_list;
+    }
+    ;
+
+opt_sorted_by_asc_desc returns [string res]
+    : { $res = "ASC"; }
+    | T_ASC { $res = "ASC"; }
+    | T_DESC { $res = "DESC"; }
+    ;
+
+opt_skewed_by_table returns [json res]
+    : { $res = json(); }
+    | { vector<Column_identifierContext*> column_list; } T_SKEWED T_BY T_OPEN_P column_list+=column_identifier ( ',' column_list+=column_identifier )* opt_on_skewed T_CLOSE_P opt_skewed_stored_as_directory {
+        vector<string> column_str_list;
+        for(Column_identifierContext* column_ctxt:$column_list)
+            column_str_list.push_back(column_ctxt->res);
+        $res = hql_skewed_by_expr(column_str_list,$opt_on_skewed.res, $opt_skewed_stored_as_directory.res);
+    } 
+    ;
+
+opt_on_skewed returns [vector<json> res]
+    : { $res = vector<json>(); }
+    | { vector<Literal_valuesContext*> values_list; } T_ON T_OPEN_P values_list+=literal_values ( ',' values_list+=literal_values )* T_CLOSE_P {
+        vector<json> values_json_list;
+        for(Literal_valuesContext* value_ctxt:$values_list)
+            values_json_list.push_back(value_ctxt->res);
+        $res = values_json_list;
+    }
+    | { vector<Literal_valuesContext*> values_list; } T_ON T_OPEN_P T_OPEN_P values_list+=literal_values ( ',' values_list+=literal_values )* T_CLOSE_P  ( ','  T_OPEN_P values_list+=literal_values ( ',' values_list+=literal_values )* T_CLOSE_P  )* T_CLOSE_P {
+        vector<json> values_json_list;
+        for(Literal_valuesContext* value_ctxt:$values_list)
+            values_json_list.push_back(value_ctxt->res);
+        $res = values_json_list;
+    }
+    ;
+
+opt_skewed_stored_as_directory returns [bool res]
+    : { $res = false; }
+    | T_STORED T_AS T_DIRECTORY { $res = true; }
+    ;
+
+opt_row_formated returns [json res]
+    : { $res = json(); }
+    | T_ROW T_FORMAT row_format { $res = $row_format.res; }
+    ;
+
+row_format returns [json res]
+    : T_DELIMITED opt_field_terminated_by opt_collection_items_terminated_by opt_map_keys_terminated_by opt_lines_terminated_by opt_null_defined_as { $res = hql_row_format_delimited($opt_field_terminated_by.res, $opt_collection_items_terminated_by.res, $opt_map_keys_terminated_by.res, $opt_lines_terminated_by.res, $opt_null_defined_as.res); }
+    | T_SERDE STRING_LITERAL opt_serde_properties { $res = hql_row_format_serde(remove_quotes($STRING_LITERAL.text), $opt_serde_properties.res); }
+    ;
+
+opt_field_terminated_by returns [json res]
+    : { $res = json(); }
+    | T_FIELDS T_TERMINATED T_BY STRING_LITERAL { $res = remove_quotes($STRING_LITERAL.text);}
+    | T_FIELDS T_TERMINATED T_BY delimiter=STRING_LITERAL T_ESCAPED T_BY escape=STRING_LITERAL { $res = remove_quotes($delimiter.text);}
+    ;
+
+opt_collection_items_terminated_by returns [string res]
+    : { $res = string(); }
+    | T_COLLECTION T_ITEMS T_TERMINATED T_BY STRING_LITERAL { $res = remove_quotes($STRING_LITERAL.text);}
+    ;
+
+opt_map_keys_terminated_by returns [string res]
+    : { $res = string(); }
+    | T_MAP T_KEYS T_TERMINATED T_BY STRING_LITERAL { $res = remove_quotes($STRING_LITERAL.text);}
+    ;
+
+opt_lines_terminated_by returns [string res]
+    : { $res = string(); }
+    | T_LINES T_TERMINATED T_BY STRING_LITERAL { $res = remove_quotes($STRING_LITERAL.text);}
+    ;
+
+opt_null_defined_as returns [string res]
+    : { $res = string(); }
+    | T_NULL T_DEFINED T_AS STRING_LITERAL { $res = remove_quotes($STRING_LITERAL.text);}
+    ;
+
+opt_serde_properties returns [vector<json> res]
+    : { $res = vector<json>(); }
+    | { vector<Serde_valContext*> opt_name_list, opt_val_list;  } T_WITH T_SERDEPROPERTIES T_OPEN_P opt_name_list+=serde_val '=' opt_val_list+=serde_val ( ',' opt_name_list+=serde_val '=' opt_val_list+=serde_val )* T_CLOSE_P {
+        vector<json> serde_opt_json_list;
+        for(int i = 0 ; i < $opt_name_list.size() ; i++)
+        {
+            json tmp;
+            tmp[$opt_name_list[i]->res] = $opt_val_list[i]->res;
+            serde_opt_json_list.push_back(tmp);
+        }
+        $res = serde_opt_json_list;
+    }
+    ;
+
+serde_val returns [string res]
+    : STRING_LITERAL { $res = remove_quotes($STRING_LITERAL.text); }
+    ;
+
+opt_stored_as returns [json res]
+    : { $res = json(); }
+    | T_STORED T_AS file_format { $res = hql_stored_as_file_format($file_format.res); }
+    | T_STORED T_AS T_INPUTFORMAT input_format=STRING_LITERAL T_OUTPUTFORMAT output_format=STRING_LITERAL { $res = hql_stored_as_file_format($input_format.text, $output_format.text); }
+    | T_STORED T_BY STRING_LITERAL opt_serde_properties { $res = hql_stored_by_serde(remove_quotes($STRING_LITERAL.text), $opt_serde_properties.res); }
+    ;
+
+opt_location returns [string res]
+    : { $res = string(); }
+    | T_LOCATION STRING_LITERAL { $res = remove_quotes($STRING_LITERAL.text); }
+    ;
+
+opt_table_properties returns [vector<json> res]
+    : { $res = vector<json>(); }
+    | { vector<Opt_table_valContext*> opt_name_list, opt_val_list; } T_TBLPROPERTIES T_OPEN_P opt_name_list+=opt_table_val '=' opt_val_list+=opt_table_val ( ',' opt_name_list+=opt_table_val '=' opt_val_list+=opt_table_val ) T_CLOSE_P {
+        vector<json> table_option_json_list;
+        for(int i = 0 ; i < $opt_name_list.size() ; i++) 
+        {
+            json tmp;
+            tmp[$opt_name_list[i]->res] = $opt_val_list[i]->res;
+            table_option_json_list.push_back(tmp);
+        }
+        $res = table_option_json_list;
+    }
+    ;
+
+opt_table_val returns [string res]
+    : STRING_LITERAL { $res = remove_quotes($STRING_LITERAL.text); }
+    ;
+
+opt_as_select returns [json res]
+    : { $res = json(); }
+    | T_AS T_OPEN_P select_stmt T_CLOSE_P { $res = $select_stmt.res; }
+    ;
+
+file_format returns [string res]
+    : T_SEQUENCEFILE { $res = "SEQUENCEFILE"; }
+    | T_TEXTFILE { $res = "TEXTFILE"; }
+    | T_RCFILE { $res = "RCFILE"; }
+    | T_ORC { $res = "ORC"; }
+    | T_PARQUET { $res = "PARQUET"; }
+    | T_AVRO { $res = "AVRO"; }
+    | T_JSONFILE  { $res = "JSONFILE"; }
+    ;
+
+column_definition returns [json res]
+    : column_identifier data_type { $res = hql_column_definition($column_identifier.res, $data_type.res); }
+    | column_identifier data_type T_COMMENT STRING_LITERAL { $res = hql_column_definition($column_identifier.res, $data_type.res, $STRING_LITERAL.text); }
+    | {vector<Column_constraintContext*> constraint_list; } column_identifier data_type (constraint_list+=column_constraint)+ T_COMMENT STRING_LITERAL { 
+        vector<json> constraint_json_list;
+        for(Column_constraintContext* cons:$constraint_list)
+        {
+            constraint_json_list.push_back(cons->res);
+        }
+        $res = hql_column_definition($column_identifier.res, $data_type.res, constraint_json_list, $STRING_LITERAL.text);
+    }
+    | {vector<Column_constraintContext*> constraint_list; } column_identifier data_type (constraint_list+=column_constraint)+ { 
+        vector<json> constraint_json_list;
+        for(Column_constraintContext* cons:$constraint_list)
+        {
+            constraint_json_list.push_back(cons->res);
+        }
+        $res = hql_column_definition($column_identifier.res, $data_type.res, constraint_json_list);
+    }
+    ;
+
+column_constraint returns [json res]
+    : T_PRIMARY T_KEY { $res = json({"primary_key", true}); }
+    | T_UNIQUE { $res = json({"unique", true}); }
+    | T_NOT T_NULL { $res = json({"not_null", true}); }
+    | T_DEFAULT default_value { $res = json({"default_value", $default_value.res}); }
+    | T_CHECK expr { $res = json({"check", $expr.res}); }
+    | T_ENABLE { $res = json({"enable", true}); }
+    | T_DISABLE { $res = json({"enable", false}); }
+    | T_NOVALIDATE { $res = json({"novalidate", true}); }
+    | T_RELY { $res = json({"rely", true}); }
+    | T_NORELY { $res = json({"norely", true}); }
+    ;
+
+default_value returns [json res]
+    : literal_values
+    | T_CURRENT_USER T_OPEN_P T_CLOSE_P
+    | T_CURRENT_DATE T_OPEN_P T_CLOSE_P
+    | T_CURRENT_TIMESTAMP T_OPEN_P T_CLOSE_P
+    ;
+
+constraint_specification returns [json res]
+    : {vector<Column_identifierContext*> column_list; } T_PRIMARY T_KEY T_OPEN_P column_list+=column_identifier ( ',' column_list+=column_identifier )* T_CLOSE_P opt_constraint_disable opt_constraint_novalidate opt_constraint_rely_no_rely {
+        vector<string> column_str_list;
+        for(Column_identifierContext* c_ctxt: $column_list) {
+            column_str_list.push_back(c_ctxt->res); }
+        $res = hql_primary_key_constraint(column_str_list, $opt_constraint_disable.res, $opt_constraint_novalidate.res, $opt_constraint_rely_no_rely.res);
+    }
+    | { vector<Column_identifierContext*> column_list; vector<Column_identifierContext*> ref_column_list; } T_CONSTRAINT IDENTIFIER T_FOREIGN T_KEY T_OPEN_P column_list+=column_identifier ( ','column_list+=column_identifier )* T_CLOSE_P T_REFERENCES tab_ident T_OPEN_P ref_column_list+=column_identifier ( ',' ref_column_list+=column_identifier )* T_CLOSE_P opt_constraint_disable opt_constraint_novalidate {
+        vector<string> column_str_list; vector<string> ref_column_str_list;
+        for(Column_identifierContext* c_ctxt: $column_list) {
+            column_str_list.push_back(c_ctxt->res); }
+        for(Column_identifierContext* c_ctxt: $ref_column_list) {
+            ref_column_str_list.push_back(c_ctxt->res); }
+        $res = hql_foreign_key_constraint(column_str_list, $tab_ident.res, ref_column_str_list, $opt_constraint_disable.res, $opt_constraint_novalidate.res);
+    }
+    | {vector<Column_identifierContext*> column_list; } T_CONSTRAINT IDENTIFIER T_UNIQUE T_OPEN_P column_list+=column_identifier ( ',' column_list+=column_identifier )* T_CLOSE_P  opt_constraint_disable opt_constraint_novalidate opt_constraint_rely_no_rely {
+        vector<string> column_str_list;
+        for(Column_identifierContext* c_ctxt: $column_list) {
+            column_str_list.push_back(c_ctxt->res); }
+        $res = hql_unique_constraint(column_str_list, $opt_constraint_disable.res, $opt_constraint_novalidate.res, $opt_constraint_rely_no_rely.res);
+    }
+    | T_CONSTRAINT IDENTIFIER T_CHECK expr opt_constraint_enable_disable opt_constraint_novalidate opt_constraint_rely_no_rely { $res = hql_check_constraint($expr.res,  $opt_constraint_enable_disable.res, $opt_constraint_novalidate.res, $opt_constraint_rely_no_rely.res); }
+    ; 
+
+opt_constraint_enable_disable returns [string res]
+    : { $res = "ENABLE"; }
+    | T_ENABLE { $res = "ENABLE"; }
+    | T_DISABLE { $res = "DISABLE"; }
+    ; 
+
+opt_constraint_enable returns [bool res]
+    :  { $res = false; }
+    | T_ENABLE { $res = true; }
+    ;
+
+opt_constraint_disable returns [bool res]
+    :  { $res = false; }
+    | T_DISABLE { $res = true; }
+    ;
+
+opt_constraint_novalidate returns [bool res]
+    :  { $res = false; }
+    | T_NOVALIDATE { $res = true; }
+    ;
+
+opt_constraint_rely_no_rely returns [string res]
+    : { $res = string(); }
+    | T_RELY { $res = "RELY"; }
+    | T_NORELY { $res = "NORELY"; }
+    ;
+
+opt_if_not_exists_flag returns [bool res]
+    : { $res = false; }
+    | T_IF T_NOT T_EXISTS { $res = true; }
+    ;
+
+table_type returns [string res]
+    : { $res = "MANAGED"; }
+    | T_EXTERNAL { $res = "EXTERNAL"; }
+    | T_TEMPORARY { $res = "TEMPORARY"; }
     ;
 
 query_stmt returns [json res]
@@ -578,7 +914,7 @@ date_func returns [json res]
     ;
 
 dat_convrt_func returns [json res]
-    : T_CAST T_OPEN_P expr T_AS dtype dtype_len? T_CLOSE_P { $res = hql_cast_func($expr.res, $dtype.res); }
+    : T_CAST T_OPEN_P expr T_AS primitive_type dtype_len? T_CLOSE_P { $res = hql_cast_func($expr.res, $primitive_type.res); }
     | T_BINARY T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("BINARY", "expr", $expr.res); }
     ;
 
@@ -735,6 +1071,7 @@ T_AT              : A T ;
 T_ATAN            : A T A N ;
 T_AUTO_INCREMENT  : A U T O '_' I N C R E M E N T ;
 T_AVG             : A V G ; 
+T_AVRO            : A V R O ;
 T_BASE64          : B A S E '6' '4' ;
 T_BEGIN           : B E G I N ;
 T_BETWEEN         : B E T W E E N ; 
@@ -743,7 +1080,9 @@ T_BIN             : B I N ;
 T_BINARY          : B I N A R Y ;
 T_BIT             : B I T ;
 T_BODY            : B O D Y ; 
+T_BOOLEAN         : B O O L E A N ;
 T_BREAK           : B R E A K ;
+T_BUCKETS         : B U C K E T S ;
 T_BY              : B Y ;
 T_BYTE            : B Y T E ; 
 T_CALL            : C A L L ;
@@ -758,6 +1097,7 @@ T_CHAR            : C H A R ;
 T_CHARACTER       : C H A R A C T E R ;
 T_CHARACTER_LENGTH: C H A R A C T E R '_' L E N G T H ;
 T_CHARSET         : C H A R S E T ;
+T_CHECK           : C H E C K ;
 T_CHR             : C H R ;
 T_CLIENT          : C L I E N T ;
 T_CLOSE           : C L O S E ;
@@ -823,6 +1163,7 @@ T_DESCRIBE        : D E S C R I B E ;
 T_DIAGNOSTICS     : D I A G N O S T I C S ;
 T_DIR             : D I R ;
 T_DIRECTORY       : D I R E C T O R Y ; 
+T_DISABLE         : D I S A B L E ;
 T_DISTINCT        : D I S T I N C T ;
 T_DISTRIBUTE      : D I S T R I B U T E ;
 T_DO              : D O ;
@@ -847,6 +1188,7 @@ T_EXISTS          : E X I S T S ;
 T_EXIT            : E X I T ;
 T_EXP             : E X P;
 T_EXPLODE         : E X P L O D E ;
+T_EXTERNAL        : E X T E R N A L ;
 T_FACTORIAL       : F A C T O R I A L ;
 T_FALLBACK        : F A L L B A C K ;
 T_FALSE           : F A L S E ;
@@ -895,6 +1237,7 @@ T_INITRANS        : I N I T R A N S ;
 T_INLINE          : I N L I N E ;
 T_INNER           : I N N E R ; 
 T_INOUT           : I N O U T;
+T_INPUTFORMAT     : I N P U T F O R M A T ;
 T_INSERT          : I N S E R T ;
 T_IN_STR          : I N S T R ;
 T_INT             : I N T ;
@@ -914,6 +1257,7 @@ T_ISOPEN          : I S O P E N ;
 T_ITEMS           : I T E M S ; 
 T_JAVA_METHOD     : J A V A '_' M E T H O D ;
 T_JOIN            : J O I N ;
+T_JSONFILE        : J S O N F I L E ;
 T_KEEP            : K E E P; 
 T_KEY             : K E Y ;
 T_KEYS            : K E Y S ;
@@ -976,8 +1320,10 @@ T_NOCOUNT         : N O C O U N T ;
 T_NOCOMPRESS      : N O C O M P R E S S ; 
 T_NOLOGGING       : N O L O G G I N G ;
 T_NONE            : N O N E ;
+T_NORELY          : N O R E L Y ;
 T_NOT             : N O T ;
 T_NOTFOUND        : N O T F O U N D ; 
+T_NOVALIDATE      : N O V A L I D A T E ;
 T_NTILE           : N T I L E ;
 T_NULL            : N U L L ;
 T_NULLIF          : N U L L I F ;
@@ -990,15 +1336,19 @@ T_ON              : O N ;
 T_ONLY            : O N L Y ;
 T_OPEN            : O P E N ;
 T_OR              : O R ;
+T_ORC             : O R C ;
 T_ORDER           : O R D E R;
 T_OUT             : O U T ;
 T_OUTER           : O U T E R ;
+T_OUTPUTFORMAT    : O U T P U T F O R M A T ;
 T_OVER            : O V E R ;
 T_OVERWRITE       : O V E R W R I T E ; 
 T_OWNER           : O W N E R ; 
 T_PACKAGE         : P A C K A G E ; 
+T_PARQUET         : P A R Q U E T ;
 T_PARSE_URL       : P A R S E '_' U R L ;
 T_PARTITION       : P A R T I T I O N ; 
+T_PARTITIONED     : P A R T I T I O N E D ; 
 T_PCTFREE         : P C T F R E E ; 
 T_PCTUSED         : P C T U S E D ;
 T_PERCENT_RANK    : P E R C E N T '_' R A N K ;
@@ -1024,6 +1374,7 @@ T_QUOTE           : Q U O T E;
 T_RADIANS         : R A D I A N S ;
 T_RAISE           : R A I S E ;
 T_RAND            : R A N D ;
+T_RCFILE          : R C F I L E ; 
 T_REAL            : R E A L ; 
 T_REFERENCES      : R E F E R E N C E S ; 
 T_REFLECT         : R E F L E C T ;
@@ -1039,6 +1390,7 @@ T_REGR_SLOPE      : R E G R '_' S L O P E ;
 T_REGR_SXX        : R E G R '_' S X X ;
 T_REGR_SXY        : R E G R '_' S X Y ;
 T_REGR_SYY        : R E G R '_' S Y Y ;
+T_RELY            : R E L Y ;
 T_REPEAT          : R E P E A T ;
 T_REPLACE         : R E P L A C E ; 
 T_RESIGNAL        : R E S I G N A L ;
@@ -1067,9 +1419,12 @@ T_SCHEMA          : S C H E M A ;
 T_SECOND          : S E C O N D ;
 T_SECONDS         : S E C O N D S;
 T_SECURITY        : S E C U R I T Y ; 
+T_SERDE           : S E R D E ;
+T_SERDEPROPERTIES : S E R D E P R O P E R T I E S ;
 T_SEGMENT         : S E G M E N T ; 
 T_SEL             : S E L ;
 T_SELECT          : S E L E C T ; 
+T_SEQUENCEFILE    : S E Q U E N C E F I L E ;
 T_SENTENCES       : S E N T E N C E S ;
 T_SET             : S E T ;
 T_SETS            : S E T S;
@@ -1081,6 +1436,7 @@ T_SIN             : S I N ;
 T_SIMPLE_DOUBLE   : S I M P L E '_' D O U B L E ;
 T_SIMPLE_FLOAT    : S I M P L E '_' F L O A T ;
 T_SIMPLE_INTEGER  : S I M P L E '_' I N T E G E R ;
+T_SKEWED          : S K E W E D ;
 T_SMALLDATETIME   : S M A L L D A T E T I M E ;
 T_SMALLINT        : S M A L L I N T ;
 T_SOUNDEX         : S O U N D E X ;
@@ -1112,8 +1468,10 @@ T_SYS_REFCURSOR   : S Y S '_' R E F C U R S O R ;
 T_TABLE           : T A B L E ;
 T_TABLESPACE      : T A B L E S P A C E ;
 T_TAN             : T A N ;
+T_TBLPROPERTIES   : T B L P R O P E R T I E S ;
 T_TEMPORARY       : T E M P O R A R Y ;
 T_TERMINATED      : T E R M I N A T E D ; 
+T_TEXTFILE        : T E X T F I L E ;
 T_TEXTIMAGE_ON    : T E X T I M A G E '_' O N ;
 T_THEN            : T H E N ;
 T_TIMESTAMP       : T I M E S T A M P ;
@@ -1132,6 +1490,7 @@ T_UCASE           : U C A S E ;
 T_UNBASE64        : U N B A S E '6' '4' ;
 T_UNHEX           : U N H E X ;
 T_UNION           : U N I O N ;
+T_UNIONTYPE       : U N I O N T Y P E ;
 T_UNIQUE          : U N I Q U E ;
 T_UNIX_TIMESTAMP  : U N I X '_' T I M E S T A M P ;
 T_UPDATE          : U P D A T E ; 

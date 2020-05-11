@@ -165,3 +165,60 @@ json hql_complex_type_access(json struct_def, json access_expr)
 	j["access_expr"] = access_expr;
 	return j;
 }
+
+json hql_primitive_type_spec(string type_name)
+{
+	json j;
+	j["type"] = "TYPE_SPECIFICATION";
+	j["type_class"] = "PRIMITIVE_TYPE";
+	j["type_name"] = type_name;
+	return j;
+}
+
+json hql_array_type_spec(string data_type)
+{
+	json j;
+	j["type"] = "TYPE_SPECIFICATION";
+	j["type_class"] = "COMPLEX_TYPE";
+	j["type_name"] = "ARRAY";
+	j["array_data_type"] = data_type;
+	return j;
+}
+
+json hql_map_type_spec(string data_type_key, string data_type_value)
+{
+	json j;
+	j["type"] = "TYPE_SPECIFICATION";
+	j["type_class"] = "COMPLEX_TYPE";
+	j["type_name"] = "MAP";
+	j["key_data_type"] = data_type_key;
+	j["val_data_type"] = data_type_value;
+	return j;
+}
+
+json hql_struct_type_spec(vector<string> columns, vector<json> column_type_specs)
+{
+	json j;
+	j["type"] = "TYPE_SPECIFICATION";
+	j["type_class"] = "COMPLEX_TYPE";
+	j["type_name"] = "STRUCT";
+	vector<json> column_type_list;
+	for (int i = 0; i < columns.size(); i++)
+	{
+		json tmp;
+		tmp[columns[i]] = column_type_specs[i];
+		column_type_list.push_back(tmp);
+	}
+	j["column_type_list"] = column_type_list;
+	return j;
+}
+
+json hql_uniontype_type_spec(vector<json> data_type_list)
+{
+	json j;
+	j["type"] = "TYPE_SPECIFICATION";
+	j["type_class"] = "COMPLEX_TYPE";
+	j["type_name"] = "UNIONTYPE";
+	j["data_type_list"] = data_type_list;
+	return j;
+}
