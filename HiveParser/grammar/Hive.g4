@@ -298,7 +298,7 @@ opt_table_val returns [string res]
 
 opt_as_select returns [json res]
     : { $res = json(); }
-    | T_AS T_OPEN_P select_stmt T_CLOSE_P { $res = $select_stmt.res; }
+    | T_AS select_stmt { $res = $select_stmt.res; }
     ;
 
 file_format returns [string res]
@@ -1607,6 +1607,8 @@ L_DEC
     | '.' DIGIT+ ( E [-+]? DIGIT+ )?
     ;
 
+L_M_COMMENT : '/*' .*? '*/' -> channel(HIDDEN) ;                       // Multiline comment
+L_S_COMMENT : ('--' | '//')  .*? '\r'? '\n' -> channel(HIDDEN) ;       // Single line comment
 
 SPACES
  : [ \u000B\t\r\n] -> channel(HIDDEN)

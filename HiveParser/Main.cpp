@@ -16,9 +16,10 @@ using json = nlohmann::json;
 
 int main(int argc, const char* argv[])
 {
-	string in = argv[1];
+	ifstream in_file;
+	in_file.open(argv[1]);
 
-	ANTLRInputStream input(in);
+	ANTLRInputStream input(in_file);
 	HiveLexer lexer(&input);
 	CommonTokenStream tokens(&lexer);
 	HiveParser parser(&tokens);
