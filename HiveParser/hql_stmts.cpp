@@ -97,6 +97,15 @@ json hql_stmt_join_table(string join_type, json right_table_expr, json join_cond
 	return j;
 }
 
+json hql_select_union_stmt(json base_select, vector<json> union_list)
+{
+	json j;
+	j["type"] = "SELECT_UNION";
+	j["base_select"] = base_select;
+	j["union_list"] = union_list;
+	return j;
+}
+
 json hql_stmt_create_table(string table_type, bool if_not_exists_flag, json table_identifier, vector<json> column_specs,
 	vector<json> constraints, string table_comment, vector<json> partitions_fields,
 	json clustered_by, json skewed_by, json row_format, json stored_as,

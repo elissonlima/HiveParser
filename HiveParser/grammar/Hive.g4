@@ -416,6 +416,27 @@ table_type returns [string res]
 
 query_stmt returns [json res]
     : select_stmt { $res = $select_stmt.res; }
+    | select_union_stmt  { $res = $select_union_stmt.res; }
+    ;
+
+select_union_stmt returns [json res]
+    : {vector<Select_union_typeContext*> union_type_list; vector<Select_stmtContext*> select_stmt_list; } base_select=select_stmt ( T_UNION union_type_list+=select_union_type select_stmt_list+=select_stmt )+ {
+        vector<json> select_union_json_list;
+        for(int i = 0 ; i < $union_type_list.size() ; i++)
+        {
+            json tmp;
+            tmp["union_type"] = $union_type_list[i]->res;
+            tmp["select_stmt"] = $select_stmt_list[i]->res;
+            select_union_json_list.push_back(tmp);
+        }
+        $res = hql_select_union_stmt($base_select.res, select_union_json_list);
+    }
+    ;
+
+select_union_type returns [string res]
+    : { $res = "DISTINCT"; }
+    | T_ALL { $res = "ALL"; }
+    | T_DISTINCT { $res = "DISTINCT"; }
     ;
 
 select_stmt returns [json res] // SELECT statement
