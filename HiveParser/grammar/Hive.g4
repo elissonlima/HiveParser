@@ -86,6 +86,16 @@ stmt returns [json res]
 
 ddl_stmt returns [json res]
     : create_table_stmt { $res = $create_table_stmt.res; }
+    | droptable_stmt { $res = $droptable_stmt.res; }
+    ;
+
+droptable_stmt returns [json res]
+    : T_DROP T_TABLE opt_if_exists tab_ident opt_drop_table_purge { $res = drop_table_stmt($opt_if_exists.res, $tab_ident.res, $opt_drop_table_purge.res); }
+    ;
+
+opt_drop_table_purge returns [bool res]
+    : { $res = false; }
+    | T_PURGE { $res = true; }
     ;
 
 create_table_stmt returns [json res]
@@ -100,6 +110,8 @@ create_table_stmt returns [json res]
                 $opt_row_formated.res, $opt_stored_as.res, $opt_location.res, 
                 $opt_table_properties.res, $opt_as_select.res);
         }
+    | T_CREATE table_type T_TABLE opt_if_not_exists_flag tab_name=tab_ident 
+        T_LIKE tab_like=tab_ident opt_location { $res = hql_create_table_like($table_type.res, $opt_if_not_exists_flag.res, $tab_name.res, $tab_like.res, $opt_location.res); }
     ;
 
 opt_column_specs returns [vector<json> res]
@@ -406,6 +418,11 @@ opt_constraint_rely_no_rely returns [string res]
 opt_if_not_exists_flag returns [bool res]
     : { $res = false; }
     | T_IF T_NOT T_EXISTS { $res = true; }
+    ;
+
+opt_if_exists returns [bool res]
+    : { $res = false; }
+    | T_IF T_EXISTS { $res = true; }
     ;
 
 table_type returns [string res]
@@ -1387,6 +1404,7 @@ T_PRIMARY         : P R I M A R Y ;
 T_PRINTF           : P R I N T F ; 
 T_PROC            : P R O C ;
 T_PROCEDURE       : P R O C E D U R E ;
+T_PURGE           : P U R G E ;
 T_QUALIFY         : Q U A L I F Y ;
 T_QUARTER         : Q U A R T E R ;
 T_QUERY_BAND      : Q U E R Y '_' B A N D ; 

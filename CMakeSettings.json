@@ -22,13 +22,7 @@
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": [
-        {
-          "name": "PYTHON",
-          "value": "C:/Users/elisson.lima/AppData/Local/Programs/Python/Python37/python.exe",
-          "type": "FILEPATH"
-        }
-      ]
+      "variables": []
     }
   ]
 }

@@ -26,3 +26,6 @@ json hql_stmt_create_table(string table_type, bool if_not_exists_flag, json tabl
 							vector<json> constraints, string table_comment, vector<json> partitions_fields, 
 							json clustered_by, json skewed_by, json row_format, json stored_as, 
 						    string location, vector<json> table_properties, json select_stmt);
+json hql_create_table_like(string table_type, bool if_not_exists_flag, json table_identifier, json table_like,
+							string location);
+json drop_table_stmt(bool opt_if_exists, json table_ident, bool opt_purge);

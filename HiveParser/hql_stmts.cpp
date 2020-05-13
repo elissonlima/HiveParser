@@ -141,3 +141,27 @@ json hql_stmt_create_table(string table_type, bool if_not_exists_flag, json tabl
 
 	return j;
 }
+
+json hql_create_table_like(string table_type, bool if_not_exists_flag, json table_identifier, json table_like,
+	string location)
+{
+	json j;
+	j["type"] = "CREATE_TABLE_STMT";
+	j["table_type"] = table_type;
+	j["if_not_exists_flag"] = if_not_exists_flag;
+	j["table_name"] = table_identifier;
+	j["table_like"] = table_like;
+	if (!location.empty())
+		j["location"] = location;
+	return j;
+}
+
+json drop_table_stmt(bool opt_if_exists, json table_ident, bool opt_purge)
+{
+	json j;
+	j["type"] = "DROP_TABLE_STMT";
+	j["opt_if_exists"] = opt_if_exists;
+	j["table"] = table_ident;
+	j["opt_purge"] = opt_purge;
+	return j;
+}
