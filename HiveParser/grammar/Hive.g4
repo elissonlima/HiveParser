@@ -82,6 +82,7 @@ dtype_len : // Data type length or size specification
 stmt returns [json res]
     : query_stmt { $res = $query_stmt.res; }
     | ddl_stmt { $res = $ddl_stmt.res; }
+    | variable_substitution { $res = $variable_substitution.res; }
     ;
 
 ddl_stmt returns [json res]
@@ -89,8 +90,43 @@ ddl_stmt returns [json res]
     | droptable_stmt { $res = $droptable_stmt.res; }
     ;
 
+variable_substitution returns [json res]
+    : T_SET opt_var_type system_var_identifier '=' expr { $res = hql_set_variable($opt_var_type.res, $system_var_identifier.res, $expr.res); }
+    ;
+
+use_var returns [json res]
+    : '$' '{' opt_var_type_use system_var_identifier '}' { $res = hql_use_variable($opt_var_type_use.res, $system_var_identifier.res); }
+    ;
+
+opt_var_type returns [string res]
+    : { $res = "HIVECONF"; }
+    | T_HIVECONF ':' { $res = "HIVECONF"; }
+    | T_HIVEVAR ':' { $res = "HIVEVAR"; }
+    ;
+
+opt_var_type_use returns [string res]
+    : { $res = "HIVEVAR"; }
+    | T_HIVECONF ':' { $res = "HIVECONF"; }
+    | T_HIVEVAR ':' { $res = "HIVEVAR"; }
+    ; 
+
+system_var_identifier returns [string res]
+    : { vector<Var_nameContext*> var_name_list; } var_name_list+=var_name ( '.' var_name_list+=var_name )* {
+        string result = "";
+        for(Var_nameContext* var_namectxt:$var_name_list)
+        {
+            result+=var_namectxt->res;
+        }
+        $res = result;
+    }
+    ;
+
+var_name returns [string res]
+    : IDENTIFIER { $res = $IDENTIFIER.text; }
+    ;
+
 droptable_stmt returns [json res]
-    : T_DROP T_TABLE opt_if_exists tab_ident opt_drop_table_purge { $res = drop_table_stmt($opt_if_exists.res, $tab_ident.res, $opt_drop_table_purge.res); }
+    : T_DROP T_TABLE opt_if_exists tab_ident opt_drop_table_purge { $res = hql_drop_table_stmt($opt_if_exists.res, $tab_ident.res, $opt_drop_table_purge.res); }
     ;
 
 opt_drop_table_purge returns [bool res]
@@ -676,6 +712,7 @@ expr returns [json res]
     | misc_func { $res = $misc_func.res; }
     | aggr_func { $res = $aggr_func.res; }
     | complex_types { $res = $complex_types.res; }
+    | use_var { $res = $use_var.res; }
     ;
 
 
@@ -870,6 +907,7 @@ expr_concat_item returns [json res]
     | str_func { $res = $str_func.res; }
     | misc_func { $res = $misc_func.res; }
     | aggr_func { $res = $aggr_func.res; }
+    | use_var { $res = $use_var.res; }
     ;
 
 cond_func returns [json res]
@@ -1046,6 +1084,10 @@ ident returns [json res]
 
 tab_ident returns [json res]
     :  ( database=IDENTIFIER '.' )? tablename=IDENTIFIER { $res = hql_type_table_identifier($database.text, $tablename.text); }
+    |  databasa_var=use_var '.' tablename_var=use_var { $res = hql_type_table_identifier_var($databasa_var.res, $tablename_var.res); }
+    |  databasa_var=use_var '.' tablename=IDENTIFIER { $res = hql_type_table_identifier_var($databasa_var.res, $tablename.text); }
+    |  databasa=IDENTIFIER '.' tablename_var=use_var { $res = hql_type_table_identifier_var($databasa.text, $tablename_var.res); }
+    |  tablename_var=use_var { $res = hql_type_table_identifier_var($tablename_var.res); }
     ;
 
 date_literal returns [string res]
@@ -1260,6 +1302,8 @@ T_HDFS            : H D F S ;
 T_HEX             : H E X ;
 T_HISTOGRAM_NUMERIC : H I S T O G R A M '_' N U M E R I C ;
 T_HIVE            : H I V E ;
+T_HIVECONF        : 'h' 'i' 'v' 'e' 'c' 'o' 'n' 'f' ;
+T_HIVEVAR        : 'h' 'i' 'v' 'e' 'v' 'a' 'r' ;
 T_HOST            : H O S T ;
 T_HOUR            : H O U R ;
 T_IDENTITY        : I D E N T I T Y ; 

@@ -28,4 +28,6 @@ json hql_stmt_create_table(string table_type, bool if_not_exists_flag, json tabl
 						    string location, vector<json> table_properties, json select_stmt);
 json hql_create_table_like(string table_type, bool if_not_exists_flag, json table_identifier, json table_like,
 							string location);
-json drop_table_stmt(bool opt_if_exists, json table_ident, bool opt_purge);
+json hql_drop_table_stmt(bool opt_if_exists, json table_ident, bool opt_purge);
+json hql_set_variable(string var_type, string var_name, json expr);
+json hql_use_variable(string var_type, string var_name);

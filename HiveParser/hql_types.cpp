@@ -222,3 +222,38 @@ json hql_uniontype_type_spec(vector<json> data_type_list)
 	j["data_type_list"] = data_type_list;
 	return j;
 }
+
+json hql_type_table_identifier_var(json table_name)
+{
+	json j;
+	j["type"] = "NAME";
+	j["value"] = table_name;
+	return j;
+}
+
+json hql_type_table_identifier_var(json table_name, json database)
+{
+	json j;
+	j["type"] = "NAME";
+	j["value"] = table_name;
+	j["database"] = database;
+	return j;
+}
+
+json hql_type_table_identifier_var(string table_name, json database)
+{
+	json j;
+	j["type"] = "NAME";
+	j["value"] = table_name;
+	j["database"] = database;
+	return j;
+}
+
+json hql_type_table_identifier_var(json table_name, string database)
+{
+	json j;
+	j["type"] = "NAME";
+	j["value"] = table_name;
+	j["database"] = database;
+	return j;
+}

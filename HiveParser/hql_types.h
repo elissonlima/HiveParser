@@ -30,3 +30,7 @@ json hql_array_type_spec(string data_type);
 json hql_map_type_spec(string data_type_key, string data_type_value);
 json hql_struct_type_spec(vector<string> columns, vector<json> column_type_specs);
 json hql_uniontype_type_spec(vector<json> data_type_list);
+json hql_type_table_identifier_var(json table_name);
+json hql_type_table_identifier_var(json table_name, json database);
+json hql_type_table_identifier_var(string table_name, json database);
+json hql_type_table_identifier_var(json table_name, string database);

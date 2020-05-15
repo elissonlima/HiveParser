@@ -156,12 +156,31 @@ json hql_create_table_like(string table_type, bool if_not_exists_flag, json tabl
 	return j;
 }
 
-json drop_table_stmt(bool opt_if_exists, json table_ident, bool opt_purge)
+json hql_drop_table_stmt(bool opt_if_exists, json table_ident, bool opt_purge)
 {
 	json j;
 	j["type"] = "DROP_TABLE_STMT";
 	j["opt_if_exists"] = opt_if_exists;
 	j["table"] = table_ident;
 	j["opt_purge"] = opt_purge;
+	return j;
+}
+
+json hql_set_variable(string var_type, string var_name, json expr)
+{
+	json j;
+	j["type"] = "VAR_SET";
+	j["var_type"] = var_type;
+	j["var_name"] = var_name;
+	j["value"] = expr;
+	return j;
+}
+
+json hql_use_variable(string var_type, string var_name)
+{
+	json j;
+	j["type"] = "VAR_USE";
+	j["var_type"] = var_type;
+	j["var_name"] = var_name;
 	return j;
 }

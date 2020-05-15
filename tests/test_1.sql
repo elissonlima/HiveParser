@@ -24,4 +24,9 @@
 
 -- CREATE TABLE uo.teste_1 LIKE uo.teste_2;
 
-DROP TABLE IF EXISTS rt2.des;
+--DROP TABLE IF EXISTS rt2.des;
+
+SET DB_RT2 = rt2;
+SET DAT_REF = 202001;
+
+select * from ${hiveconf:DB_RT2}.tabela where anomes = ${hiveconf:DAT_REF} ;
