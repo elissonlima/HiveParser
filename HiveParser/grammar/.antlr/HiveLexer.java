@@ -2,7 +2,9 @@
 
     #include <string>
     #include <vector>
+    #include <map>
     #include <cstdio>
+    #include <iterator>
     #include "nlohmann/json.hpp"
     #include "hql_types.h"
     #include "hql_exprs.h"
@@ -13,6 +15,7 @@
     using namespace std;
     using json = nlohmann::json;
 
+    
 
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

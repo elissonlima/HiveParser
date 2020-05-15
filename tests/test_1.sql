@@ -28,5 +28,6 @@
 
 SET DB_RT2 = rt2;
 SET DAT_REF = 202001;
+SET hivevar:DAT_RFRC = 202001;
 
-select * from ${hiveconf:DB_RT2}.tabela where anomes = ${hiveconf:DAT_REF} ;
+select * from ${hiveconf:DB_RT2}.tabela_${DAT_RFRC}_abc_${hiveconf:DAT_REF} where anomes = ${hiveconf:DAT_REF} ;

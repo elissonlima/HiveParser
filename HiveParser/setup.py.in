@@ -7,11 +7,14 @@ setup(name='hiveparser',
     Extension('hiveparser', 
         ['${CMAKE_CURRENT_SOURCE_DIR}/module.cpp', 
             '${CMAKE_CURRENT_SOURCE_DIR}/HiveParserModule.cpp',
-            '${ANTLR_HiveParser_OUTPUT_DIR}/HiveParser.cpp','${ANTLR_HiveParser_OUTPUT_DIR}/HiveLexer.cpp',
-            '${CMAKE_CURRENT_SOURCE_DIR}/HqlFunction.cpp'],
-        include_dirs = ['${CMAKE_CURRENT_SOURCE_DIR}', '${ANTLR4_INCLUDE_DIRS}', '${ANTLR_HiveParser_OUTPUT_DIR}'],
+            '${CMAKE_CURRENT_SOURCE_DIR}/hql_types.cpp',
+            '${CMAKE_CURRENT_SOURCE_DIR}/hql_exprs.cpp',
+            '${CMAKE_CURRENT_SOURCE_DIR}/hql_stmts.cpp',
+            '${CMAKE_CURRENT_SOURCE_DIR}/hql_functions.cpp',
+            '${ANTLR_HiveParser_OUTPUT_DIR}/HiveParser.cpp','${ANTLR_HiveParser_OUTPUT_DIR}/HiveLexer.cpp'],
+        include_dirs = ['${CMAKE_CURRENT_SOURCE_DIR}', '${ANTLR4_INCLUDE_DIRS}', '${ANTLR_HiveParser_OUTPUT_DIR}', '${NLOHMANN_JSON_INCLUDE_BUILD_DIR}'],
         extra_compile_args=['-DANTLR4CPP_STATIC'],
-        library_dirs = ['${ANTLR4_LIB_DIR}', '${ANTLR4_INCLUDE_DIRS}', '${ANTLR_HiveParser_OUTPUT_DIR}'],
+        library_dirs = ['${ANTLR4_LIB_DIR}', '${ANTLR4_INCLUDE_DIRS}', '${ANTLR_HiveParser_OUTPUT_DIR}', '${NLOHMANN_JSON_INCLUDE_BUILD_DIR}'],
         libraries = ['antlr4-runtime-static']
         )
     ]

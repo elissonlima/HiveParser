@@ -3,7 +3,9 @@ grammar Hive;
 @header {
     #include <string>
     #include <vector>
+    #include <map>
     #include <cstdio>
+    #include <iterator>
     #include "nlohmann/json.hpp"
     #include "hql_types.h"
     #include "hql_exprs.h"
@@ -14,8 +16,42 @@ grammar Hive;
     using namespace std;
     using json = nlohmann::json;
 
+    
 }
 
+@parser::members { 
+    map<string, json> hivevar_context_variables; 
+    map<string, json> hiveconf_context_variables;
+
+    void save_var(string var_name, string var_type, json var_value)
+    {
+        if(var_type == "HIVECONF")
+        {
+            hiveconf_context_variables.insert(make_pair(var_name, var_value));
+        }
+        else if(var_type == "HIVEVAR")
+        {
+            hivevar_context_variables.insert(make_pair(var_name, var_value));
+        }
+    }
+
+    json get_value(string var_name, string var_type)
+    {
+        if(var_type == "HIVECONF")
+        {
+            json tmp = hiveconf_context_variables.find(var_name)->second;
+
+            return tmp;
+        }
+        else if(var_type == "HIVEVAR")
+        {
+            json tmp =  hivevar_context_variables.find(var_name)->second;
+            return tmp;
+        }
+
+        return NULL;
+    }
+}
 
 /* Parser */
 
@@ -91,24 +127,15 @@ ddl_stmt returns [json res]
     ;
 
 variable_substitution returns [json res]
-    : T_SET opt_var_type system_var_identifier '=' expr { $res = hql_set_variable($opt_var_type.res, $system_var_identifier.res, $expr.res); }
+    : T_SET opt_var_set_type system_var_identifier '=' expr { 
+        save_var($system_var_identifier.res, $opt_var_set_type.res, $expr.res);
+        $res = hql_set_variable($opt_var_set_type.res, $system_var_identifier.res, $expr.res); 
+    }
     ;
 
 use_var returns [json res]
-    : '$' '{' opt_var_type_use system_var_identifier '}' { $res = hql_use_variable($opt_var_type_use.res, $system_var_identifier.res); }
+    : '$' '{' opt_var_use_type system_var_identifier '}' { $res = get_value($system_var_identifier.res, $opt_var_use_type.res); }
     ;
-
-opt_var_type returns [string res]
-    : { $res = "HIVECONF"; }
-    | T_HIVECONF ':' { $res = "HIVECONF"; }
-    | T_HIVEVAR ':' { $res = "HIVEVAR"; }
-    ;
-
-opt_var_type_use returns [string res]
-    : { $res = "HIVEVAR"; }
-    | T_HIVECONF ':' { $res = "HIVECONF"; }
-    | T_HIVEVAR ':' { $res = "HIVEVAR"; }
-    ; 
 
 system_var_identifier returns [string res]
     : { vector<Var_nameContext*> var_name_list; } var_name_list+=var_name ( '.' var_name_list+=var_name )* {
@@ -119,6 +146,18 @@ system_var_identifier returns [string res]
         }
         $res = result;
     }
+    ;
+
+opt_var_set_type returns [string res]
+    : { $res = "HIVECONF"; }
+    | T_HIVECONF ':' { $res = "HIVECONF"; }
+    | T_HIVEVAR ':' { $res = "HIVEVAR"; }
+    ;
+
+opt_var_use_type returns [string res]
+    : { $res = "HIVEVAR"; }
+    | T_HIVECONF ':' { $res = "HIVECONF"; }
+    | T_HIVEVAR ':' { $res = "HIVEVAR"; }
     ;
 
 var_name returns [string res]
@@ -1084,11 +1123,28 @@ ident returns [json res]
 
 tab_ident returns [json res]
     :  ( database=IDENTIFIER '.' )? tablename=IDENTIFIER { $res = hql_type_table_identifier($database.text, $tablename.text); }
-    |  databasa_var=use_var '.' tablename_var=use_var { $res = hql_type_table_identifier_var($databasa_var.res, $tablename_var.res); }
-    |  databasa_var=use_var '.' tablename=IDENTIFIER { $res = hql_type_table_identifier_var($databasa_var.res, $tablename.text); }
-    |  databasa=IDENTIFIER '.' tablename_var=use_var { $res = hql_type_table_identifier_var($databasa.text, $tablename_var.res); }
-    |  tablename_var=use_var { $res = hql_type_table_identifier_var($tablename_var.res); }
+    |  database_var=complex_name '.' tablename_var=complex_name { $res = hql_type_table_identifier($database_var.res, $tablename_var.res); }
+    |  tablename_var=complex_name { $res = hql_type_table_identifier(string(), $tablename_var.res); }
     ;
+
+complex_name returns [string res]
+    : {vector<Complex_atom_nameContext*> name_list; } ( name_list+=complex_atom_name)+ {
+        string result = "";
+        for(Complex_atom_nameContext* name_ctxt:$name_list)
+            result+=name_ctxt->res;
+        $res = result;
+    }
+    // : IDENTIFIER use_var { $res = $IDENTIFIER.text + to_string($use_var.res["value"]); }
+    // | use_var IDENTIFIER { $res = $IDENTIFIER.text + to_string($use_var.res["value"]); }
+    // | pt_1=IDENTIFIER use_var pt_2=IDENTIFIER { $res = $pt_1.text + to_string($use_var.res["value"]) + $pt_2.text; }
+    // | use_var { $res =  to_string($use_var.res["value"]); }
+    // | IDENTIFIER  { $res = $IDENTIFIER.text; }
+    ;
+
+complex_atom_name returns [string res]
+    : IDENTIFIER { $res = $IDENTIFIER.text; }
+    | use_var { $res =  remove_quotes(to_string($use_var.res["value"])); }
+    ; 
 
 date_literal returns [string res]
     : T_DATE STRING_LITERAL { $res = $STRING_LITERAL.text; }

@@ -228,6 +228,7 @@ json hql_type_table_identifier_var(json table_name)
 	json j;
 	j["type"] = "NAME";
 	j["value"] = table_name;
+	j["database"] = "DEFAULT";
 	return j;
 }
 
