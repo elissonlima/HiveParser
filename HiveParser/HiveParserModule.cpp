@@ -9,5 +9,5 @@ std::string parse(std::string in)
 	HiveParser parser(&tokens);
 
 	HiveParser::ProgramContext* tree = parser.program();
-	return tree->res;
+	return tree->res.dump();
 }
