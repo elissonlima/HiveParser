@@ -8,10 +8,14 @@ del pathlib
 del sys
 
 def parse(str_in):
+
+    if type(str_in) is not str:
+        raise TypeError("Input must be str type")
+
     import json
     try:
         result = json.loads(hiveparser_c.parse(str_in))
-        return result
+        return result['stmt_list']
     except Exception as ex:
         print(ex)
         return dict()
