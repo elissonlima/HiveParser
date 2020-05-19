@@ -184,3 +184,15 @@ json hql_use_variable(string var_type, string var_name)
 	j["var_name"] = var_name;
 	return j;
 }
+
+json hql_insert_select_stmt(json table_name, vector<json> partitions, bool opt_if_not_exists, json select_stmt)
+{
+	json j;
+	j["type"] = "INSERT_SELECT_STMT";
+	j["table_name"] = table_name;
+	if (partitions.size() > 0)
+		j["partitions"] = partitions;
+	j["opt_if_not_exists"] = opt_if_not_exists;
+	j["select_stmt"] = select_stmt;
+	return j;
+}

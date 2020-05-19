@@ -136,9 +136,9 @@ json hql_case_func(json case_expr, vector<json> when_expr_list, vector<json> the
 		when_then_expr["then"] = then_expr_list[i];
 		when_then_expr_list.push_back(when_then_expr);
 	}
-	if (case_expr != NULL)
+	if (!case_expr.empty())
 		j["case_expr"] = case_expr;
-	if (else_expr != NULL)
+	if (!else_expr.empty())
 		j["else_expr"] = else_expr;
 	j["when_then_expr_list"] = when_then_expr_list;
 	return j;
@@ -162,5 +162,11 @@ std::string remove_quotes(std::string in)
 {
 	in.erase(std::remove(in.begin(), in.end(), '\''), in.end());
 	in.erase(std::remove(in.begin(), in.end(), '"'), in.end());
+	return in;
+}
+
+std::string remove_backquotes(std::string in)
+{
+	in.erase(std::remove(in.begin(), in.end(), '`'), in.end());
 	return in;
 }

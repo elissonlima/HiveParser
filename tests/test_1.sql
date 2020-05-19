@@ -1,33 +1,12 @@
--- Hiveparser tests
-
--- CREATE TABLE tbuo_teste STORED AS TEXTFILE AS SELECT cpf, agen, con FROM uo.xpto;
-
--- CREATE TABLE tbuo_teste 
--- (
---     cpf STRING,
---     agen STRING,
---     cont STRING
--- )
--- PARTITIONED BY (anomes INT)
--- ROW FORMAT DELIMITED
--- FIELDS TERMINATED BY ';'
--- LINES TERMINATED BY '\n'
--- LOCATION '\dados\prod\uo_teste\tbuo_teste'
--- ;
-
--- SELECT cpf, cnpj FROM tab1
--- UNION 
--- SELECT cpf, cnpj FROM tab2
--- UNION ALL
--- SELECT cpf, cnpj FROM tab3
--- ;
-
--- CREATE TABLE uo.teste_1 LIKE uo.teste_2;
-
---DROP TABLE IF EXISTS rt2.des;
-
-SET DB_RT2 = rt2;
-SET DAT_REF = 202001;
-SET hivevar:DAT_RFRC = 202001;
-
-select * from ${hiveconf:DB_RT2}.tabela_${DAT_RFRC}_abc_${hiveconf:DAT_REF} where anomes = ${hiveconf:DAT_REF} ;
+SELECT
+DIAENC.NUMERO_CLIENTE AS NUMERO_CLIENTE,
+DIAENC.CORR_FACTURATION AS CORR_FACTURACION,
+NVL(CLI.CLI_GRUPO, 'SEM GRUPO') AS GRUPO,
+0 AS COFINS_FAT,
+0 AS COFINS_REFAT,
+DIAENC.VALOR_ENCARGO AS COFINS_CANC,
+from_unixtime(unix_timestamp(DIAENC.DT_CANCELAMENTO,'yyyy-MM-dd'),'yyyyMM') AS IGE_REFERENCIA
+FROM BT_ENCARGOS_DIARIO DIAENC
+WHERE 
+TRIM(FAT.CLASSE) IN ('REBRBPC','REBRIND','REBRMUL','REBRQUI','REBXR','REPLN','RESBOPT','01','1')
+;

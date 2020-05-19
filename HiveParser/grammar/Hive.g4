@@ -116,7 +116,7 @@ dtype_len : // Data type length or size specification
      ;
 
 stmt returns [json res]
-    : query_stmt { $res = $query_stmt.res; }
+    : full_select_stmt { $res = $full_select_stmt.res; }
     | ddl_stmt { $res = $ddl_stmt.res; }
     | variable_substitution { $res = $variable_substitution.res; }
     ;
@@ -124,6 +124,37 @@ stmt returns [json res]
 ddl_stmt returns [json res]
     : create_table_stmt { $res = $create_table_stmt.res; }
     | droptable_stmt { $res = $droptable_stmt.res; }
+    | insert_stmt { $res = $insert_stmt.res; }
+    ;
+
+insert_stmt returns [json res]
+    : T_INSERT T_INTO T_TABLE tab_ident opt_insert_partitions opt_if_not_exists_flag full_select_stmt { $res = hql_insert_select_stmt($tab_ident.res, $opt_insert_partitions.res, $opt_if_not_exists_flag.res, $full_select_stmt.res); }
+    ;
+
+opt_insert_partitions returns [vector<json> res]
+    : { $res = vector<json>(); }
+    | { vector<Name_identifierContext*> col_name_list; vector<Literal_valuesContext*> col_value_list; } T_PARTITION T_OPEN_P col_name_list+=name_identifier '=' col_value_list+=literal_values ( ',' col_name_list+=name_identifier '=' col_value_list+=literal_values )* T_CLOSE_P
+    {
+        vector<json> result_list;
+        for(int i = 0 ; i < $col_name_list.size() ; i++)
+        {
+            json tmp;
+            tmp[remove_backquotes($col_name_list[i]->res)] = $col_value_list[i]->res;
+            result_list.push_back(tmp);
+        }
+        $res = result_list;
+    }
+    | { vector<Name_identifierContext*> col_name_list; } T_PARTITION T_OPEN_P col_name_list+=name_identifier ( ',' col_name_list+=name_identifier )* T_CLOSE_P
+    {
+        vector<json> result_list;
+        for(int i = 0 ; i < $col_name_list.size() ; i++)
+        {
+            json tmp;
+            tmp[remove_backquotes($col_name_list[i]->res)] = "NULL";
+            result_list.push_back(tmp);
+        }
+        $res = result_list;
+    }
     ;
 
 variable_substitution returns [json res]
@@ -161,7 +192,7 @@ opt_var_use_type returns [string res]
     ;
 
 var_name returns [string res]
-    : IDENTIFIER { $res = $IDENTIFIER.text; }
+    : name_identifier { $res = $name_identifier.res; }
     ;
 
 droptable_stmt returns [json res]
@@ -367,7 +398,7 @@ opt_location returns [string res]
 
 opt_table_properties returns [vector<json> res]
     : { $res = vector<json>(); }
-    | { vector<Opt_table_valContext*> opt_name_list, opt_val_list; } T_TBLPROPERTIES T_OPEN_P opt_name_list+=opt_table_val '=' opt_val_list+=opt_table_val ( ',' opt_name_list+=opt_table_val '=' opt_val_list+=opt_table_val ) T_CLOSE_P {
+    | { vector<Opt_table_valContext*> opt_name_list, opt_val_list; } T_TBLPROPERTIES T_OPEN_P opt_name_list+=opt_table_val '=' opt_val_list+=opt_table_val ( ',' opt_name_list+=opt_table_val '=' opt_val_list+=opt_table_val )* T_CLOSE_P {
         vector<json> table_option_json_list;
         for(int i = 0 ; i < $opt_name_list.size() ; i++) 
         {
@@ -385,7 +416,7 @@ opt_table_val returns [string res]
 
 opt_as_select returns [json res]
     : { $res = json(); }
-    | T_AS select_stmt { $res = $select_stmt.res; }
+    | T_AS full_select_stmt { $res = $full_select_stmt.res; }
     ;
 
 file_format returns [string res]
@@ -446,7 +477,7 @@ constraint_specification returns [json res]
             column_str_list.push_back(c_ctxt->res); }
         $res = hql_primary_key_constraint(column_str_list, $opt_constraint_disable.res, $opt_constraint_novalidate.res, $opt_constraint_rely_no_rely.res);
     }
-    | { vector<Column_identifierContext*> column_list; vector<Column_identifierContext*> ref_column_list; } T_CONSTRAINT IDENTIFIER T_FOREIGN T_KEY T_OPEN_P column_list+=column_identifier ( ','column_list+=column_identifier )* T_CLOSE_P T_REFERENCES tab_ident T_OPEN_P ref_column_list+=column_identifier ( ',' ref_column_list+=column_identifier )* T_CLOSE_P opt_constraint_disable opt_constraint_novalidate {
+    | { vector<Column_identifierContext*> column_list; vector<Column_identifierContext*> ref_column_list; } T_CONSTRAINT name_identifier T_FOREIGN T_KEY T_OPEN_P column_list+=column_identifier ( ','column_list+=column_identifier )* T_CLOSE_P T_REFERENCES tab_ident T_OPEN_P ref_column_list+=column_identifier ( ',' ref_column_list+=column_identifier )* T_CLOSE_P opt_constraint_disable opt_constraint_novalidate {
         vector<string> column_str_list; vector<string> ref_column_str_list;
         for(Column_identifierContext* c_ctxt: $column_list) {
             column_str_list.push_back(c_ctxt->res); }
@@ -454,13 +485,13 @@ constraint_specification returns [json res]
             ref_column_str_list.push_back(c_ctxt->res); }
         $res = hql_foreign_key_constraint(column_str_list, $tab_ident.res, ref_column_str_list, $opt_constraint_disable.res, $opt_constraint_novalidate.res);
     }
-    | {vector<Column_identifierContext*> column_list; } T_CONSTRAINT IDENTIFIER T_UNIQUE T_OPEN_P column_list+=column_identifier ( ',' column_list+=column_identifier )* T_CLOSE_P  opt_constraint_disable opt_constraint_novalidate opt_constraint_rely_no_rely {
+    | {vector<Column_identifierContext*> column_list; } T_CONSTRAINT name_identifier T_UNIQUE T_OPEN_P column_list+=column_identifier ( ',' column_list+=column_identifier )* T_CLOSE_P  opt_constraint_disable opt_constraint_novalidate opt_constraint_rely_no_rely {
         vector<string> column_str_list;
         for(Column_identifierContext* c_ctxt: $column_list) {
             column_str_list.push_back(c_ctxt->res); }
         $res = hql_unique_constraint(column_str_list, $opt_constraint_disable.res, $opt_constraint_novalidate.res, $opt_constraint_rely_no_rely.res);
     }
-    | T_CONSTRAINT IDENTIFIER T_CHECK expr opt_constraint_enable_disable opt_constraint_novalidate opt_constraint_rely_no_rely { $res = hql_check_constraint($expr.res,  $opt_constraint_enable_disable.res, $opt_constraint_novalidate.res, $opt_constraint_rely_no_rely.res); }
+    | T_CONSTRAINT name_identifier T_CHECK expr opt_constraint_enable_disable opt_constraint_novalidate opt_constraint_rely_no_rely { $res = hql_check_constraint($expr.res,  $opt_constraint_enable_disable.res, $opt_constraint_novalidate.res, $opt_constraint_rely_no_rely.res); }
     ; 
 
 opt_constraint_enable_disable returns [string res]
@@ -506,7 +537,7 @@ table_type returns [string res]
     | T_TEMPORARY { $res = "TEMPORARY"; }
     ;
 
-query_stmt returns [json res]
+full_select_stmt returns [json res]
     : select_stmt { $res = $select_stmt.res; }
     | select_union_stmt  { $res = $select_union_stmt.res; }
     ;
@@ -550,7 +581,7 @@ opt_lateral_view_expr returns [json res]
     ;
 
 column_identifier returns [string res]
-    : IDENTIFIER { $res = $IDENTIFIER.text; }
+    : name_identifier { $res = $name_identifier.res; }
     ;
 
 opt_where_expr returns [json res]
@@ -644,8 +675,9 @@ join_condition returns [json res]
 
 table_factor returns [json res]
    : tab_ident { $res =hql_stmt_table_ref($tab_ident.res, "DEFAULT"); } 
-   | tab_ident T_AS? IDENTIFIER { $res =hql_stmt_table_ref($tab_ident.res, $IDENTIFIER.text); } 
-   | '(' select_stmt ')' T_AS? IDENTIFIER { $res =hql_stmt_table_ref($select_stmt.res, $IDENTIFIER.text); }
+   | tab_ident T_AS? name_identifier { $res =hql_stmt_table_ref($tab_ident.res, $name_identifier.res); } 
+   | '(' select_union_stmt ')' T_AS? name_identifier { $res =hql_stmt_table_ref($select_union_stmt.res, $name_identifier.res); }
+   | '(' select_stmt ')' T_AS? name_identifier { $res =hql_stmt_table_ref($select_stmt.res, $name_identifier.res); }
    ;
 
 select_all_distinct returns [string res]
@@ -663,14 +695,14 @@ select_expr_list returns [vector<json> res]
     ;
 
 select_expr returns [json res]
-    : expr T_AS? IDENTIFIER { $res = hql_select_expr($expr.res, $IDENTIFIER.text); }
+    : expr T_AS? name_identifier { $res = hql_select_expr($expr.res, $name_identifier.res); }
     | expr { $res = hql_select_expr($expr.res); }
-    | expr T_AS? IDENTIFIER { $res = hql_select_expr($expr.res, $IDENTIFIER.text); }
+    | expr T_AS? name_identifier { $res = hql_select_expr($expr.res, $name_identifier.res); }
     | expr { $res = hql_select_expr($expr.res); }
     | '*' { $res = hql_select_all_expr(); } 
-    | IDENTIFIER '.' '*' { $res = hql_select_all_expr($IDENTIFIER.text); }
+    | name_identifier '.' '*' { $res = hql_select_all_expr($name_identifier.res); }
     | over_clause { $res = hql_select_expr($over_clause.res, "DEFAULT"); }
-    | over_clause  T_AS? IDENTIFIER { $res = hql_select_expr($over_clause.res, $IDENTIFIER.text); }
+    | over_clause  T_AS? name_identifier { $res = hql_select_expr($over_clause.res, $name_identifier.res); }
     ;
 
 over_clause returns [json res]
@@ -717,7 +749,10 @@ analytic_func returns [json res]
 expr_list returns [vector<json> res]
     : { vector<ExprContext*> exprs; } T_OPEN_P exprs+=expr (',' exprs+=expr)* T_CLOSE_P {
         vector<json> expr_list_json;
-        for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
+        for (ExprContext* exp_contxt : $exprs)
+        { 
+            expr_list_json.push_back(exp_contxt->res); 
+        }
         $res = expr_list_json;
     }
     ;
@@ -734,9 +769,9 @@ expr returns [json res]
     | l_expr=expr set_operators_is NULL_CONST { $res = hql_bool_operator($set_operators_is.res, $l_expr.res, hql_null_constant()); }
     | eval_expr=expr T_BETWEEN start_interval=expr T_AND end_interval=expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, false); }
     | eval_expr=expr T_NOT T_BETWEEN start_interval=expr T_AND end_interval=expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, true); }
-    | eval_expr=expr set_operators_in expr_list { $res = hql_set_operators_in($set_operators_in.res, $expr.res, $expr_list.res);  }
-    | eval_expr=expr set_operators_in T_OPEN_P select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_in.res, $expr.res, $select_stmt.res); }
-    | eval_expr=expr set_operators_exists T_OPEN_P select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_exists.res, $expr.res, $select_stmt.res); }
+    | eval_expr=expr set_operators_in expr_list { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $expr_list.res);  }
+    | eval_expr=expr set_operators_in T_OPEN_P select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $select_stmt.res); }
+    | eval_expr=expr set_operators_exists T_OPEN_P select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_exists.res, $eval_expr.res, $select_stmt.res); }
     | eval_expr=expr set_operators_like r_expr=expr { $res = hql_bool_operator($set_operators_like.res, $eval_expr.res, $r_expr.res); }
     | literal_values { $res = $literal_values.res; } 
     | ident { $res =  $ident.res; }
@@ -966,7 +1001,7 @@ cond_func returns [json res]
             when_expr_list_json.push_back($when_exprs[i]->res);
             then_expr_list_json.push_back($then_exprs[i]->res);
         }
-        $res = hql_case_func($case_expr.res, when_expr_list_json, then_expr_list_json, NULL);
+        $res = hql_case_func($case_expr.res, when_expr_list_json, then_expr_list_json, json());
      }
     | { vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; } T_CASE case_expr=expr (T_WHEN when_exprs+=expr T_THEN then_exprs+=expr)+ T_ELSE els_expr=expr T_END{ 
         vector<json> when_expr_list_json; vector<json> then_expr_list_json;
@@ -984,7 +1019,7 @@ cond_func returns [json res]
             when_expr_list_json.push_back($when_exprs[i]->res);
             then_expr_list_json.push_back($then_exprs[i]->res);
         }
-        $res = hql_case_func(NULL, when_expr_list_json, then_expr_list_json, NULL);
+        $res = hql_case_func(json(), when_expr_list_json, then_expr_list_json, json());
      }
     | { vector<ExprContext*> when_exprs; vector<ExprContext*> then_exprs; } T_CASE (T_WHEN when_exprs+=expr T_THEN then_exprs+=expr)+ T_ELSE els_expr=expr T_END{ 
         vector<json> when_expr_list_json; vector<json> then_expr_list_json;
@@ -993,14 +1028,16 @@ cond_func returns [json res]
             when_expr_list_json.push_back($when_exprs[i]->res);
             then_expr_list_json.push_back($then_exprs[i]->res);
         }
-        $res = hql_case_func(NULL, when_expr_list_json, then_expr_list_json, $els_expr.res);
+        $res = hql_case_func(json(), when_expr_list_json, then_expr_list_json, $els_expr.res);
      }
     | T_NULLIF T_OPEN_P a_expr=expr ',' b_expr=expr T_CLOSE_P { $res = hql_double_param_func("NULLIF", "a_expr", $a_expr.res, "b_expr", $b_expr.res); }
     | T_ASSERT_TRUE T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("ASSERT_TRUE", "expr", $expr.res); }
     ;
 
 date_func returns [json res]
-    : T_UNIX_TIMESTAMP T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("UNIX_TIMESTAMP"); }
+    : T_FROM_UNIXTIME T_OPEN_P unix_time=expr T_CLOSE_P { $res = hql_single_param_func("FROM_UNIXTIME", "unixtime", $unix_time.res); }
+    | T_FROM_UNIXTIME T_OPEN_P unix_time=expr ',' str_format=expr T_CLOSE_P { $res = hql_double_param_func("FROM_UNIXTIME", "unixtime", $unix_time.res,"format",$str_format.res); }
+    | T_UNIX_TIMESTAMP T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("UNIX_TIMESTAMP"); }
     | T_UNIX_TIMESTAMP T_OPEN_P date_expr=expr T_CLOSE_P { $res = hql_single_param_func("UNIX_TIMESTAMP", "date", $date_expr.res); }
     | T_UNIX_TIMESTAMP T_OPEN_P date_expr=expr ',' pattern_expr=expr T_CLOSE_P { $res = hql_double_param_func("UNIX_TIMESTAMP", "date", $date_expr.res, "pattern", $pattern_expr.res); }
     | T_YEAR T_OPEN_P date_expr=expr T_CLOSE_P { $res = hql_single_param_func("YEAR", "date", $date_expr.res); }
@@ -1118,11 +1155,14 @@ literal_values returns [json res]
     ;
 
 ident returns [json res]
-    : ( database=IDENTIFIER '.' )? ( tablename=IDENTIFIER '.' )? field=IDENTIFIER { $res = hql_type_identifier($database.text, $tablename.text, $field.text); }
+    : ( database=name_identifier '.' ) ( tablename=name_identifier '.' ) field=name_identifier { $res = hql_type_identifier($database.res, $tablename.res, $field.res); }
+    | ( tablename=name_identifier '.' ) field=name_identifier { $res = hql_type_identifier(string(), $tablename.res, $field.res); }
+    | field=name_identifier { $res = hql_type_identifier(string(), string(), $field.res); }
     ;
 
 tab_ident returns [json res]
-    :  ( database=IDENTIFIER '.' )? tablename=IDENTIFIER { $res = hql_type_table_identifier($database.text, $tablename.text); }
+    :  database=name_identifier '.' tablename=name_identifier { $res = hql_type_table_identifier($database.res, $tablename.res); }
+    |  tablename=name_identifier { $res = hql_type_table_identifier(string(), $tablename.res); }
     |  database_var=complex_name '.' tablename_var=complex_name { $res = hql_type_table_identifier($database_var.res, $tablename_var.res); }
     |  tablename_var=complex_name { $res = hql_type_table_identifier(string(), $tablename_var.res); }
     ;
@@ -1134,17 +1174,17 @@ complex_name returns [string res]
             result+=name_ctxt->res;
         $res = result;
     }
-    // : IDENTIFIER use_var { $res = $IDENTIFIER.text + to_string($use_var.res["value"]); }
-    // | use_var IDENTIFIER { $res = $IDENTIFIER.text + to_string($use_var.res["value"]); }
-    // | pt_1=IDENTIFIER use_var pt_2=IDENTIFIER { $res = $pt_1.text + to_string($use_var.res["value"]) + $pt_2.text; }
-    // | use_var { $res =  to_string($use_var.res["value"]); }
-    // | IDENTIFIER  { $res = $IDENTIFIER.text; }
     ;
 
 complex_atom_name returns [string res]
-    : IDENTIFIER { $res = $IDENTIFIER.text; }
+    : name_identifier { $res = $name_identifier.res; }
     | use_var { $res =  remove_quotes(to_string($use_var.res["value"])); }
     ; 
+
+name_identifier returns [string res]
+    : IDENTIFIER { $res = $IDENTIFIER.text; }
+    | non_reserved_words { $res = $non_reserved_words.res; }
+    ;
 
 date_literal returns [string res]
     : T_DATE STRING_LITERAL { $res = $STRING_LITERAL.text; }
@@ -1178,6 +1218,329 @@ unary_operator
     | '+'
     | '!'
     | T_NOT
+    ;
+
+// Tokens that are not reserved words and can be used as identifiers
+non_reserved_words returns [string res]
+    : T_ACTIVITY_COUNT { $res = $T_ACTIVITY_COUNT.text; }
+//  | T_ACTION 
+//  | T_ADD2
+    | T_ALL { $res = $T_ALL.text; }
+//  | T_ALLOCATE
+    | T_ALTER { $res = $T_ALTER.text; }
+    | T_AND { $res = $T_AND.text; }
+//  | T_ANSI_NULLS
+//  | T_ANSI_PADDING
+    | T_AS { $res = $T_AS.text; }
+    | T_ASC { $res = $T_ASC.text; }
+//  | T_ASSOCIATE
+    | T_AT { $res = $T_AT.text; }
+    | T_AUTO_INCREMENT { $res = $T_AUTO_INCREMENT.text; }
+    | T_AVG { $res = $T_AVG.text; }
+//  | T_BATCHSIZE
+    | T_BEGIN { $res = $T_BEGIN.text; }
+    | T_BETWEEN { $res = $T_BETWEEN.text; }
+    | T_BIGINT { $res = $T_BIGINT.text; }
+//  | T_BINARY_DOUBLE
+//  | T_BINARY_FLOAT
+    | T_BIT { $res = $T_BIT.text; }
+    | T_BODY { $res = $T_BODY.text; }
+    | T_BREAK { $res = $T_BREAK.text; }
+    | T_BY { $res = $T_BY.text; }
+    | T_BYTE { $res = $T_BYTE.text; }
+    | T_CALL { $res = $T_CALL.text; }
+    | T_CALLER { $res = $T_CALLER.text; }
+    | T_CASCADE { $res = $T_CASCADE.text; }
+    | T_CASE { $res = $T_CASE.text; }
+//  | T_CASESPECIFIC
+    | T_CAST { $res = $T_CAST.text; }
+    | T_CHAR { $res = $T_CHAR.text; }
+    | T_CHARACTER { $res = $T_CHARACTER.text; }
+    | T_CHARSET { $res = $T_CHARSET.text; }
+    | T_CLIENT { $res = $T_CLIENT.text; }
+    | T_CLOSE { $res = $T_CLOSE.text; }
+    | T_CLUSTERED { $res = $T_CLUSTERED.text; }
+    | T_CMP { $res = $T_CMP.text; }
+    | T_COLLECT { $res = $T_COLLECT.text; }
+    | T_COLLECTION { $res = $T_COLLECTION.text; }
+    | T_COLUMN { $res = $T_COLUMN.text; }
+    | T_COMMENT { $res = $T_COMMENT.text; }
+    | T_COMPRESS { $res = $T_COMPRESS.text; }
+    | T_CONSTANT { $res = $T_CONSTANT.text; }
+    | T_COPY { $res = $T_COPY.text; }
+    | T_COMMIT { $res = $T_COMMIT.text; }
+    | T_CONCAT { $res = $T_CONCAT.text; }
+    | T_CONDITION { $res = $T_CONDITION.text; }
+    | T_CONSTRAINT { $res = $T_CONSTRAINT.text; }
+    | T_CONTINUE { $res = $T_CONTINUE.text; }
+    | T_COUNT { $res = $T_COUNT.text; }
+    | T_COUNT_BIG { $res = $T_COUNT_BIG.text; }
+    | T_CREATE { $res = $T_CREATE.text; }
+    | T_CREATION { $res = $T_CREATION.text; }
+    | T_CREATOR { $res = $T_CREATOR.text; }
+    | T_CS { $res = $T_CS.text; }
+    | T_CUME_DIST { $res = $T_CUME_DIST.text; }
+    | T_CURRENT { $res = $T_CURRENT.text; }
+    | T_CURRENT_DATE { $res = $T_CURRENT_DATE.text; }
+    | T_CURRENT_SCHEMA { $res = $T_CURRENT_SCHEMA.text; }
+    | T_CURRENT_TIMESTAMP { $res = $T_CURRENT_TIMESTAMP.text; }
+    | T_CURRENT_USER { $res = $T_CURRENT_USER.text; }
+    | T_CURSOR { $res = $T_CURSOR.text; }
+//  | T_DATA
+    | T_DATABASE { $res = $T_DATABASE.text; }
+    | T_DATE { $res = $T_DATE.text; }
+    | T_DATETIME { $res = $T_DATETIME.text; }
+    | T_DAY { $res = $T_DAY.text; }
+    | T_DAYS { $res = $T_DAYS.text; }
+    | T_DEC { $res = $T_DEC.text; }
+    | T_DECIMAL { $res = $T_DECIMAL.text; }
+    | T_DECLARE { $res = $T_DECLARE.text; }
+    | T_DEFAULT { $res = $T_DEFAULT.text; }
+    | T_DEFERRED { $res = $T_DEFERRED.text; }
+    | T_DEFINED { $res = $T_DEFINED.text; }
+    | T_DEFINER { $res = $T_DEFINER.text; }
+    | T_DEFINITION { $res = $T_DEFINITION.text; }
+    | T_DELETE { $res = $T_DELETE.text; }
+    | T_DELIMITED { $res = $T_DELIMITED.text; }
+    | T_DELIMITER { $res = $T_DELIMITER.text; }
+    | T_DENSE_RANK { $res = $T_DENSE_RANK.text; }
+    | T_DESC { $res = $T_DESC.text; }
+    | T_DESCRIBE { $res = $T_DESCRIBE.text; }
+    | T_DIAGNOSTICS { $res = $T_DIAGNOSTICS.text; }
+    | T_DIR { $res = $T_DIR.text; }
+    | T_DIRECTORY { $res = $T_DIRECTORY.text; }
+    | T_DISTINCT { $res = $T_DISTINCT.text; }
+    | T_DISTRIBUTE { $res = $T_DISTRIBUTE.text; }
+    | T_DO  { $res = $T_DO.text; }
+    | T_DOUBLE { $res = $T_DOUBLE.text; }
+    | T_DROP { $res = $T_DROP.text; }
+    | T_DYNAMIC { $res = $T_DYNAMIC.text; }
+    | T_ENABLE { $res = $T_ENABLE.text; }
+    | T_ENGINE { $res = $T_ENGINE.text; }
+    | T_ESCAPED { $res = $T_ESCAPED.text; }
+    | T_EXCEPT { $res = $T_EXCEPT.text; }
+    | T_EXEC { $res = $T_EXEC.text; }
+    | T_EXECUTE { $res = $T_EXECUTE.text; }
+    | T_EXCEPTION { $res = $T_EXCEPTION.text; }
+    | T_EXCLUSIVE { $res = $T_EXCLUSIVE.text; }
+    | T_EXISTS { $res = $T_EXISTS.text; }
+    | T_EXIT { $res = $T_EXIT.text; }
+    | T_FALLBACK { $res = $T_FALLBACK.text; }
+    | T_FALSE { $res = $T_FALSE.text; }
+    | T_FETCH { $res = $T_FETCH.text; }
+    | T_FIELDS { $res = $T_FIELDS.text; }
+    | T_FILE { $res = $T_FILE.text; }
+    | T_FILES { $res = $T_FILES.text; }
+    | T_FIRST_VALUE { $res = $T_FIRST_VALUE.text; }
+    | T_FLOAT { $res = $T_FLOAT.text; }
+    | T_FOR { $res = $T_FOR.text; }
+    | T_FOREIGN { $res = $T_FOREIGN.text; }
+    | T_FORMAT { $res = $T_FORMAT.text; }
+    | T_FOUND { $res = $T_FOUND.text; }
+    | T_FROM { $res = $T_FROM.text; }
+    | T_FULL { $res = $T_FULL.text; }
+    | T_FUNCTION { $res = $T_FUNCTION.text; }
+    | T_GET { $res = $T_GET.text; }
+    | T_GLOBAL { $res = $T_GLOBAL.text; }
+    | T_GO { $res = $T_GO.text; }
+    | T_GRANT { $res = $T_GRANT.text; }
+    | T_GROUP { $res = $T_GROUP.text; }
+    | T_HANDLER { $res = $T_HANDLER.text; }
+    | T_HASH { $res = $T_HASH.text; }
+    | T_HAVING { $res = $T_HAVING.text; }
+    | T_HDFS { $res = $T_HDFS.text; }
+//  | T_HIVE         
+    | T_HOST { $res = $T_HOST.text; }
+    | T_IDENTITY { $res = $T_IDENTITY.text; }
+    | T_IF { $res = $T_IF.text; }
+    | T_IGNORE { $res = $T_IGNORE.text; }
+    | T_IMMEDIATE { $res = $T_IMMEDIATE.text; }
+    | T_IN { $res = $T_IN.text; }
+    | T_INCLUDE { $res = $T_INCLUDE.text; }
+    | T_INDEX { $res = $T_INDEX.text; }
+    | T_INITRANS { $res = $T_INITRANS.text; }
+    | T_INNER { $res = $T_INNER.text; }
+    | T_INOUT { $res = $T_INOUT.text; }
+    | T_INSERT { $res = $T_INSERT.text; }
+    | T_INT { $res = $T_INT.text; }
+    | T_INT2 { $res = $T_INT2.text; }
+    | T_INT4 { $res = $T_INT4.text; }
+    | T_INT8 { $res = $T_INT8.text; }
+    | T_INTEGER { $res = $T_INTEGER.text; }
+    | T_INTERSECT { $res = $T_INTERSECT.text; }
+    | T_INTERVAL { $res = $T_INTERVAL.text; }
+    | T_INTO { $res = $T_INTO.text; }
+    | T_INVOKER { $res = $T_INVOKER.text; }
+    | T_ITEMS { $res = $T_ITEMS.text; }
+    | T_IS { $res = $T_IS.text; }
+    | T_ISOPEN { $res = $T_ISOPEN.text; }
+    | T_JOIN { $res = $T_JOIN.text; }
+    | T_KEEP { $res = $T_KEEP.text; }
+    | T_KEY { $res = $T_KEY.text; }
+    | T_KEYS { $res = $T_KEYS.text; }
+    | T_LAG { $res = $T_LAG.text; }
+    | T_LANGUAGE { $res = $T_LANGUAGE.text; }
+    | T_LAST_VALUE { $res = $T_LAST_VALUE.text; }
+    | T_LEAD { $res = $T_LEAD.text; }
+    | T_LEAVE { $res = $T_LEAVE.text; }
+    | T_LEFT { $res = $T_LEFT.text; }
+    | T_LIKE { $res = $T_LIKE.text; }
+    | T_LIMIT { $res = $T_LIMIT.text; }
+    | T_LINES { $res = $T_LINES.text; }
+    | T_LOCAL { $res = $T_LOCAL.text; }
+    | T_LOCATION { $res = $T_LOCATION.text; }
+    | T_LOCATOR { $res = $T_LOCATOR.text; }
+    | T_LOCATORS { $res = $T_LOCATORS.text; }
+    | T_LOCKS { $res = $T_LOCKS.text; }
+    | T_LOG { $res = $T_LOG.text; }
+    | T_LOGGED { $res = $T_LOGGED.text; }
+    | T_LOGGING { $res = $T_LOGGING.text; }
+    | T_LOOP { $res = $T_LOOP.text; }
+    | T_MAP { $res = $T_MAP.text; }
+    | T_MATCHED { $res = $T_MATCHED.text; }
+    | T_MAX { $res = $T_MAX.text; }
+    | T_MAXTRANS { $res = $T_MAXTRANS.text; }
+    | T_MERGE { $res = $T_MERGE.text; }
+    | T_MESSAGE_TEXT { $res = $T_MESSAGE_TEXT.text; }
+    | T_MICROSECOND { $res = $T_MICROSECOND.text; }
+    | T_MICROSECONDS { $res = $T_MICROSECONDS.text; }
+    | T_MIN { $res = $T_MIN.text; }
+    | T_MULTISET { $res = $T_MULTISET.text; }
+    | T_NCHAR { $res = $T_NCHAR.text; }
+    | T_NEW { $res = $T_NEW.text; }
+    | T_NVARCHAR { $res = $T_NVARCHAR.text; }
+    | T_NO { $res = $T_NO.text; }
+    | T_NOCOMPRESS { $res = $T_NOCOMPRESS.text; }
+    | T_NOCOUNT { $res = $T_NOCOUNT.text; }
+    | T_NOLOGGING { $res = $T_NOLOGGING.text; }
+    | T_NONE { $res = $T_NONE.text; }
+    | T_NOT { $res = $T_NOT.text; }
+    | T_NOTFOUND { $res = $T_NOTFOUND.text; }
+    | T_NUMERIC { $res = $T_NUMERIC.text; }
+    | T_NUMBER { $res = $T_NUMBER.text; }
+    | T_OBJECT { $res = $T_OBJECT.text; }
+    | T_OFF { $res = $T_OFF.text; }
+    | T_ON { $res = $T_ON.text; }
+    | T_ONLY { $res = $T_ONLY.text; }
+    | T_OPEN { $res = $T_OPEN.text; }
+    | T_OR { $res = $T_OR.text; }
+    | T_ORDER { $res = $T_ORDER.text; }
+    | T_OUT { $res = $T_OUT.text; }
+    | T_OUTER { $res = $T_OUTER.text; }
+    | T_OVER { $res = $T_OVER.text; }
+    | T_OVERWRITE { $res = $T_OVERWRITE.text; }
+    | T_OWNER { $res = $T_OWNER.text; }
+    | T_PACKAGE { $res = $T_PACKAGE.text; }
+    | T_PART_COUNT { $res = $T_PART_COUNT.text; }
+    | T_PART_LOC { $res = $T_PART_LOC.text; }
+    | T_PARTITION { $res = $T_PARTITION.text; }
+    | T_PCTFREE { $res = $T_PCTFREE.text; }
+    | T_PCTUSED { $res = $T_PCTUSED.text; }
+    | T_PRECISION { $res = $T_PRECISION.text; }
+    | T_PRESERVE { $res = $T_PRESERVE.text; }
+    | T_PRIMARY { $res = $T_PRIMARY.text; }
+//  | T_PRINT 
+    | T_PROC { $res = $T_PROC.text; }
+    | T_PROCEDURE { $res = $T_PROCEDURE.text; }
+    | T_PWD { $res = $T_PWD.text; }
+    | T_QUALIFY { $res = $T_QUALIFY.text; }
+    | T_QUERY_BAND { $res = $T_QUERY_BAND.text; }
+    | T_QUIT { $res = $T_QUIT.text; }
+//  | T_QUOTED_IDENTIFIER
+    | T_RAISE { $res = $T_RAISE.text; }
+    | T_RANK { $res = $T_RANK.text; }
+    | T_REAL { $res = $T_REAL.text; }
+    | T_REFERENCES { $res = $T_REFERENCES.text; }
+    | T_REGEXP { $res = $T_REGEXP.text; }
+    | T_RR { $res = $T_RR.text; }
+    | T_REPLACE { $res = $T_REPLACE.text; }
+    | T_RESIGNAL { $res = $T_RESIGNAL.text; }
+    | T_RESTRICT { $res = $T_RESTRICT.text; }
+    | T_RESULT { $res = $T_RESULT.text; }
+    | T_RESULT_SET_LOCATOR { $res = $T_RESULT_SET_LOCATOR.text; }
+    | T_RETURN { $res = $T_RETURN.text; }
+    | T_RETURNS { $res = $T_RETURNS.text; }
+    | T_REVERSE { $res = $T_REVERSE.text; }
+    | T_RIGHT { $res = $T_RIGHT.text; }
+    | T_RLIKE { $res = $T_RLIKE.text; }
+    | T_RS { $res = $T_RS.text; }
+    | T_ROLE { $res = $T_ROLE.text; }
+    | T_ROLLBACK { $res = $T_ROLLBACK.text; }
+    | T_ROW { $res = $T_ROW.text; }
+    | T_ROWS { $res = $T_ROWS.text; }
+    | T_ROW_COUNT { $res = $T_ROW_COUNT.text; }
+    | T_ROW_NUMBER { $res = $T_ROW_NUMBER.text; }
+    | T_SCHEMA { $res = $T_SCHEMA.text; }
+    | T_SECOND { $res = $T_SECOND.text; }
+    | T_SECONDS { $res = $T_SECONDS.text; }
+    | T_SECURITY { $res = $T_SECURITY.text; }
+    | T_SEGMENT { $res = $T_SEGMENT.text; }
+    | T_SEL { $res = $T_SEL.text; }
+    | T_SELECT { $res = $T_SELECT.text; }
+    //| T_SESSION { $res = $T_SESSION.text; }
+    //| T_SESSIONS { $res = $T_SESSIONS.text; }
+    | T_SET { $res = $T_SET.text; }
+    | T_SETS { $res = $T_SETS.text; }
+    //| T_SHARE { $res = $T_SHARE.text; }
+    //| T_SIGNAL { $res = $T_SIGNAL.text; }
+    | T_SIMPLE_DOUBLE { $res = $T_SIMPLE_DOUBLE.text; }
+    | T_SIMPLE_FLOAT { $res = $T_SIMPLE_FLOAT.text; }
+    | T_SMALLDATETIME { $res = $T_SMALLDATETIME.text; }
+    | T_SMALLINT { $res = $T_SMALLINT.text; }
+    | T_SPLIT { $res = $T_SPLIT.text; }
+    | T_SQL { $res = $T_SQL.text; }
+    | T_SQLEXCEPTION { $res = $T_SQLEXCEPTION.text; }
+    | T_SQLINSERT { $res = $T_SQLINSERT.text; }
+    | T_SQLSTATE { $res = $T_SQLSTATE.text; }
+    | T_SQLWARNING { $res = $T_SQLWARNING.text; }
+    | T_STATS { $res = $T_STATS.text; }
+    | T_STATISTICS { $res = $T_STATISTICS.text; }
+    | T_STEP { $res = $T_STEP.text; }
+    | T_STDEV { $res = $T_STDEV.text; }
+    | T_STORAGE { $res = $T_STORAGE.text; }
+    | T_STORED { $res = $T_STORED.text; }
+    | T_STRING { $res = $T_STRING.text; }
+    | T_SUBDIR { $res = $T_SUBDIR.text; }
+    | T_SUBSTRING { $res = $T_SUBSTRING.text; }
+    | T_SUM { $res = $T_SUM.text; }
+    | T_SUMMARY { $res = $T_SUMMARY.text; }
+    | T_SYSDATE { $res = $T_SYSDATE.text; }
+    | T_SYS_REFCURSOR { $res = $T_SYS_REFCURSOR.text; }
+    | T_TABLE { $res = $T_TABLE.text; }
+    | T_TABLESPACE { $res = $T_TABLESPACE.text; }
+    | T_TEMPORARY { $res = $T_TEMPORARY.text; }
+    | T_TERMINATED { $res = $T_TERMINATED.text; }
+    | T_TEXTIMAGE_ON { $res = $T_TEXTIMAGE_ON.text; }
+    | T_THEN { $res = $T_THEN.text; }
+    | T_TIMESTAMP { $res = $T_TIMESTAMP.text; }
+    | T_TITLE { $res = $T_TITLE.text; }
+    | T_TO { $res = $T_TO.text; }
+    | T_TOP { $res = $T_TOP.text; }
+    | T_TRANSACTION { $res = $T_TRANSACTION.text; }
+    | T_TRIM { $res = $T_TRIM.text; }
+    | T_TRUE { $res = $T_TRUE.text; }
+    | T_TRUNCATE { $res = $T_TRUNCATE.text; }
+    | T_UNIQUE { $res = $T_UNIQUE.text; }
+    | T_UPDATE { $res = $T_UPDATE.text; }
+    | T_UR { $res = $T_UR.text; }
+    | T_USE { $res = $T_USE.text; }
+    | T_USER { $res = $T_USER.text; }
+    | T_USING { $res = $T_USING.text; }
+    | T_VALUE { $res = $T_VALUE.text; }
+    | T_VALUES { $res = $T_VALUES.text; }
+    | T_VAR { $res = $T_VAR.text; }
+    | T_VARCHAR { $res = $T_VARCHAR.text; }
+    | T_VARCHAR2 { $res = $T_VARCHAR2.text; }
+    | T_VARYING { $res = $T_VARYING.text; }
+    | T_VARIANCE { $res = $T_VARIANCE.text; }
+    | T_VOLATILE { $res = $T_VOLATILE.text; }
+    | T_WHILE { $res = $T_WHILE.text; }
+    | T_WITH { $res = $T_WITH.text; }
+    | T_WITHOUT { $res = $T_WITHOUT.text; }
+    | T_WORK { $res = $T_WORK.text; }
+    | T_XACT_ABORT { $res = $T_XACT_ABORT.text; }
+    | T_XML { $res = $T_XML.text; }
+    | T_YES { $res = $T_YES.text; }
     ;
 
 NULL_CONST
@@ -1342,6 +1705,7 @@ T_FORMAT          : F O R M A T ;
 T_FORMAT_NUMBER   : F O R M A T '_' N U M B E R ;
 T_FOUND           : F O U N D ;
 T_FROM            : F R O M ; 
+T_FROM_UNIXTIME   : F R O M '_' U N I X T I M E ;
 T_FROMUTCTIMESTAMP  : F R O M '_' U T C '_' T I M E S T A M P ;
 T_FULL            : F U L L ;
 T_FUNCTION        : F U N C T I O N ;
@@ -1357,7 +1721,6 @@ T_HAVING          : H A V I N G ;
 T_HDFS            : H D F S ; 
 T_HEX             : H E X ;
 T_HISTOGRAM_NUMERIC : H I S T O G R A M '_' N U M E R I C ;
-T_HIVE            : H I V E ;
 T_HIVECONF        : 'h' 'i' 'v' 'e' 'c' 'o' 'n' 'f' ;
 T_HIVEVAR        : 'h' 'i' 'v' 'e' 'v' 'a' 'r' ;
 T_HOST            : H O S T ;

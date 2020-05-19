@@ -9,4 +9,9 @@ del sys
 
 def parse(str_in):
     import json
-    return json.loads(hiveparser_c.parse(str_in))
+    try:
+        result = json.loads(hiveparser_c.parse(str_in))
+        return result
+    except Exception as ex:
+        print(ex)
+        return dict()

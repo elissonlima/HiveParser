@@ -68,34 +68,20 @@ json hql_type_timestamp_literal(string value)
 json hql_type_identifier(string database, string table, string ident)
 {
 	json j;
-	j["type"] = "NAME";
+	j["type"] = "NAME";	
 	ident.erase(std::remove(ident.begin(), ident.end(), '`'), ident.end());
 	j["value"] = ident;
-
-	if (!database.empty())
-	{
-		database.erase(std::remove(database.begin(), database.end(), '`'), database.end());
-		j["database"] = database;
-	}
-	else
-		j["database"] = "DEFAULT";
 
 	if (!table.empty())
 	{
 		table.erase(std::remove(table.begin(), table.end(), '`'), table.end());
 		j["table"] = table;
 	}
-	else
+
+	if (!database.empty())
 	{
-		if (!database.empty())
-		{
-			j["table"] = database;
-			j["database"] = "DEFAULT";
-		}
-		else
-		{
-			j["table"] = "DEFAULT";
-		}			
+		database.erase(std::remove(database.begin(), database.end(), '`'), database.end());
+		j["database"] = database;
 	}
 
 	return j;
@@ -226,7 +212,7 @@ json hql_uniontype_type_spec(vector<json> data_type_list)
 json hql_type_table_identifier_var(json table_name)
 {
 	json j;
-	j["type"] = "NAME";
+	j["type"] = "TABLE_NAME";
 	j["value"] = table_name;
 	j["database"] = "DEFAULT";
 	return j;
@@ -235,7 +221,7 @@ json hql_type_table_identifier_var(json table_name)
 json hql_type_table_identifier_var(json table_name, json database)
 {
 	json j;
-	j["type"] = "NAME";
+	j["type"] = "TABLE_NAME";
 	j["value"] = table_name;
 	j["database"] = database;
 	return j;
@@ -244,7 +230,7 @@ json hql_type_table_identifier_var(json table_name, json database)
 json hql_type_table_identifier_var(string table_name, json database)
 {
 	json j;
-	j["type"] = "NAME";
+	j["type"] = "TABLE_NAME";
 	j["value"] = table_name;
 	j["database"] = database;
 	return j;
@@ -253,7 +239,7 @@ json hql_type_table_identifier_var(string table_name, json database)
 json hql_type_table_identifier_var(json table_name, string database)
 {
 	json j;
-	j["type"] = "NAME";
+	j["type"] = "TABLE_NAME";
 	j["value"] = table_name;
 	j["database"] = database;
 	return j;
