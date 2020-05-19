@@ -9,7 +9,7 @@ PyObject* py_parse(PyObject* self, PyObject* args)
     std::string in(input);
     std::string result = parse(in);
 
-    return PyBytes_FromString(result.c_str());
+    return PyUnicode_FromString(result.c_str());
 }
 
 static PyMethodDef ModuleMethods[] = {
@@ -18,15 +18,15 @@ static PyMethodDef ModuleMethods[] = {
 };
 
 
-static struct PyModuleDef hiveparsermodule = {
+static struct PyModuleDef hiveparser_cmodule = {
     PyModuleDef_HEAD_INIT,
-    "hiveparser", /* name of module */
+    "hiveparser_c", /* name of module */
     "Hive QL Parser", /* Doc string (may be NULL) */
     0, /* Size of per-interpreter state or -1 */
     ModuleMethods /* Method table */
 };
 
 /* Module initialization function */
-PyMODINIT_FUNC PyInit_hiveparser(void) {
-    return PyModule_Create(&hiveparsermodule);
+PyMODINIT_FUNC PyInit_hiveparser_c(void) {
+    return PyModule_Create(&hiveparser_cmodule);
 }

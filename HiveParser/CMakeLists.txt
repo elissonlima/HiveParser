@@ -14,6 +14,7 @@ add_definitions(-DANTLR4CPP_STATIC)
 # using /MD flag for antlr4_runtime (for Visual C++ compilers only)
 set(ANTLR4_WITH_STATIC_CRT OFF)
 # add external build for antlrcpp
+#set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
 include(ExternalAntlr4Cpp)
 # add antrl4cpp artifacts to project environment
 include_directories(${ANTLR4_INCLUDE_DIRS})
@@ -27,7 +28,7 @@ find_package(ANTLR REQUIRED)
 
 add_subdirectory("third_part")
 
-
+message("BASE PROJECT PATH ${BASE_PROJECT_PATH}")
 # set variable pointing to the antlr tool that supports C++
 # this is not required if the jar file can be found under PATH environment
 
@@ -49,7 +50,6 @@ include_directories(${ANTLR4_RUNTIME_LIBRARIES})
 message("Lexer out dir ${ANTLR_HiveLexer_OUTPUT_DIR}")
 message("Parser out dir ${ANTLR_HiveParser_OUTPUT_DIR}")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
 add_executable(hiveparser main.cpp hql_types.cpp hql_exprs.cpp hql_stmts.cpp hql_functions.cpp
 #               ${ANTLR_HiveLexer_CXX_OUTPUTS}
                ${ANTLR_HiveParser_CXX_OUTPUTS})
@@ -70,9 +70,9 @@ set(OUTPUT      "${CMAKE_CURRENT_BINARY_DIR}/build_ext")
 configure_file(${SETUP_PY_IN} ${SETUP_PY})
 
 add_custom_command(OUTPUT ${OUTPUT}
-                    COMMAND ${PYTHON} ${SETUP_PY} build_ext
+                    COMMAND ${PYTHON} ${SETUP_PY} build_ext -b ${BASE_PROJECT_PATH}/python_module/hiveparser
 #                    COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT} 
-                   DEPENDS hiveparser)
+                   DEPENDS antlr4_static)
 
 add_custom_target(target ALL DEPENDS ${OUTPUT})
 
