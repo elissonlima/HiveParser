@@ -1,8 +1,8 @@
-#HiveParser
+# HiveParser
 
-###Hive Query Language Parser to JSON
+### Hive Query Language Parser to JSON
 
-####Usage 
+#### Usage 
 
 ```python
 import hiveparser
