@@ -90,7 +90,7 @@ json hql_type_identifier(string database, string table, string ident)
 json hql_type_table_identifier(string database, string ident)
 {
 	json j;
-	j["type"] = "NAME";
+	j["type"] = "TABLE_NAME";
 	ident.erase(std::remove(ident.begin(), ident.end(), '`'), ident.end());
 	j["value"] = ident;
 	j["database"] = "DEFAULT";

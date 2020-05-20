@@ -54,7 +54,7 @@ add_executable(hiveparser main.cpp hql_types.cpp hql_exprs.cpp hql_stmts.cpp hql
 #               ${ANTLR_HiveLexer_CXX_OUTPUTS}
                ${ANTLR_HiveParser_CXX_OUTPUTS})
 
-target_link_libraries(hiveparser antlr4_static nlohmann_json::nlohmann_json)
+target_link_libraries(hiveparser antlr4_shared nlohmann_json::nlohmann_json)
 
 # target_link_libraries(hiveparser antlr4_shared)
 #add_custom_command(TARGET hiveparser
