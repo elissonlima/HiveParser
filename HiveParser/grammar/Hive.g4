@@ -22,6 +22,7 @@ grammar Hive;
 @parser::members { 
     map<string, json> hivevar_context_variables; 
     map<string, json> hiveconf_context_variables;
+    string database_now = "DEFAULT";
 
     void save_var(string var_name, string var_type, json var_value)
     {
@@ -125,6 +126,7 @@ ddl_stmt returns [json res]
     : create_table_stmt { $res = $create_table_stmt.res; }
     | droptable_stmt { $res = $droptable_stmt.res; }
     | insert_stmt { $res = $insert_stmt.res; }
+    | T_USE name_identifier { database_now = remove_backquotes($name_identifier.res); }
     ;
 
 insert_stmt returns [json res]
@@ -702,7 +704,7 @@ select_expr returns [json res]
     | '*' { $res = hql_select_all_expr(); } 
     | name_identifier '.' '*' { $res = hql_select_all_expr($name_identifier.res); }
     | over_clause { $res = hql_select_expr($over_clause.res, "DEFAULT"); }
-    | over_clause  T_AS? name_identifier { $res = hql_select_expr($over_clause.res, $name_identifier.res); }
+    | over_clause T_AS? name_identifier { $res = hql_select_expr($over_clause.res, $name_identifier.res); }
     ;
 
 over_clause returns [json res]
@@ -1162,16 +1164,17 @@ ident returns [json res]
 
 tab_ident returns [json res]
     :  database=name_identifier '.' tablename=name_identifier { $res = hql_type_table_identifier($database.res, $tablename.res); }
-    |  tablename=name_identifier { $res = hql_type_table_identifier(string(), $tablename.res); }
+    |  tablename=name_identifier { $res = hql_type_table_identifier(database_now, $tablename.res); }
     |  database_var=complex_name '.' tablename_var=complex_name { $res = hql_type_table_identifier($database_var.res, $tablename_var.res); }
-    |  tablename_var=complex_name { $res = hql_type_table_identifier(string(), $tablename_var.res); }
+    |  tablename_var=complex_name { $res = hql_type_table_identifier(database_now, $tablename_var.res); }
     ;
 
 complex_name returns [string res]
-    : {vector<Complex_atom_nameContext*> name_list; } ( name_list+=complex_atom_name)+ {
+    : {vector<Complex_atom_nameContext*> name_list; } ( name_list+=complex_atom_name)* use_var {
         string result = "";
         for(Complex_atom_nameContext* name_ctxt:$name_list)
             result+=name_ctxt->res;
+        result += remove_quotes(to_string($use_var.res["value"]));
         $res = result;
     }
     ;

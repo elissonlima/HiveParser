@@ -9,8 +9,18 @@ del sys
 
 def parse(str_in):
 
+
     if type(str_in) is not str:
-        raise TypeError("Input must be str type")
+        import _io
+        if(type(str_in) == _io.TextIOWrapper):
+            str_in = str_in.read()        
+        else:
+            raise TypeError("Input must be str, TextIOWrapper type")
+    else:        
+        import os.path
+        if(os.path.isfile(str_in)):
+            arq_open = open(str_in)
+            str_in = arq_open.read()
 
     import json
     try:
