@@ -57,11 +57,11 @@ add_executable(hiveparser main.cpp hql_types.cpp hql_exprs.cpp hql_stmts.cpp hql
 target_link_libraries(hiveparser antlr4_shared nlohmann_json::nlohmann_json)
 
 # target_link_libraries(hiveparser antlr4_shared)
-#add_custom_command(TARGET hiveparser
-#                   POST_BUILD
-#                   COMMAND ${CMAKE_COMMAND}
-#                           -E copy ${ANTLR4_RUNTIME_LIBRARIES} .
-#                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command(TARGET hiveparser
+                   POST_BUILD
+                   COMMAND ${CMAKE_COMMAND}
+                           -E copy ${ANTLR4_RUNTIME_LIBRARIES} .
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 set(SETUP_PY_IN "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in")
 set(SETUP_PY    "${CMAKE_CURRENT_BINARY_DIR}/setup.py")

@@ -185,6 +185,14 @@ json hql_use_variable(string var_type, string var_name)
 	return j;
 }
 
+json hql_var_name_value(string var_value)
+{
+	json j;
+	j["type"] = "VAR_VALUE";
+	j["value"] = var_value;
+	return j;
+}
+
 json hql_insert_select_stmt(json table_name, vector<json> partitions, bool opt_if_not_exists, json select_stmt)
 {
 	json j;

@@ -160,11 +160,20 @@ opt_insert_partitions returns [vector<json> res]
     ;
 
 variable_substitution returns [json res]
-    : T_SET opt_var_set_type system_var_identifier '=' expr { 
-        save_var($system_var_identifier.res, $opt_var_set_type.res, $expr.res);
-        $res = hql_set_variable($opt_var_set_type.res, $system_var_identifier.res, $expr.res); 
+    : T_SET opt_var_set_type system_var_identifier '=' set_var_value { 
+        save_var($system_var_identifier.res, $opt_var_set_type.res, $set_var_value.res);
+        $res = hql_set_variable($opt_var_set_type.res, $system_var_identifier.res, $set_var_value.res); 
     }
     ;
+
+set_var_value returns [json res]
+    : NIDENTIFIER { $res = hql_var_name_value(remove_backquotes($NIDENTIFIER.text)); }
+    | non_reserved_words { $res = hql_var_name_value($non_reserved_words.res); }
+    | unary_operator { $res = hql_var_name_value($unary_operator.text); }
+    | reserved_words { $res = hql_var_name_value($reserved_words.res); }
+    | expr { $res = $expr.res; }
+    ;
+
 
 use_var returns [json res]
     : '$' '{' opt_var_use_type system_var_identifier '}' { $res = get_value($system_var_identifier.res, $opt_var_use_type.res); }
@@ -175,7 +184,7 @@ system_var_identifier returns [string res]
         string result = "";
         for(Var_nameContext* var_namectxt:$var_name_list)
         {
-            result+=var_namectxt->res;
+            result += "." + var_namectxt->res;
         }
         $res = result;
     }
@@ -1051,15 +1060,15 @@ date_func returns [json res]
     | T_SECOND T_OPEN_P date_expr=expr T_CLOSE_P { $res = hql_single_param_func("SECOND", "date", $date_expr.res); }
     | T_WEEKOFYEAR T_OPEN_P date_expr=expr T_CLOSE_P { $res = hql_single_param_func("WEEKOFYEAR", "date", $date_expr.res); }
     | T_DATEDIFF T_OPEN_P enddate=expr ',' startdate=expr T_CLOSE_P { $res = hql_double_param_func("DATEDIFF", "enddate", $enddate.res, "startdate", $startdate.res); }
-    | T_DATEADD T_OPEN_P startdate=expr ',' days=expr T_CLOSE_P { $res = hql_double_param_func("DATEDIFF", "startdate", $startdate.res, "days", $days.res); }
-    | T_DATESUB T_OPEN_P startdate=expr ',' days=expr T_CLOSE_P { $res = hql_double_param_func("DATEDIFF", "startdate", $startdate.res, "days", $days.res); }
-    | T_TOUTCTIMESTAMP T_OPEN_P ts=expr ',' timezone=expr T_CLOSE_P { $res = hql_double_param_func("TO_UTC_TIMESTAMP", "ts", $ts.res, "timezone", $timezone.res); }
-    | T_FROMUTCTIMESTAMP T_OPEN_P ts=expr ',' timezone=expr T_CLOSE_P { $res = hql_double_param_func("FROM_UTC_TIMESTAMP", "ts", $ts.res, "timezone", $timezone.res); }
+    | T_DATE_ADD T_OPEN_P startdate=expr ',' days=expr T_CLOSE_P { $res = hql_double_param_func("DATEDIFF", "startdate", $startdate.res, "days", $days.res); }
+    | T_DATE_SUB T_OPEN_P startdate=expr ',' days=expr T_CLOSE_P { $res = hql_double_param_func("DATEDIFF", "startdate", $startdate.res, "days", $days.res); }
+    | T_TO_UTC_TIMESTAMP T_OPEN_P ts=expr ',' timezone=expr T_CLOSE_P { $res = hql_double_param_func("TO_UTC_TIMESTAMP", "ts", $ts.res, "timezone", $timezone.res); }
+    | T_FROM_UTC_TIMESTAMP T_OPEN_P ts=expr ',' timezone=expr T_CLOSE_P { $res = hql_double_param_func("FROM_UTC_TIMESTAMP", "ts", $ts.res, "timezone", $timezone.res); }
     | T_CURRENT_DATE (T_OPEN_P T_CLOSE_P)? { $res = hql_fixed_func("CURRENT_DATE"); }
     | T_CURRENT_TIMESTAMP (T_OPEN_P T_CLOSE_P)? { $res = hql_fixed_func("T_CURRENT_TIMESTAMP"); }
     | T_ADD_MONTHS T_OPEN_P startdate=expr ',' num_months=expr T_CLOSE_P { $res = hql_double_param_func("ADD_MONTHS", "startdate", $startdate.res, "num_months", $num_months.res); }
     | T_ADD_MONTHS T_OPEN_P startdate=expr ',' num_months=expr ',' out_date_format=expr T_CLOSE_P { $res = hql_three_param_func("ADD_MONTHS", "startdate", $startdate.res, "num_months", $num_months.res, "out_date_format", $out_date_format.res); }
-    | T_LASTDAY T_OPEN_P date_expr=expr T_CLOSE_P { $res = hql_single_param_func("LAST_DAY", "date", $date_expr.res); }
+    | T_LAST_DAY T_OPEN_P date_expr=expr T_CLOSE_P { $res = hql_single_param_func("LAST_DAY", "date", $date_expr.res); }
     | T_NEXT_DAY T_OPEN_P startdate=expr ',' day_of_week=expr T_CLOSE_P { $res = hql_double_param_func("NEXT_DAY", "startdate", $startdate.res, "day_of_week", $day_of_week.res); }
     | T_TRUNC T_OPEN_P date_expr=expr ',' format=expr T_CLOSE_P { $res = hql_double_param_func("TRUNC", "date", $date_expr.res, "format", $format.res); }
     | T_MONTHS_BETWEEN T_OPEN_P date1=expr ',' date2=expr T_CLOSE_P { $res = hql_double_param_func("MONTHS_BETWEEN", "date1", $date1.res, "date2", $date2.res); }
@@ -1140,7 +1149,7 @@ math_func returns [json res]
     | 'E' T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("EULER_CONST"); }
     | 'PI' T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("PI_CONST"); }
     | T_FACTORIAL T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("FACTORIAL", "expr", $expr.res); }
-    | T_CBR T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("CUBE_ROOT", "expr", $expr.res); }
+    | T_CBRT T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("CUBE_ROOT", "expr", $expr.res); }
     ;
 
 // https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
@@ -1223,328 +1232,561 @@ unary_operator
     | T_NOT
     ;
 
-// Tokens that are not reserved words and can be used as identifiers
-non_reserved_words returns [string res]
-    : T_ACTIVITY_COUNT { $res = $T_ACTIVITY_COUNT.text; }
-//  | T_ACTION 
-//  | T_ADD2
-    | T_ALL { $res = $T_ALL.text; }
-//  | T_ALLOCATE
+reserved_words returns [string res]
+    : T_ALL { $res = $T_ALL.text; }
     | T_ALTER { $res = $T_ALTER.text; }
     | T_AND { $res = $T_AND.text; }
-//  | T_ANSI_NULLS
-//  | T_ANSI_PADDING
+    | T_ARRAY { $res = $T_ARRAY.text; }
     | T_AS { $res = $T_AS.text; }
-    | T_ASC { $res = $T_ASC.text; }
-//  | T_ASSOCIATE
-    | T_AT { $res = $T_AT.text; }
-    | T_AUTO_INCREMENT { $res = $T_AUTO_INCREMENT.text; }
-    | T_AVG { $res = $T_AVG.text; }
-//  | T_BATCHSIZE
-    | T_BEGIN { $res = $T_BEGIN.text; }
+    | T_AUTHORIZATION { $res = $T_AUTHORIZATION.text; }
     | T_BETWEEN { $res = $T_BETWEEN.text; }
     | T_BIGINT { $res = $T_BIGINT.text; }
-//  | T_BINARY_DOUBLE
-//  | T_BINARY_FLOAT
-    | T_BIT { $res = $T_BIT.text; }
-    | T_BODY { $res = $T_BODY.text; }
-    | T_BREAK { $res = $T_BREAK.text; }
+    | T_BINARY { $res = $T_BINARY.text; }
+    | T_BOOLEAN { $res = $T_BOOLEAN.text; }
+    | T_BOTH { $res = $T_BOTH.text; }
     | T_BY { $res = $T_BY.text; }
-    | T_BYTE { $res = $T_BYTE.text; }
-    | T_CALL { $res = $T_CALL.text; }
-    | T_CALLER { $res = $T_CALLER.text; }
-    | T_CASCADE { $res = $T_CASCADE.text; }
     | T_CASE { $res = $T_CASE.text; }
-//  | T_CASESPECIFIC
     | T_CAST { $res = $T_CAST.text; }
     | T_CHAR { $res = $T_CHAR.text; }
-    | T_CHARACTER { $res = $T_CHARACTER.text; }
-    | T_CHARSET { $res = $T_CHARSET.text; }
-    | T_CLIENT { $res = $T_CLIENT.text; }
-    | T_CLOSE { $res = $T_CLOSE.text; }
-    | T_CLUSTERED { $res = $T_CLUSTERED.text; }
-    | T_CMP { $res = $T_CMP.text; }
-    | T_COLLECT { $res = $T_COLLECT.text; }
-    | T_COLLECTION { $res = $T_COLLECTION.text; }
     | T_COLUMN { $res = $T_COLUMN.text; }
-    | T_COMMENT { $res = $T_COMMENT.text; }
-    | T_COMPRESS { $res = $T_COMPRESS.text; }
-    | T_CONSTANT { $res = $T_CONSTANT.text; }
-    | T_COPY { $res = $T_COPY.text; }
-    | T_COMMIT { $res = $T_COMMIT.text; }
-    | T_CONCAT { $res = $T_CONCAT.text; }
-    | T_CONDITION { $res = $T_CONDITION.text; }
-    | T_CONSTRAINT { $res = $T_CONSTRAINT.text; }
-    | T_CONTINUE { $res = $T_CONTINUE.text; }
-    | T_COUNT { $res = $T_COUNT.text; }
-    | T_COUNT_BIG { $res = $T_COUNT_BIG.text; }
+    | T_CONF { $res = $T_CONF.text; }
     | T_CREATE { $res = $T_CREATE.text; }
-    | T_CREATION { $res = $T_CREATION.text; }
-    | T_CREATOR { $res = $T_CREATOR.text; }
-    | T_CS { $res = $T_CS.text; }
-    | T_CUME_DIST { $res = $T_CUME_DIST.text; }
+    | T_CROSS { $res = $T_CROSS.text; }
+    | T_CUBE { $res = $T_CUBE.text; }
     | T_CURRENT { $res = $T_CURRENT.text; }
     | T_CURRENT_DATE { $res = $T_CURRENT_DATE.text; }
-    | T_CURRENT_SCHEMA { $res = $T_CURRENT_SCHEMA.text; }
     | T_CURRENT_TIMESTAMP { $res = $T_CURRENT_TIMESTAMP.text; }
-    | T_CURRENT_USER { $res = $T_CURRENT_USER.text; }
     | T_CURSOR { $res = $T_CURSOR.text; }
-//  | T_DATA
     | T_DATABASE { $res = $T_DATABASE.text; }
     | T_DATE { $res = $T_DATE.text; }
-    | T_DATETIME { $res = $T_DATETIME.text; }
-    | T_DAY { $res = $T_DAY.text; }
-    | T_DAYS { $res = $T_DAYS.text; }
-    | T_DEC { $res = $T_DEC.text; }
     | T_DECIMAL { $res = $T_DECIMAL.text; }
-    | T_DECLARE { $res = $T_DECLARE.text; }
-    | T_DEFAULT { $res = $T_DEFAULT.text; }
-    | T_DEFERRED { $res = $T_DEFERRED.text; }
-    | T_DEFINED { $res = $T_DEFINED.text; }
-    | T_DEFINER { $res = $T_DEFINER.text; }
-    | T_DEFINITION { $res = $T_DEFINITION.text; }
     | T_DELETE { $res = $T_DELETE.text; }
-    | T_DELIMITED { $res = $T_DELIMITED.text; }
-    | T_DELIMITER { $res = $T_DELIMITER.text; }
-    | T_DENSE_RANK { $res = $T_DENSE_RANK.text; }
-    | T_DESC { $res = $T_DESC.text; }
     | T_DESCRIBE { $res = $T_DESCRIBE.text; }
-    | T_DIAGNOSTICS { $res = $T_DIAGNOSTICS.text; }
-    | T_DIR { $res = $T_DIR.text; }
-    | T_DIRECTORY { $res = $T_DIRECTORY.text; }
     | T_DISTINCT { $res = $T_DISTINCT.text; }
-    | T_DISTRIBUTE { $res = $T_DISTRIBUTE.text; }
-    | T_DO  { $res = $T_DO.text; }
     | T_DOUBLE { $res = $T_DOUBLE.text; }
     | T_DROP { $res = $T_DROP.text; }
-    | T_DYNAMIC { $res = $T_DYNAMIC.text; }
-    | T_ENABLE { $res = $T_ENABLE.text; }
-    | T_ENGINE { $res = $T_ENGINE.text; }
-    | T_ESCAPED { $res = $T_ESCAPED.text; }
-    | T_EXCEPT { $res = $T_EXCEPT.text; }
-    | T_EXEC { $res = $T_EXEC.text; }
-    | T_EXECUTE { $res = $T_EXECUTE.text; }
-    | T_EXCEPTION { $res = $T_EXCEPTION.text; }
-    | T_EXCLUSIVE { $res = $T_EXCLUSIVE.text; }
+    | T_ELSE { $res = $T_ELSE.text; }
+    | T_END { $res = $T_END.text; }
+    | T_EXCHANGE { $res = $T_EXCHANGE.text; }
     | T_EXISTS { $res = $T_EXISTS.text; }
-    | T_EXIT { $res = $T_EXIT.text; }
-    | T_FALLBACK { $res = $T_FALLBACK.text; }
+    | T_EXTENDED { $res = $T_EXTENDED.text; }
+    | T_EXTERNAL { $res = $T_EXTERNAL.text; }
     | T_FALSE { $res = $T_FALSE.text; }
     | T_FETCH { $res = $T_FETCH.text; }
-    | T_FIELDS { $res = $T_FIELDS.text; }
-    | T_FILE { $res = $T_FILE.text; }
-    | T_FILES { $res = $T_FILES.text; }
-    | T_FIRST_VALUE { $res = $T_FIRST_VALUE.text; }
     | T_FLOAT { $res = $T_FLOAT.text; }
+    | T_FOLLOWING { $res = $T_FOLLOWING.text; }
     | T_FOR { $res = $T_FOR.text; }
-    | T_FOREIGN { $res = $T_FOREIGN.text; }
-    | T_FORMAT { $res = $T_FORMAT.text; }
-    | T_FOUND { $res = $T_FOUND.text; }
     | T_FROM { $res = $T_FROM.text; }
     | T_FULL { $res = $T_FULL.text; }
     | T_FUNCTION { $res = $T_FUNCTION.text; }
-    | T_GET { $res = $T_GET.text; }
-    | T_GLOBAL { $res = $T_GLOBAL.text; }
-    | T_GO { $res = $T_GO.text; }
     | T_GRANT { $res = $T_GRANT.text; }
     | T_GROUP { $res = $T_GROUP.text; }
-    | T_HANDLER { $res = $T_HANDLER.text; }
-    | T_HASH { $res = $T_HASH.text; }
+    | T_GROUPING { $res = $T_GROUPING.text; }
     | T_HAVING { $res = $T_HAVING.text; }
-    | T_HDFS { $res = $T_HDFS.text; }
-//  | T_HIVE         
-    | T_HOST { $res = $T_HOST.text; }
-    | T_IDENTITY { $res = $T_IDENTITY.text; }
     | T_IF { $res = $T_IF.text; }
-    | T_IGNORE { $res = $T_IGNORE.text; }
-    | T_IMMEDIATE { $res = $T_IMMEDIATE.text; }
+    | T_IMPORT { $res = $T_IMPORT.text; }
     | T_IN { $res = $T_IN.text; }
-    | T_INCLUDE { $res = $T_INCLUDE.text; }
-    | T_INDEX { $res = $T_INDEX.text; }
-    | T_INITRANS { $res = $T_INITRANS.text; }
     | T_INNER { $res = $T_INNER.text; }
-    | T_INOUT { $res = $T_INOUT.text; }
     | T_INSERT { $res = $T_INSERT.text; }
     | T_INT { $res = $T_INT.text; }
-    | T_INT2 { $res = $T_INT2.text; }
-    | T_INT4 { $res = $T_INT4.text; }
-    | T_INT8 { $res = $T_INT8.text; }
-    | T_INTEGER { $res = $T_INTEGER.text; }
     | T_INTERSECT { $res = $T_INTERSECT.text; }
     | T_INTERVAL { $res = $T_INTERVAL.text; }
     | T_INTO { $res = $T_INTO.text; }
-    | T_INVOKER { $res = $T_INVOKER.text; }
-    | T_ITEMS { $res = $T_ITEMS.text; }
     | T_IS { $res = $T_IS.text; }
-    | T_ISOPEN { $res = $T_ISOPEN.text; }
     | T_JOIN { $res = $T_JOIN.text; }
-    | T_KEEP { $res = $T_KEEP.text; }
-    | T_KEY { $res = $T_KEY.text; }
-    | T_KEYS { $res = $T_KEYS.text; }
-    | T_LAG { $res = $T_LAG.text; }
-    | T_LANGUAGE { $res = $T_LANGUAGE.text; }
-    | T_LAST_VALUE { $res = $T_LAST_VALUE.text; }
-    | T_LEAD { $res = $T_LEAD.text; }
-    | T_LEAVE { $res = $T_LEAVE.text; }
+    | T_LATERAL { $res = $T_LATERAL.text; }
     | T_LEFT { $res = $T_LEFT.text; }
+    | T_LESS { $res = $T_LESS.text; }
     | T_LIKE { $res = $T_LIKE.text; }
-    | T_LIMIT { $res = $T_LIMIT.text; }
-    | T_LINES { $res = $T_LINES.text; }
     | T_LOCAL { $res = $T_LOCAL.text; }
-    | T_LOCATION { $res = $T_LOCATION.text; }
-    | T_LOCATOR { $res = $T_LOCATOR.text; }
-    | T_LOCATORS { $res = $T_LOCATORS.text; }
-    | T_LOCKS { $res = $T_LOCKS.text; }
-    | T_LOG { $res = $T_LOG.text; }
-    | T_LOGGED { $res = $T_LOGGED.text; }
-    | T_LOGGING { $res = $T_LOGGING.text; }
-    | T_LOOP { $res = $T_LOOP.text; }
+    | T_MACRO { $res = $T_MACRO.text; }
     | T_MAP { $res = $T_MAP.text; }
-    | T_MATCHED { $res = $T_MATCHED.text; }
-    | T_MAX { $res = $T_MAX.text; }
-    | T_MAXTRANS { $res = $T_MAXTRANS.text; }
-    | T_MERGE { $res = $T_MERGE.text; }
-    | T_MESSAGE_TEXT { $res = $T_MESSAGE_TEXT.text; }
-    | T_MICROSECOND { $res = $T_MICROSECOND.text; }
-    | T_MICROSECONDS { $res = $T_MICROSECONDS.text; }
-    | T_MIN { $res = $T_MIN.text; }
-    | T_MULTISET { $res = $T_MULTISET.text; }
-    | T_NCHAR { $res = $T_NCHAR.text; }
-    | T_NEW { $res = $T_NEW.text; }
-    | T_NVARCHAR { $res = $T_NVARCHAR.text; }
-    | T_NO { $res = $T_NO.text; }
-    | T_NOCOMPRESS { $res = $T_NOCOMPRESS.text; }
-    | T_NOCOUNT { $res = $T_NOCOUNT.text; }
-    | T_NOLOGGING { $res = $T_NOLOGGING.text; }
+    | T_MORE { $res = $T_MORE.text; }
     | T_NONE { $res = $T_NONE.text; }
     | T_NOT { $res = $T_NOT.text; }
-    | T_NOTFOUND { $res = $T_NOTFOUND.text; }
-    | T_NUMERIC { $res = $T_NUMERIC.text; }
-    | T_NUMBER { $res = $T_NUMBER.text; }
-    | T_OBJECT { $res = $T_OBJECT.text; }
-    | T_OFF { $res = $T_OFF.text; }
+    | T_NULL { $res = $T_NULL.text; }
+    | T_OF { $res = $T_OF.text; }
     | T_ON { $res = $T_ON.text; }
-    | T_ONLY { $res = $T_ONLY.text; }
-    | T_OPEN { $res = $T_OPEN.text; }
     | T_OR { $res = $T_OR.text; }
     | T_ORDER { $res = $T_ORDER.text; }
     | T_OUT { $res = $T_OUT.text; }
     | T_OUTER { $res = $T_OUTER.text; }
     | T_OVER { $res = $T_OVER.text; }
-    | T_OVERWRITE { $res = $T_OVERWRITE.text; }
-    | T_OWNER { $res = $T_OWNER.text; }
-    | T_PACKAGE { $res = $T_PACKAGE.text; }
-    | T_PART_COUNT { $res = $T_PART_COUNT.text; }
-    | T_PART_LOC { $res = $T_PART_LOC.text; }
+    | T_PARTIALSCAN { $res = $T_PARTIALSCAN.text; }
     | T_PARTITION { $res = $T_PARTITION.text; }
-    | T_PCTFREE { $res = $T_PCTFREE.text; }
-    | T_PCTUSED { $res = $T_PCTUSED.text; }
-    | T_PRECISION { $res = $T_PRECISION.text; }
+    | T_PERCENT { $res = $T_PERCENT.text; }
+    | T_PRECEDING { $res = $T_PRECEDING.text; }
     | T_PRESERVE { $res = $T_PRESERVE.text; }
-    | T_PRIMARY { $res = $T_PRIMARY.text; }
-//  | T_PRINT 
-    | T_PROC { $res = $T_PROC.text; }
     | T_PROCEDURE { $res = $T_PROCEDURE.text; }
-    | T_PWD { $res = $T_PWD.text; }
-    | T_QUALIFY { $res = $T_QUALIFY.text; }
-    | T_QUERY_BAND { $res = $T_QUERY_BAND.text; }
-    | T_QUIT { $res = $T_QUIT.text; }
-//  | T_QUOTED_IDENTIFIER
-    | T_RAISE { $res = $T_RAISE.text; }
-    | T_RANK { $res = $T_RANK.text; }
-    | T_REAL { $res = $T_REAL.text; }
-    | T_REFERENCES { $res = $T_REFERENCES.text; }
-    | T_REGEXP { $res = $T_REGEXP.text; }
-    | T_RR { $res = $T_RR.text; }
-    | T_REPLACE { $res = $T_REPLACE.text; }
-    | T_RESIGNAL { $res = $T_RESIGNAL.text; }
-    | T_RESTRICT { $res = $T_RESTRICT.text; }
-    | T_RESULT { $res = $T_RESULT.text; }
-    | T_RESULT_SET_LOCATOR { $res = $T_RESULT_SET_LOCATOR.text; }
-    | T_RETURN { $res = $T_RETURN.text; }
-    | T_RETURNS { $res = $T_RETURNS.text; }
-    | T_REVERSE { $res = $T_REVERSE.text; }
+    | T_RANGE { $res = $T_RANGE.text; }
+    | T_READS { $res = $T_READS.text; }
+    | T_REDUCE { $res = $T_REDUCE.text; }
+    | T_REVOKE { $res = $T_REVOKE.text; }
     | T_RIGHT { $res = $T_RIGHT.text; }
-    | T_RLIKE { $res = $T_RLIKE.text; }
-    | T_RS { $res = $T_RS.text; }
-    | T_ROLE { $res = $T_ROLE.text; }
-    | T_ROLLBACK { $res = $T_ROLLBACK.text; }
+    | T_ROLLUP { $res = $T_ROLLUP.text; }
     | T_ROW { $res = $T_ROW.text; }
     | T_ROWS { $res = $T_ROWS.text; }
-    | T_ROW_COUNT { $res = $T_ROW_COUNT.text; }
-    | T_ROW_NUMBER { $res = $T_ROW_NUMBER.text; }
-    | T_SCHEMA { $res = $T_SCHEMA.text; }
-    | T_SECOND { $res = $T_SECOND.text; }
-    | T_SECONDS { $res = $T_SECONDS.text; }
-    | T_SECURITY { $res = $T_SECURITY.text; }
-    | T_SEGMENT { $res = $T_SEGMENT.text; }
-    | T_SEL { $res = $T_SEL.text; }
     | T_SELECT { $res = $T_SELECT.text; }
-    //| T_SESSION { $res = $T_SESSION.text; }
-    //| T_SESSIONS { $res = $T_SESSIONS.text; }
     | T_SET { $res = $T_SET.text; }
-    | T_SETS { $res = $T_SETS.text; }
-    //| T_SHARE { $res = $T_SHARE.text; }
-    //| T_SIGNAL { $res = $T_SIGNAL.text; }
-    | T_SIMPLE_DOUBLE { $res = $T_SIMPLE_DOUBLE.text; }
-    | T_SIMPLE_FLOAT { $res = $T_SIMPLE_FLOAT.text; }
-    | T_SMALLDATETIME { $res = $T_SMALLDATETIME.text; }
     | T_SMALLINT { $res = $T_SMALLINT.text; }
-    | T_SPLIT { $res = $T_SPLIT.text; }
-    | T_SQL { $res = $T_SQL.text; }
-    | T_SQLEXCEPTION { $res = $T_SQLEXCEPTION.text; }
-    | T_SQLINSERT { $res = $T_SQLINSERT.text; }
-    | T_SQLSTATE { $res = $T_SQLSTATE.text; }
-    | T_SQLWARNING { $res = $T_SQLWARNING.text; }
-    | T_STATS { $res = $T_STATS.text; }
-    | T_STATISTICS { $res = $T_STATISTICS.text; }
-    | T_STEP { $res = $T_STEP.text; }
-    | T_STDEV { $res = $T_STDEV.text; }
-    | T_STORAGE { $res = $T_STORAGE.text; }
-    | T_STORED { $res = $T_STORED.text; }
-    | T_STRING { $res = $T_STRING.text; }
-    | T_SUBDIR { $res = $T_SUBDIR.text; }
-    | T_SUBSTRING { $res = $T_SUBSTRING.text; }
-    | T_SUM { $res = $T_SUM.text; }
-    | T_SUMMARY { $res = $T_SUMMARY.text; }
-    | T_SYSDATE { $res = $T_SYSDATE.text; }
-    | T_SYS_REFCURSOR { $res = $T_SYS_REFCURSOR.text; }
     | T_TABLE { $res = $T_TABLE.text; }
-    | T_TABLESPACE { $res = $T_TABLESPACE.text; }
-    | T_TEMPORARY { $res = $T_TEMPORARY.text; }
-    | T_TERMINATED { $res = $T_TERMINATED.text; }
-    | T_TEXTIMAGE_ON { $res = $T_TEXTIMAGE_ON.text; }
+    | T_TABLESAMPLE { $res = $T_TABLESAMPLE.text; }
     | T_THEN { $res = $T_THEN.text; }
     | T_TIMESTAMP { $res = $T_TIMESTAMP.text; }
-    | T_TITLE { $res = $T_TITLE.text; }
     | T_TO { $res = $T_TO.text; }
-    | T_TOP { $res = $T_TOP.text; }
-    | T_TRANSACTION { $res = $T_TRANSACTION.text; }
-    | T_TRIM { $res = $T_TRIM.text; }
+    | T_TRANSFORM { $res = $T_TRANSFORM.text; }
+    | T_TRIGGER { $res = $T_TRIGGER.text; }
     | T_TRUE { $res = $T_TRUE.text; }
     | T_TRUNCATE { $res = $T_TRUNCATE.text; }
-    | T_UNIQUE { $res = $T_UNIQUE.text; }
+    | T_UNBOUNDED { $res = $T_UNBOUNDED.text; }
+    | T_UNION { $res = $T_UNION.text; }
+    | T_UNIQUEJOIN { $res = $T_UNIQUEJOIN.text; }
     | T_UPDATE { $res = $T_UPDATE.text; }
-    | T_UR { $res = $T_UR.text; }
-    | T_USE { $res = $T_USE.text; }
     | T_USER { $res = $T_USER.text; }
     | T_USING { $res = $T_USING.text; }
-    | T_VALUE { $res = $T_VALUE.text; }
+    | T_UTC_TMESTAMP { $res = $T_UTC_TMESTAMP.text; }
     | T_VALUES { $res = $T_VALUES.text; }
-    | T_VAR { $res = $T_VAR.text; }
     | T_VARCHAR { $res = $T_VARCHAR.text; }
-    | T_VARCHAR2 { $res = $T_VARCHAR2.text; }
-    | T_VARYING { $res = $T_VARYING.text; }
-    | T_VARIANCE { $res = $T_VARIANCE.text; }
-    | T_VOLATILE { $res = $T_VOLATILE.text; }
-    | T_WHILE { $res = $T_WHILE.text; }
+    | T_WHEN { $res = $T_WHEN.text; }
+    | T_WHERE { $res = $T_WHERE.text; }
+    | T_WINDOW { $res = $T_WINDOW.text; }
     | T_WITH { $res = $T_WITH.text; }
-    | T_WITHOUT { $res = $T_WITHOUT.text; }
-    | T_WORK { $res = $T_WORK.text; }
-    | T_XACT_ABORT { $res = $T_XACT_ABORT.text; }
-    | T_XML { $res = $T_XML.text; }
-    | T_YES { $res = $T_YES.text; }
+    | T_COMMIT { $res = $T_COMMIT.text; }
+    | T_ONLY { $res = $T_ONLY.text; }
+    | T_REGEXP { $res = $T_REGEXP.text; }
+    | T_RLIKE { $res = $T_RLIKE.text; }
+    | T_ROLLBACK { $res = $T_ROLLBACK.text; }
+    | T_START { $res = $T_START.text; }
+    | T_CACHE { $res = $T_CACHE.text; }
+    | T_CONSTRAINT { $res = $T_CONSTRAINT.text; }
+    | T_FOREIGN { $res = $T_FOREIGN.text; }
+    | T_PRIMARY { $res = $T_PRIMARY.text; }
+    | T_REFERENCES { $res = $T_REFERENCES.text; }
+    | T_DAYOFWEEK { $res = $T_DAYOFWEEK.text; }
+    | T_EXTRACT { $res = $T_EXTRACT.text; }
+    | T_FLOOR { $res = $T_FLOOR.text; }
+    | T_INTEGER { $res = $T_INTEGER.text; }
+    | T_PRECISION { $res = $T_PRECISION.text; }
+    | T_VIEWS { $res = $T_VIEWS.text; }
+    | T_TIME { $res = $T_TIME.text; }
+    | T_NUMERIC { $res = $T_NUMERIC.text; }
+    | T_SYNC { $res = $T_SYNC.text; }
     ;
+
+// Tokens that are not reserved words and can be used as identifiers
+non_reserved_words returns [string res]
+    : function_names { $res = $function_names.res; }
+    | T_ADD_W { $res = $T_ADD_W.text; }
+    | T_ADMIN { $res = $T_ADMIN.text; }
+    | T_AFTER { $res = $T_AFTER.text; }
+    | T_ANALYZE { $res = $T_ANALYZE.text; }
+    | T_ARCHIVE { $res = $T_ARCHIVE.text; }
+    | T_ASC { $res = $T_ASC.text; }
+    | T_AUTOCOMMIT { $res = $T_AUTOCOMMIT.text; }
+    | T_BEFORE { $res = $T_BEFORE.text; }
+    | T_BUCKET { $res = $T_BUCKET.text; }
+    | T_BUCKETS { $res = $T_BUCKETS.text; }
+    | T_CASCADE { $res = $T_CASCADE.text; }
+    | T_CHANGE { $res = $T_CHANGE.text; }
+    | T_CLUSTER { $res = $T_CLUSTER.text; }
+    | T_CLUSTERED { $res = $T_CLUSTERED.text; }
+    | T_CLUSTERSTATUS { $res = $T_CLUSTERSTATUS.text; }
+    | T_COLLECTION { $res = $T_COLLECTION.text; }
+    | T_COLUMNS { $res = $T_COLUMNS.text; }
+    | T_COMMENT { $res = $T_COMMENT.text; }
+    | T_COMPACT { $res = $T_COMPACT.text; }
+    | T_COMPACTIONS { $res = $T_COMPACTIONS.text; }
+    | T_COMPUTE { $res = $T_COMPUTE.text; }
+    | T_CONCATENATE { $res = $T_CONCATENATE.text; }
+    | T_CONTINUE { $res = $T_CONTINUE.text; }
+    | T_DATA { $res = $T_DATA.text; }
+    | T_DATABASES { $res = $T_DATABASES.text; }
+    | T_DATETIME { $res = $T_DATETIME.text; }
+    | T_DAY { $res = $T_DAY.text; }
+    | T_DBPROPERTIES { $res = $T_DBPROPERTIES.text; }
+    | T_DEFERRED { $res = $T_DEFERRED.text; }
+    | T_DEFINED { $res = $T_DEFINED.text; }
+    | T_DELIMITED { $res = $T_DELIMITED.text; }
+    | T_DEPENDENCY { $res = $T_DEPENDENCY.text; }
+    | T_DESC { $res = $T_DESC.text; }
+    | T_DIRECTORIES { $res = $T_DIRECTORIES.text; }
+    | T_DIRECTORY { $res = $T_DIRECTORY.text; }
+    | T_DISABLE { $res = $T_DISABLE.text; }
+    | T_DISTRIBUTE { $res = $T_DISTRIBUTE.text; }
+    | T_ELEM_TYPE { $res = $T_ELEM_TYPE.text; }
+    | T_ENABLE { $res = $T_ENABLE.text; }
+    | T_ESCAPED { $res = $T_ESCAPED.text; }
+    | T_EXCLUSIVE { $res = $T_EXCLUSIVE.text; }
+    | T_EXPLAIN { $res = $T_EXPLAIN.text; }
+    | T_EXPORT { $res = $T_EXPORT.text; }
+    | T_FIELDS { $res = $T_FIELDS.text; }
+    | T_FILE { $res = $T_FILE.text; }
+    | T_FILEFORMAT { $res = $T_FILEFORMAT.text; }
+    | T_FIRST { $res = $T_FIRST.text; }
+    | T_FORMAT { $res = $T_FORMAT.text; }
+    | T_FORMATTED { $res = $T_FORMATTED.text; }
+    | T_FUNCTIONS { $res = $T_FUNCTIONS.text; }
+    | T_HOLD_DDLTIME { $res = $T_HOLD_DDLTIME.text; }
+    | T_HOUR { $res = $T_HOUR.text; }
+    | T_IDXPROPERTIES { $res = $T_IDXPROPERTIES.text; }
+    | T_IGNORE { $res = $T_IGNORE.text; }
+    | T_INDEX { $res = $T_INDEX.text; }
+    | T_INDEXES { $res = $T_INDEXES.text; }
+    | T_INPATH { $res = $T_INPATH.text; }
+    | T_INPUTDRIVER { $res = $T_INPUTDRIVER.text; }
+    | T_INPUTFORMAT { $res = $T_INPUTFORMAT.text; }
+    | T_ITEMS { $res = $T_ITEMS.text; }
+    | T_JAR { $res = $T_JAR.text; }
+    | T_KEYS { $res = $T_KEYS.text; }
+    | T_KEY_TYPE { $res = $T_KEY_TYPE.text; }
+    | T_LIMIT { $res = $T_LIMIT.text; }
+    | T_LINES { $res = $T_LINES.text; }
+    | T_LOAD { $res = $T_LOAD.text; }
+    | T_LOCATION { $res = $T_LOCATION.text; }
+    | T_LOCK { $res = $T_LOCK.text; }
+    | T_LOCKS { $res = $T_LOCKS.text; }
+    | T_LOGICAL { $res = $T_LOGICAL.text; }
+    | T_LONG { $res = $T_LONG.text; }
+    | T_MAPJOIN { $res = $T_MAPJOIN.text; }
+    | T_MATERIALIZED { $res = $T_MATERIALIZED.text; }
+    | T_METADATA { $res = $T_METADATA.text; }
+    | T_MINUS { $res = $T_MINUS.text; }
+    | T_MINUTE { $res = $T_MINUTE.text; }
+    | T_MONTH { $res = $T_MONTH.text; }
+    | T_MSCK { $res = $T_MSCK.text; }
+    | T_NOSCAN { $res = $T_NOSCAN.text; }
+    | T_NO_DROP { $res = $T_NO_DROP.text; }
+    | T_OFFLINE { $res = $T_OFFLINE.text; }
+    | T_OPTION { $res = $T_OPTION.text; }
+    | T_OUTPUTDRIVER { $res = $T_OUTPUTDRIVER.text; }
+    | T_OUTPUTFORMAT { $res = $T_OUTPUTFORMAT.text; }
+    | T_OVERWRITE { $res = $T_OVERWRITE.text; }
+    | T_OWNER { $res = $T_OWNER.text; }
+    | T_PARTITIONED { $res = $T_PARTITIONED.text; }
+    | T_PARTITIONS { $res = $T_PARTITIONS.text; }
+    | T_PLUS { $res = $T_PLUS.text; }
+    | T_PRETTY { $res = $T_PRETTY.text; }
+    | T_PRINCIPALS { $res = $T_PRINCIPALS.text; }
+    | T_PROTECTION { $res = $T_PROTECTION.text; }
+    | T_PURGE { $res = $T_PURGE.text; }
+    | T_READ { $res = $T_READ.text; }
+    | T_READONLY { $res = $T_READONLY.text; }
+    | T_REBUILD { $res = $T_REBUILD.text; }
+    | T_RECORDREADER { $res = $T_RECORDREADER.text; }
+    | T_RECORDWRITER { $res = $T_RECORDWRITER.text; }
+    | T_RELOAD { $res = $T_RELOAD.text; }
+    | T_RENAME { $res = $T_RENAME.text; }
+    | T_REPAIR { $res = $T_REPAIR.text; }
+    | T_REPLACE { $res = $T_REPLACE.text; }
+    | T_REPLICATION { $res = $T_REPLICATION.text; }
+    | T_RESTRICT { $res = $T_RESTRICT.text; }
+    | T_REWRITE { $res = $T_REWRITE.text; }
+    | T_ROLE { $res = $T_ROLE.text; }
+    | T_ROLES { $res = $T_ROLES.text; }
+    | T_SCHEMA { $res = $T_SCHEMA.text; }
+    | T_SCHEMAS { $res = $T_SCHEMAS.text; }
+    | T_SECOND { $res = $T_SECOND.text; }
+    | T_SEMI { $res = $T_SEMI.text; }
+    | T_SERDE { $res = $T_SERDE.text; }
+    | T_SERDEPROPERTIES { $res = $T_SERDEPROPERTIES.text; }
+    | T_SERVER { $res = $T_SERVER.text; }
+    | T_SETS { $res = $T_SETS.text; }
+    | T_SHARED { $res = $T_SHARED.text; }
+    | T_SHOW { $res = $T_SHOW.text; }
+    | T_SHOW_DATABASE { $res = $T_SHOW_DATABASE.text; }
+    | T_SKEWED { $res = $T_SKEWED.text; }
+    | T_SORT { $res = $T_SORT.text; }
+    | T_SORTED { $res = $T_SORTED.text; }
+    | T_SSL { $res = $T_SSL.text; }
+    | T_STATISTICS { $res = $T_STATISTICS.text; }
+    | T_STORED { $res = $T_STORED.text; }
+    | T_STREAMTABLE { $res = $T_STREAMTABLE.text; }
+    | T_STRING { $res = $T_STRING.text; }
+    | T_STRUCT { $res = $T_STRUCT.text; }
+    | T_TABLES { $res = $T_TABLES.text; }
+    | T_TBLPROPERTIES { $res = $T_TBLPROPERTIES.text; }
+    | T_TEMPORARY { $res = $T_TEMPORARY.text; }
+    | T_TERMINATED { $res = $T_TERMINATED.text; }
+    | T_TINYINT { $res = $T_TINYINT.text; }
+    | T_TOUCH { $res = $T_TOUCH.text; }
+    | T_TRANSACTIONS { $res = $T_TRANSACTIONS.text; }
+    | T_UNARCHIVE { $res = $T_UNARCHIVE.text; }
+    | T_UNDO { $res = $T_UNDO.text; }
+    | T_UNIONTYPE { $res = $T_UNIONTYPE.text; }
+    | T_UNLOCK { $res = $T_UNLOCK.text; }
+    | T_UNSET { $res = $T_UNSET.text; }
+    | T_UNSIGNED { $res = $T_UNSIGNED.text; }
+    | T_URI { $res = $T_URI.text; }
+    | T_USE { $res = $T_USE.text; }
+    | T_UTC { $res = $T_UTC.text; }
+    | T_UTCTIMESTAMP { $res = $T_UTCTIMESTAMP.text; }
+    | T_VALUE_TYPE { $res = $T_VALUE_TYPE.text; }
+    | T_VIEW { $res = $T_VIEW.text; }
+    | T_WHILE { $res = $T_WHILE.text; }
+    | T_YEAR { $res = $T_YEAR.text; }
+    | T_ISOLATION { $res = $T_ISOLATION.text; }
+    | T_LEVEL { $res = $T_LEVEL.text; }
+    | T_OFFSET { $res = $T_OFFSET.text; }
+    | T_SNAPSHOT { $res = $T_SNAPSHOT.text; }
+    | T_TRANSACTION { $res = $T_TRANSACTION.text; }
+    | T_WORK { $res = $T_WORK.text; }
+    | T_WRITE { $res = $T_WRITE.text; }
+    | T_ABORT { $res = $T_ABORT.text; }
+    | T_KEY { $res = $T_KEY.text; }
+    | T_LAST { $res = $T_LAST.text; }
+    | T_NORELY { $res = $T_NORELY.text; }
+    | T_NOVALIDATE { $res = $T_NOVALIDATE.text; }
+    | T_NULLS { $res = $T_NULLS.text; }
+    | T_RELY { $res = $T_RELY.text; }
+    | T_VALIDATE { $res = $T_VALIDATE.text; }
+    | T_DETAIL { $res = $T_DETAIL.text; }
+    | T_DOW { $res = $T_DOW.text; }
+    | T_EXPRESSION { $res = $T_EXPRESSION.text; }
+    | T_OPERATOR { $res = $T_OPERATOR.text; }
+    | T_QUARTER { $res = $T_QUARTER.text; }
+    | T_SUMMARY { $res = $T_SUMMARY.text; }
+    | T_VECTORIZATION { $res = $T_VECTORIZATION.text; }
+    | T_WEEK { $res = $T_WEEK.text; }
+    | T_YEARS { $res = $T_YEARS.text; }
+    | T_MONTHS { $res = $T_MONTHS.text; }
+    | T_WEEKS { $res = $T_WEEKS.text; }
+    | T_DAYS { $res = $T_DAYS.text; }
+    | T_HOURS { $res = $T_HOURS.text; }
+    | T_MINUTES { $res = $T_MINUTES.text; }
+    | T_SECONDS { $res = $T_SECONDS.text; }
+    | T_TIMESTAMPTZ { $res = $T_TIMESTAMPTZ.text; }
+    | T_ZONE { $res = $T_ZONE.text; }
+    | T_SYSDATE { $res = $T_SYSDATE.text; }
+    | T_NAMED_STRUCT { $res = $T_NAMED_STRUCT.text; }
+    | T_UNIQUE { $res = $T_UNIQUE.text; }
+    | T_CHECK { $res = $T_CHECK.text; }
+    | T_DEFAULT { $res = $T_DEFAULT.text; }
+    | T_SEQUENCEFILE { $res = $T_SEQUENCEFILE.text; }
+    | T_TEXTFILE { $res = $T_TEXTFILE.text; }
+    | T_RCFILE { $res = $T_RCFILE.text; }
+    | T_ORC { $res = $T_ORC.text; }
+    | T_PARQUET { $res = $T_PARQUET.text; }
+    | T_AVRO { $res = $T_AVRO.text; }
+    | T_JSONFILE { $res = $T_JSONFILE.text; }
+    | T_HIVECONF { $res = $T_HIVECONF.text; }
+    | T_HIVEVAR { $res = $T_HIVEVAR.text; }
+    | T_BYTE { $res = $T_BYTE.text; }
+    ;
+
+function_names returns [string res]
+    : T_REGR_AVGX { $res = $T_REGR_AVGX.text; }
+    | T_LOWER { $res = $T_LOWER.text; }
+    | T_SHIFTRIGHT { $res = $T_SHIFTRIGHT.text; }
+    | T_LOG { $res = $T_LOG.text; }
+    | T_ABS { $res = $T_ABS.text; }
+    | T_NULLIF { $res = $T_NULLIF.text; }
+    | T_ENCODE { $res = $T_ENCODE.text; }
+    | T_FIELD { $res = $T_FIELD.text; }
+    | T_END { $res = $T_END.text; }
+    | T_DATE_SUB { $res = $T_DATE_SUB.text; }
+    | T_ASIN { $res = $T_ASIN.text; }
+    | T_SUBSTR { $res = $T_SUBSTR.text; }
+    | T_UNIX_TIMESTAMP { $res = $T_UNIX_TIMESTAMP.text; }
+    | T_DECODE { $res = $T_DECODE.text; }
+    | T_STDDEV_POP { $res = $T_STDDEV_POP.text; }
+    | T_SIN { $res = $T_SIN.text; }
+    | T_SORT_ARRAY { $res = $T_SORT_ARRAY.text; }
+    | T_BINARY { $res = $T_BINARY.text; }
+    | T_CONCATENATE { $res = $T_CONCATENATE.text; }
+    | T_CURRENT_USER { $res = $T_CURRENT_USER.text; }
+    | T_ASSERT_TRUE { $res = $T_ASSERT_TRUE.text; }
+    | T_NVL { $res = $T_NVL.text; }
+    | T_SHA2 { $res = $T_SHA2.text; }
+    | T_DATEDIFF { $res = $T_DATEDIFF.text; }
+    | T_HISTOGRAM_NUMERIC { $res = $T_HISTOGRAM_NUMERIC.text; }
+    | T_TO_DATE { $res = $T_TO_DATE.text; }
+    | T_NEGATIVE { $res = $T_NEGATIVE.text; }
+    | T_CONCAT_WS { $res = $T_CONCAT_WS.text; }
+    | T_LEAST { $res = $T_LEAST.text; }
+    | T_FIND_IN_SET { $res = $T_FIND_IN_SET.text; }
+    | T_CONCAT { $res = $T_CONCAT.text; }
+    | T_MD5 { $res = $T_MD5.text; }
+    | T_SUBSTRING_INDEX { $res = $T_SUBSTRING_INDEX.text; }
+    | T_E { $res = $T_E.text; }
+    | T_CONTEXT_NGRAMS { $res = $T_CONTEXT_NGRAMS.text; }
+    | T_UNHEX { $res = $T_UNHEX.text; }
+    | T_ELT { $res = $T_ELT.text; }
+    | T_BEGINNING { $res = $T_BEGINNING.text; }
+    | T_AVG { $res = $T_AVG.text; }
+    | T_EXP { $res = $T_EXP.text; }
+    | T_EXTRACT { $res = $T_EXTRACT.text; }
+    | T_QUARTER { $res = $T_QUARTER.text; }
+    | T_STDDEV_SAMP { $res = $T_STDDEV_SAMP.text; }
+    | T_HASH { $res = $T_HASH.text; }
+    | T_SURROGATE_KEY { $res = $T_SURROGATE_KEY.text; }
+    | T_FROM_UNIXTIME { $res = $T_FROM_UNIXTIME.text; }
+    | T_COLLECT_SET { $res = $T_COLLECT_SET.text; }
+    | T_ASCII { $res = $T_ASCII.text; }
+    | T_REGR_R2 { $res = $T_REGR_R2.text; }
+    | T_OR { $res = $T_OR.text; }
+    | T_PERCENTILE_APPROX { $res = $T_PERCENTILE_APPROX.text; }
+    | T_SIZE { $res = $T_SIZE.text; }
+    | T_NGRAMS { $res = $T_NGRAMS.text; }
+    | T_MASK_SHOW_FIRST_N { $res = $T_MASK_SHOW_FIRST_N.text; }
+    | T_EXPLODE { $res = $T_EXPLODE.text; }
+    | T_REGR_COUNT { $res = $T_REGR_COUNT.text; }
+    | T_COUNT { $res = $T_COUNT.text; }
+    | T_LENGTH { $res = $T_LENGTH.text; }
+    | T_LOCATE { $res = $T_LOCATE.text; }
+    | T_ACOS { $res = $T_ACOS.text; }
+    | T_REPLACE { $res = $T_REPLACE.text; }
+    | T_PMOD { $res = $T_PMOD.text; }
+    | T_DAY { $res = $T_DAY.text; }
+    | T_CHR { $res = $T_CHR.text; }
+    | T_SPLIT { $res = $T_SPLIT.text; }
+    | T_UNARY { $res = $T_UNARY.text; }
+    | T_MINUTE { $res = $T_MINUTE.text; }
+    | T_RADIANS { $res = $T_RADIANS.text; }
+    | T_INLINE { $res = $T_INLINE.text; }
+    | T_LPAD { $res = $T_LPAD.text; }
+    | T_CBRT { $res = $T_CBRT.text; }
+    | T_FROM_UTC_TIMESTAMP { $res = $T_FROM_UTC_TIMESTAMP.text; }
+    | T_CAST { $res = $T_CAST.text; }
+    | T_TRANSLATE { $res = $T_TRANSLATE.text; }
+    | T_CRC32 { $res = $T_CRC32.text; }
+    | T_OCTET_LENGTH { $res = $T_OCTET_LENGTH.text; }
+    | T_INITCAP { $res = $T_INITCAP.text; }
+    | T_POSITIVE { $res = $T_POSITIVE.text; }
+    | T_UNBASE64 { $res = $T_UNBASE64.text; }
+    | T_FACTORIAL { $res = $T_FACTORIAL.text; }
+    | T_REGEXP_EXTRACT { $res = $T_REGEXP_EXTRACT.text; }
+    | T_COS { $res = $T_COS.text; }
+    | T_MONTH { $res = $T_MONTH.text; }
+    | T_NTILE { $res = $T_NTILE.text; }
+    | T_SHIFTRIGHTUNSIGNED { $res = $T_SHIFTRIGHTUNSIGNED.text; }
+    | T_AES_ENCRYPT { $res = $T_AES_ENCRYPT.text; }
+    | T_LAST_DAY { $res = $T_LAST_DAY.text; }
+    | T_SECOND { $res = $T_SECOND.text; }
+    | T_TO_UTC_TIMESTAMP { $res = $T_TO_UTC_TIMESTAMP.text; }
+    | T_QUOTE { $res = $T_QUOTE.text; }
+    | T_SQRT { $res = $T_SQRT.text; }
+    | T_PARSE_URL { $res = $T_PARSE_URL.text; }
+    | T_EQUAL { $res = $T_EQUAL.text; }
+    | T_MONTHS_BETWEEN { $res = $T_MONTHS_BETWEEN.text; }
+    | T_MASK_HASH { $res = $T_MASK_HASH.text; }
+    | T_XOR { $res = $T_XOR.text; }
+    | T_LOG10 { $res = $T_LOG10.text; }
+    | T_SENTENCES { $res = $T_SENTENCES.text; }
+    | T_MAP_VALUES { $res = $T_MAP_VALUES.text; }
+    | T_INSTR { $res = $T_INSTR.text; }
+    | T_MASK { $res = $T_MASK.text; }
+    | T_AND { $res = $T_AND.text; }
+    | T_VARIANCE { $res = $T_VARIANCE.text; }
+    | T_VAR_SAMP { $res = $T_VAR_SAMP.text; }
+    | T_SHA1 { $res = $T_SHA1.text; }
+    | T_TAN { $res = $T_TAN.text; }
+    | T_ADD_MONTHS { $res = $T_ADD_MONTHS.text; }
+    | T_MAP_KEYS { $res = $T_MAP_KEYS.text; }
+    | T_ATAN { $res = $T_ATAN.text; }
+    | T_TRUNC { $res = $T_TRUNC.text; }
+    | T_LEVENSHTEIN { $res = $T_LEVENSHTEIN.text; }
+    | T_YEAR { $res = $T_YEAR.text; }
+    | T_ARRAY_CONTAINS { $res = $T_ARRAY_CONTAINS.text; }
+    | T_MIN { $res = $T_MIN.text; }
+    | T_GET_JSON_OBJECT { $res = $T_GET_JSON_OBJECT.text; }
+    | T_REGR_INTERCEPT { $res = $T_REGR_INTERCEPT.text; }
+    | T_MASK_SHOW_LAST_N { $res = $T_MASK_SHOW_LAST_N.text; }
+    | T_RPAD { $res = $T_RPAD.text; }
+    | T_PERCENTILE { $res = $T_PERCENTILE.text; }
+    | T_REGR_AVGY { $res = $T_REGR_AVGY.text; }
+    | T_REGR_SYY { $res = $T_REGR_SYY.text; }
+    | T_REFLECT { $res = $T_REFLECT.text; }
+    | T_DATE_FORMAT { $res = $T_DATE_FORMAT.text; }
+    | T_CEIL { $res = $T_CEIL.text; }
+    | T_CONV { $res = $T_CONV.text; }
+    | T_BASE64 { $res = $T_BASE64.text; }
+    | T_WEEKOFYEAR { $res = $T_WEEKOFYEAR.text; }
+    | T_BIN { $res = $T_BIN.text; }
+    | T_STAR { $res = $T_STAR.text; }
+    | T_PLUS { $res = $T_PLUS.text; }
+    | T_REGR_SXX { $res = $T_REGR_SXX.text; }
+    | T_DEGREES { $res = $T_DEGREES.text; }
+    | T_AES_DECRYPT { $res = $T_AES_DECRYPT.text; }
+    | T_MAX { $res = $T_MAX.text; }
+    | T_LOG2 { $res = $T_LOG2.text; }
+    | T_CURRENT_DATABASE { $res = $T_CURRENT_DATABASE.text; }
+    | T_JAVA_METHOD { $res = $T_JAVA_METHOD.text; }
+    | T_HOUR { $res = $T_HOUR.text; }
+    | T_STACK { $res = $T_STACK.text; }
+    | T_LN { $res = $T_LN.text; }
+    | T_CHARACTER_LENGTH { $res = $T_CHARACTER_LENGTH.text; }
+    | T_ROUND { $res = $T_ROUND.text; }
+    | T_RAND { $res = $T_RAND.text; }
+    | T_COLLECT_LIST { $res = $T_COLLECT_LIST.text; }
+    | T_REGEXP_REPLACE { $res = $T_REGEXP_REPLACE.text; }
+    | T_POW { $res = $T_POW.text; }
+    | T_SOUNDEX { $res = $T_SOUNDEX.text; }
+    | T_IF { $res = $T_IF.text; }
+    | T_SHIFTLEFT { $res = $T_SHIFTLEFT.text; }
+    | T_UPPER { $res = $T_UPPER.text; }
+    | T_BROUND { $res = $T_BROUND.text; }
+    | T_ISNULL { $res = $T_ISNULL.text; }
+    | T_COVAR_POP { $res = $T_COVAR_POP.text; }
+    | T_HEX { $res = $T_HEX.text; }
+    | T_PARENT { $res = $T_PARENT.text; }
+    | T_WIDTH_BUCKET { $res = $T_WIDTH_BUCKET.text; }
+    | T_REVERSE { $res = $T_REVERSE.text; }
+    | T_SPACE { $res = $T_SPACE.text; }
+    | T_BRACKET_OP { $res = $T_BRACKET_OP.text; }
+    | T_RTRIM { $res = $T_RTRIM.text; }
+    | T_LTRIM { $res = $T_LTRIM.text; }
+    | T_TRIM { $res = $T_TRIM.text; }
+    | T_FORMAT_NUMBER { $res = $T_FORMAT_NUMBER.text; }
+    | T_NEXT_DAY { $res = $T_NEXT_DAY.text; }
+    | T_VERSION { $res = $T_VERSION.text; }
+    | T_BUILDVERSION { $res = $T_BUILDVERSION.text; }
+    | T_MASK_FIRST_N { $res = $T_MASK_FIRST_N.text; }
+    | T_PI { $res = $T_PI.text; }
+    | T_COALESCE { $res = $T_COALESCE.text; }
+    | T_STR_TO_MAP { $res = $T_STR_TO_MAP.text; }
+    | T_REGR_SLOPE { $res = $T_REGR_SLOPE.text; }
+    | T_REPEAT { $res = $T_REPEAT.text; }
+    | T_JSON_TUPLE { $res = $T_JSON_TUPLE.text; }
+    | T_MASK_LAST_N { $res = $T_MASK_LAST_N.text; }
+    | T_SIGN { $res = $T_SIGN.text; }
+    | T_PARSE_URL_TUPLE { $res = $T_PARSE_URL_TUPLE.text; }
+    | T_IN_FILE { $res = $T_IN_FILE.text; }
+    | T_SUM { $res = $T_SUM.text; }
+    | T_CORR { $res = $T_CORR.text; }
+    | T_REGR_SXY { $res = $T_REGR_SXY.text; }
+    | T_GREATEST { $res = $T_GREATEST.text; }
+    | T_COVAR_SAMP { $res = $T_COVAR_SAMP.text; }
+    | T_LOGGED_IN_USER { $res = $T_LOGGED_IN_USER.text; }
+    | T_PRINTF { $res = $T_PRINTF.text; }
+    | T_FLOOR { $res = $T_FLOOR.text; }
+    | T_POSEXPLODE { $res = $T_POSEXPLODE.text; }
+    | T_DATE_ADD { $res = $T_DATE_ADD.text; }
+    | T_POWER { $res = $T_POWER.text; }
+    | T_CEILING { $res = $T_CEILING.text; }
+    | T_VAR_POP { $res = $T_VAR_POP.text; }
+    | T_XPATH { $res = $T_XPATH.text; }
+    | T_XPATH_BOOLEAN { $res = $T_XPATH_BOOLEAN.text; }
+    | T_XPATH_DOUBLE { $res = $T_XPATH_DOUBLE.text; }
+    | T_XPATH_FLOAT { $res = $T_XPATH_FLOAT.text; }
+    | T_XPATH_INT { $res = $T_XPATH_INT.text; }
+    | T_XPATH_LONG { $res = $T_XPATH_LONG.text; }
+    | T_XPATH_NUMBER { $res = $T_XPATH_NUMBER.text; }
+    | T_XPATH_SHORT { $res = $T_XPATH_SHORT.text; }
+    | T_XPATH_STRING { $res = $T_XPATH_STRING.text; }
+    | T_SHA { $res = $T_SHA.text; }
+    | T_UCASE { $res = $T_UCASE.text; }
+    | T_SUBSTRING { $res = $T_SUBSTRING.text; }
+    | T_LCASE { $res = $T_LCASE.text; }
+    | T_FIELD_IN_SET { $res = $T_FIELD_IN_SET.text; }
+    | T_GET_JSON_OBJECTS { $res = $T_GET_JSON_OBJECTS.text; }
+    | T_IN_STR { $res = $T_IN_STR.text; }
+    | T_RANK { $res = $T_RANK.text; }
+    | T_DENSE_RANK { $res = $T_DENSE_RANK.text; }
+    | T_ROW_NUMBER { $res = $T_ROW_NUMBER.text; }
+    | T_CUME_DIST { $res = $T_CUME_DIST.text; }
+    | T_PERCENT_RANK { $res = $T_PERCENT_RANK.text; }
+    ;
+
 
 NULL_CONST
     : T_NULL
@@ -1555,511 +1797,533 @@ BOOL_LITERAL
     | T_FALSE
     ;
 
-T_ABS             : A B S ;
-T_ACOS            : A C O S ;
-T_ADD_MONTHS      : A D D '_' M O N T H S ;
-T_AES_ENCRYPT     : A E S '_' E N C R Y P T ;
-T_AES_DECRYPT     : A E S '_' D E C R Y P T ;
-T_ALL             : A L L ;
-T_ALTER           : A L T E R ;
-T_AND             : A N D ;
-T_ARRAY           : A R R A Y ;
-T_AS              : A S ;
-T_ASC             : A S C ;
-T_ASCII           : A S C I I ;
-T_ASIN            : A S I N ;
-T_ASSERT_TRUE     : A S S E R T '_' T R U E ;
-T_AT              : A T ;
-T_ATAN            : A T A N ;
-T_AUTO_INCREMENT  : A U T O '_' I N C R E M E N T ;
-T_AVG             : A V G ; 
-T_AVRO            : A V R O ;
-T_BASE64          : B A S E '6' '4' ;
-T_BEGIN           : B E G I N ;
-T_BETWEEN         : B E T W E E N ; 
-T_BIGINT          : B I G I N T ;
-T_BIN             : B I N ;
-T_BINARY          : B I N A R Y ;
-T_BIT             : B I T ;
-T_BODY            : B O D Y ; 
-T_BOOLEAN         : B O O L E A N ;
-T_BREAK           : B R E A K ;
-T_BUCKETS         : B U C K E T S ;
-T_BY              : B Y ;
-T_BYTE            : B Y T E ; 
-T_CALL            : C A L L ;
-T_CALLER          : C A L L E R ;
-T_CASCADE         : C A S C A D E ; 
-T_CASE            : C A S E ;
-T_CAST            : C A S T ;
-T_CBR             : C B R ;
-T_CEIL            : C E I L ;
-T_CEILING         : C E I L I N G ;
-T_CHAR            : C H A R ;
-T_CHARACTER       : C H A R A C T E R ;
-T_CHARACTER_LENGTH: C H A R A C T E R '_' L E N G T H ;
-T_CHARSET         : C H A R S E T ;
-T_CHECK           : C H E C K ;
-T_CHR             : C H R ;
-T_CLIENT          : C L I E N T ;
-T_CLOSE           : C L O S E ;
-T_CLUSTERED       : C L U S T E R E D;
-T_CMP             : C M P ;
-T_COALESCE        : C O A L E S C E ; 
-T_COLLECT         : C O L L E C T ; 
-T_COLLECT_SET     : C O L L E C T '_' S E T ;
-T_COLLECT_LIST    : C O L L E C T '_' L I S T ;
-T_COLLECTION      : C O L L E C T I O N ; 
-T_COLUMN          : C O L U M N ;
-T_COMMENT         : C O M M E N T;
-T_CONSTANT        : C O N S T A N T ;
-T_COMMIT          : C O M M I T ; 
-T_COMPRESS        : C O M P R E S S ;
-T_CONCAT          : C O N C A T ;
-T_CONCAT_WS       : C O N C A T '_' W S ;
-T_CONDITION       : C O N D I T I O N ;
-T_CONSTRAINT      : C O N S T R A I N T ; 
-T_CONTINUE        : C O N T I N U E ;
-T_CONV            : C O N V ;
-T_COPY            : C O P Y ;
-T_CORR            : C O R R ;
-T_COS             : C O S ;
-T_COUNT           : C O U N T ;
-T_COUNT_BIG       : C O U N T '_' B I G;
-T_COVAR_POP       : C O V A R '_' P O P ;
-T_COVAR_SAMP      : C O V A R '_' S A M P ;
-T_CRC32           : C R C '3' '2' ;
-T_CREATE          : C R E A T E ;
-T_CREATION        : C R E A T I O N ; 
-T_CREATOR         : C R E A T O R ;
-T_CROSS           : C R O S S ;
-T_CS              : C S;
-T_CURRENT         : C U R R E N T ;
-T_CURRENT_SCHEMA  : C U R R E N T '_' S C H E M A ;
-T_CURRENT_DATABASE : C U R R E N T '_' D A T A B A S E ;
-T_CURSOR          : C U R S O R ;
-T_DATABASE        : D A T A B A S E ;
-T_DATE            : D A T E ;
-T_DATEADD         : D A T E '_' A D D ;
-T_DATEDIFF        : D A T E D I F F ;
-T_DATE_FORMAT     : D A T E '_' F O R M A T ;
-T_DATESUB         : D A T E '_' S U B ;
-T_DATETIME        : D A T E T I M E ;
-T_DAY             : D A Y ;
-T_DAYS            : D A Y S ;
-T_DEC             : D E C ;
-T_DECIMAL         : D E C I M A L ;
-T_DECODE          : D E C O D E ;
-T_DECLARE         : D E C L A R E ;
-T_DEFAULT         : D E F A U L T ;
-T_DEFERRED        : D E F E R R E D ; 
-T_DEFINED         : D E F I N E D ; 
-T_DEFINER         : D E F I N E R ;
-T_DEFINITION      : D E F I N I T I O N ; 
-T_DEGREES         : D E G R E E S ;
-T_DELETE          : D E L E T E ;
-T_DELIMITED       : D E L I M I T E D ; 
-T_DELIMITER       : D E L I M I T E R ; 
-T_DESC            : D E S C ;
-T_DESCRIBE        : D E S C R I B E ; 
-T_DIAGNOSTICS     : D I A G N O S T I C S ;
-T_DIR             : D I R ;
-T_DIRECTORY       : D I R E C T O R Y ; 
-T_DISABLE         : D I S A B L E ;
-T_DISTINCT        : D I S T I N C T ;
-T_DISTRIBUTE      : D I S T R I B U T E ;
-T_DO              : D O ;
-T_DOUBLE          : D O U B L E ;
-T_DROP            : D R O P ;
-T_DYNAMIC         : D Y N A M I C ; 
-T_ELSE            : E L S E ;
-T_ELSEIF          : E L S E I F ;
-T_ELSIF           : E L S I F ;
-T_ELT             : E L T ;
-T_ENABLE          : E N A B L E ;
-T_ENCODE          : E N C O D E ;
-T_END             : E N D ;
-T_ENGINE          : E N G I N E ;
-T_ESCAPED         : E S C A P E D ; 
-T_EXCEPT          : E X C E P T ;
-T_EXEC            : E X E C ;
-T_EXECUTE         : E X E C U T E ;
-T_EXCEPTION       : E X C E P T I O N ;
-T_EXCLUSIVE       : E X C L U S I V E ; 
-T_EXISTS          : E X I S T S ; 
-T_EXIT            : E X I T ;
-T_EXP             : E X P;
-T_EXPLODE         : E X P L O D E ;
-T_EXTERNAL        : E X T E R N A L ;
-T_FACTORIAL       : F A C T O R I A L ;
-T_FALLBACK        : F A L L B A C K ;
-T_FALSE           : F A L S E ;
-T_FETCH           : F E T C H ;
-T_FIELD           : F I E L D  ; 
-T_FIELDS          : F I E L D S ; 
-T_FIELD_IN_SET    : F I E L D '_' I N '_' S E T ;
-T_FILE            : F I L E ;
-T_FILES           : F I L E S ; 
-T_FLOAT           : F L O A T ;
-T_FLOOR           : F L O O R;
-T_FOR             : F O R ;
-T_FOREIGN         : F O R E I G N ; 
-T_FORMAT          : F O R M A T ;
-T_FORMAT_NUMBER   : F O R M A T '_' N U M B E R ;
-T_FOUND           : F O U N D ;
-T_FROM            : F R O M ; 
-T_FROM_UNIXTIME   : F R O M '_' U N I X T I M E ;
-T_FROMUTCTIMESTAMP  : F R O M '_' U T C '_' T I M E S T A M P ;
-T_FULL            : F U L L ;
-T_FUNCTION        : F U N C T I O N ;
-T_GET             : G E T ;
-T_GET_JSON_OBJECTS : G E T '_' J S O N '_' P A T H ;
-T_GLOBAL          : G L O B A L ; 
-T_GO              : G O ;
-T_GRANT           : G R A N T ; 
-T_GROUP           : G R O U P ;
-T_HANDLER         : H A N D L E R ;
-T_HASH            : H A S H ;
-T_HAVING          : H A V I N G ;
-T_HDFS            : H D F S ; 
-T_HEX             : H E X ;
-T_HISTOGRAM_NUMERIC : H I S T O G R A M '_' N U M E R I C ;
-T_HIVECONF        : 'h' 'i' 'v' 'e' 'c' 'o' 'n' 'f' ;
-T_HIVEVAR        : 'h' 'i' 'v' 'e' 'v' 'a' 'r' ;
-T_HOST            : H O S T ;
-T_HOUR            : H O U R ;
-T_IDENTITY        : I D E N T I T Y ; 
-T_IF              : I F ;
-T_IGNORE          : I G N O R E ; 
-T_IMMEDIATE       : I M M E D I A T E ;
-T_IN              : I N ;
-T_INCLUDE         : I N C L U D E ;
-T_INDEX           : I N D E X ;
-T_IN_FILE         : I N '_' F I L E ;
-T_INITCAP         : I N I T C A P ;
-T_INITRANS        : I N I T R A N S ;
-T_INLINE          : I N L I N E ;
-T_INNER           : I N N E R ; 
-T_INOUT           : I N O U T;
-T_INPUTFORMAT     : I N P U T F O R M A T ;
-T_INSERT          : I N S E R T ;
-T_IN_STR          : I N S T R ;
-T_INT             : I N T ;
-T_INT2            : I N T '2';
-T_INT4            : I N T '4';
-T_INT8            : I N T '8';
-T_INTEGER         : I N T E G E R ;
-T_INTERSECT       : I N T E R S E C T ;
-T_INTERVAL        : I N T E R V A L ; 
-T_INTO            : I N T O ;
-T_INVOKER         : I N V O K E R ;
-T_IS              : I S ;
-T_ISNOTNULL       : I S N O T N U L L ;
-T_ISNULL          : I S N U L L ;
-T_NVL             : N V L ;
-T_ISOPEN          : I S O P E N ;
-T_ITEMS           : I T E M S ; 
-T_JAVA_METHOD     : J A V A '_' M E T H O D ;
-T_JOIN            : J O I N ;
-T_JSONFILE        : J S O N F I L E ;
-T_KEEP            : K E E P; 
-T_KEY             : K E Y ;
-T_KEYS            : K E Y S ;
-T_LANGUAGE        : L A N G U A G E ;
-T_LASTDAY         : L A S T '_' D A Y ;
-T_LATERAL         : L A T E R A L ;
-T_LCASE           : L C A S E ;
-T_LEAVE           : L E A V E ;
-T_LEFT            : L E F T ;
-T_LENGTH          : L E N G T H ;
-T_LEVENSHTEIN     : L E V E N S H T E I N ;
-T_LIKE            : L I K E ; 
-T_LIMIT           : L I M I T ;
-T_LINES           : L I N E S ; 
-T_LOCAL           : L O C A L ;
-T_LOCATE          : L O C A T E ;
-T_LOCATION        : L O C A T I O N ;
-T_LOCATOR         : L O C A T O R ; 
-T_LOCATORS        : L O C A T O R S ; 
-T_LOCKS           : L O C K S ; 
-T_LOG             : L O G ; 
-T_LOG10           : L O G '1' '0'; 
-T_LOG2            : L O G '2'; 
-T_LOGGED          : L O G G E D ; 
-T_LOGGED_IN_USER  : L O G G E D '_' I N '_' U S E R ; 
-T_LOGGING         : L O G G I N G ; 
-T_LOOP            : L O O P ;
-T_LOWER           : L O W E R ;
-T_LPAD            : L P A D ;
-T_LN              : L N ;
-T_LTRIM           : L T R I M ;
-T_MAP             : M A P ; 
-T_MASK            : M A S K ;
-T_MASK_FIRST_N    : M A S K '_' F I R S T '_' N ;
-T_MASK_HASH       : M A S K '_' H A S H ;
-T_MASK_LAST_N    : M A S K '_' L A S T '_' N ;
-T_MASK_SHOW_FIRST_N : M A S K '_' S H O W '_' F I R S T '_' N ;
-T_MASK_SHOW_LAST_N : M A S K '_' S H O W '_' L A S T '_' N ;
-T_MATCHED         : M A T C H E D ; 
-T_MAX             : M A X ;
-T_MAXTRANS        : M A X T R A N S ; 
-T_MD5             : M D '5' ;
-T_MERGE           : M E R G E ; 
-T_MESSAGE_TEXT    : M E S S A G E '_' T E X T ;
-T_MICROSECOND     : M I C R O S E C O N D ;
-T_MICROSECONDS    : M I C R O S E C O N D S;
-T_MIN             : M I N ;
-T_MINUTE          : M I N U T E ;
-T_MONTH           : M O N T H ;
-T_MONTHS_BETWEEN  : M O N T H S '_' B E T W E E N ;
-T_MULTISET        : M U L T I S E T ; 
-T_NAMED_STRUCT    : N A M E D '_' S T R U C T ;
-T_NCHAR           : N C H A R ; 
-T_NEGATIVE        : N E G A T I V E ;
-T_NEXT_DAY        : N E X T '_' D A Y ;
-T_NEW             : N E W ;
-T_NVARCHAR        : N V A R C H A R ; 
-T_NO              : N O ;
-T_NOCOUNT         : N O C O U N T ;
-T_NOCOMPRESS      : N O C O M P R E S S ; 
-T_NOLOGGING       : N O L O G G I N G ;
-T_NONE            : N O N E ;
-T_NORELY          : N O R E L Y ;
-T_NOT             : N O T ;
-T_NOTFOUND        : N O T F O U N D ; 
-T_NOVALIDATE      : N O V A L I D A T E ;
-T_NTILE           : N T I L E ;
-T_NULL            : N U L L ;
-T_NULLIF          : N U L L I F ;
-T_NUMERIC         : N U M E R I C ; 
-T_NUMBER          : N U M B E R ;
-T_OBJECT          : O B J E C T ; 
-T_OCTET_LENGTH    : O C T E T '_' L E N G T H ;
-T_OFF             : O F F ;
-T_ON              : O N ;
-T_ONLY            : O N L Y ;
-T_OPEN            : O P E N ;
-T_OR              : O R ;
-T_ORC             : O R C ;
-T_ORDER           : O R D E R;
-T_OUT             : O U T ;
-T_OUTER           : O U T E R ;
-T_OUTPUTFORMAT    : O U T P U T F O R M A T ;
-T_OVER            : O V E R ;
-T_OVERWRITE       : O V E R W R I T E ; 
-T_OWNER           : O W N E R ; 
-T_PACKAGE         : P A C K A G E ; 
-T_PARQUET         : P A R Q U E T ;
-T_PARSE_URL       : P A R S E '_' U R L ;
-T_PARTITION       : P A R T I T I O N ; 
-T_PARTITIONED     : P A R T I T I O N E D ; 
-T_PCTFREE         : P C T F R E E ; 
-T_PCTUSED         : P C T U S E D ;
-T_PERCENT_RANK    : P E R C E N T '_' R A N K ;
-T_PERCENTILE      : P E R C E N T I L E ;
-T_PERCENTILE_APPROX : P E R C E N T I L E '_' A P P R O X ;
-T_PLS_INTEGER     : P L S '_' I N T E G E R ;
-T_PMOD            : P M O D ;
-T_POSITIVE        : P O S I T I V E ;
-T_POSEXPLODE      : P O S E X P L O D E ;
-T_POW             : P O W;
-T_POWER           : P O W E R;
-T_PRECISION       : P R E C I S I O N ; 
-T_PRESERVE        : P R E S E R V E ; 
-T_PRIMARY         : P R I M A R Y ;
-T_PRINTF           : P R I N T F ; 
-T_PROC            : P R O C ;
-T_PROCEDURE       : P R O C E D U R E ;
-T_PURGE           : P U R G E ;
-T_QUALIFY         : Q U A L I F Y ;
-T_QUARTER         : Q U A R T E R ;
-T_QUERY_BAND      : Q U E R Y '_' B A N D ; 
-T_QUIT            : Q U I T ; 
-T_QUOTE           : Q U O T E;
-T_RADIANS         : R A D I A N S ;
-T_RAISE           : R A I S E ;
-T_RAND            : R A N D ;
-T_RCFILE          : R C F I L E ; 
-T_REAL            : R E A L ; 
-T_REFERENCES      : R E F E R E N C E S ; 
-T_REFLECT         : R E F L E C T ;
-T_REGEXP          : R E G E X P ;
-T_REGEXP_EXTRACT  : R E G E X P '_' E X T R A C T ;
-T_REGEXP_REPLACE  : R E G E X P '_' R E P L A C E ;
-T_REGR_AVGX       : R E G R '_' A V G X ;
-T_REGR_AVGY       : R E G R '_' A V G Y ;
-T_REGR_COUNT      : R E G R '_' C O U N T ;
-T_REGR_INTERCEPT  : R E G R '_' I N T E R C E P T ;
-T_REGR_R2         : R E G R '_'R '2' ;
-T_REGR_SLOPE      : R E G R '_' S L O P E ;
-T_REGR_SXX        : R E G R '_' S X X ;
-T_REGR_SXY        : R E G R '_' S X Y ;
-T_REGR_SYY        : R E G R '_' S Y Y ;
-T_RELY            : R E L Y ;
-T_REPEAT          : R E P E A T ;
-T_REPLACE         : R E P L A C E ; 
-T_RESIGNAL        : R E S I G N A L ;
-T_RESTRICT        : R E S T R I C T ; 
-T_RESULT          : R E S U L T ; 
-T_RESULT_SET_LOCATOR : R E S U L T '_' S E T '_' L O C A T O R ;
-T_RETURN          : R E T U R N ;
-T_RETURNS         : R E T U R N S ;
-T_REVERSE         : R E V E R S E ;
-T_RIGHT           : R I G H T ;
-T_RLIKE           : R L I K E ;
-T_ROLE            : R O L E ;
-T_ROLLBACK        : R O L L B A C K ;
-T_ROUND           : R O U N D ;
-T_ROW             : R O W ; 
-T_ROWS            : R O W S ; 
-T_ROWTYPE         : R O W T Y P E ; 
-T_ROW_COUNT       : R O W '_' C O U N T ;
-T_RPAD            : R P A D ;
-T_RR              : R R;
-T_RS              : R S ;
-T_RTRIM           : R T R I M ;
-T_PWD             : P W D ; 
-T_TRIM            : T R I M ;
-T_SCHEMA          : S C H E M A ;
-T_SECOND          : S E C O N D ;
-T_SECONDS         : S E C O N D S;
-T_SECURITY        : S E C U R I T Y ; 
-T_SERDE           : S E R D E ;
-T_SERDEPROPERTIES : S E R D E P R O P E R T I E S ;
-T_SEGMENT         : S E G M E N T ; 
-T_SEL             : S E L ;
-T_SELECT          : S E L E C T ; 
-T_SEQUENCEFILE    : S E Q U E N C E F I L E ;
-T_SENTENCES       : S E N T E N C E S ;
-T_SET             : S E T ;
-T_SETS            : S E T S;
-T_SHA             : S H A ;
-T_SHA1             : S H A '1' ;
-T_SHA2             : S H A '2' ;
-T_SIGN            : S I G N ;
-T_SIN             : S I N ; 
-T_SIMPLE_DOUBLE   : S I M P L E '_' D O U B L E ;
-T_SIMPLE_FLOAT    : S I M P L E '_' F L O A T ;
-T_SIMPLE_INTEGER  : S I M P L E '_' I N T E G E R ;
-T_SKEWED          : S K E W E D ;
-T_SMALLDATETIME   : S M A L L D A T E T I M E ;
-T_SMALLINT        : S M A L L I N T ;
-T_SOUNDEX         : S O U N D E X ;
-T_SPACE           : S P A C E ;
-T_SPLIT           : S P L I T ;
-T_SQL             : S Q L ; 
-T_SQLEXCEPTION    : S Q L E X C E P T I O N ;
-T_SQLINSERT       : S Q L I N S E R T ;
-T_SQLSTATE        : S Q L S T A T E ;
-T_SQLWARNING      : S Q L W A R N I N G ;
-T_SQRT            : S Q R T ;
-T_STATS           : S T A T S ; 
-T_STATISTICS      : S T A T I S T I C S ;
-T_STDDEV_POP      : S T D D E V '_' P O P ;
-T_STDDEV_SAMP     : S T D D E V '_' S A M P ;
-T_STEP            : S T E P ; 
-T_STORAGE         : S T O R A G E ; 
-T_STORED          : S T O R E D ;
-T_STRING          : S T R I N G ;
-T_STR_TO_MAP      : S T R '_' T O '_' M A P ;
-T_STRUCT          : S T R U C T ;
-T_SUBDIR          : S U B D I R ; 
-T_SUBSTR          : S U B S T R ; 
-T_SUBSTRING       : S U B S T R I N G ; 
-T_SUBSTRING_INDEX : S U B S T R I N G '_' I N D E X ;
-T_SUM             : S U M ;
-T_SUMMARY         : S U M M A R Y ;
-T_SYS_REFCURSOR   : S Y S '_' R E F C U R S O R ; 
-T_TABLE           : T A B L E ;
-T_TABLESPACE      : T A B L E S P A C E ;
-T_TAN             : T A N ;
-T_TBLPROPERTIES   : T B L P R O P E R T I E S ;
-T_TEMPORARY       : T E M P O R A R Y ;
-T_TERMINATED      : T E R M I N A T E D ; 
-T_TEXTFILE        : T E X T F I L E ;
-T_TEXTIMAGE_ON    : T E X T I M A G E '_' O N ;
-T_THEN            : T H E N ;
-T_TIMESTAMP       : T I M E S T A M P ;
-T_TINYINT         : T I N Y I N T ;
-T_TITLE           : T I T L E ;
-T_TO              : T O ; 
-T_TOP             : T O P ;
-T_TOUTCTIMESTAMP  : T O '_' U T C '_' T I M E S T A M P ;
-T_TRANSACTION     : T R A N S A C T I O N ;
-T_TRANSLATE       : T R A N S L A T E ;
-T_TRUE            : T R U E ;
-T_TRUNCATE        : T R U N C A T E;
-T_TRUNC            : T R U N C ;
-T_TYPE            : T Y P E ; 
-T_UCASE           : U C A S E ;
-T_UNBASE64        : U N B A S E '6' '4' ;
-T_UNHEX           : U N H E X ;
-T_UNION           : U N I O N ;
-T_UNIONTYPE       : U N I O N T Y P E ;
-T_UNIQUE          : U N I Q U E ;
-T_UNIX_TIMESTAMP  : U N I X '_' T I M E S T A M P ;
-T_UPDATE          : U P D A T E ; 
-T_UPPER           : U P P E R;
-T_UR              : U R ;
-T_USE             : U S E ;
-T_USING           : U S I N G ;
-T_VALUE           : V A L U E ;
-T_VALUES          : V A L U E S ;
-T_VAR             : V A R ;
-T_VARCHAR         : V A R C H A R ;
-T_VARCHAR2        : V A R C H A R '2' ;
-T_VARYING         : V A R Y I N G ;
-T_VERSION         : V E R S I O N;
-T_VIEW            : V I E W ;
-T_VOLATILE        : V O L A T I L E ;
-T_WEEKOFYEAR      : W E E K O F Y E A R ;
-T_WHEN            : W H E N ;
-T_WHERE           : W H E R E ;
-T_WHILE           : W H I L E ;
-T_WITH            : W I T H ; 
-T_WITHOUT         : W I T H O U T ;
-T_WORK            : W O R K ;
-T_XACT_ABORT      : X A C T '_' A B O R T ;
-T_XML             : X M L ;
-T_XPATH                : X P A T H ;
-T_XPATH_BOOLEAN        : X P A T H '_' B O O L E A N ;
-T_XPATH_DOUBLE         : X P A T H '_' D O U B L E ;
-T_XPATH_FLOAT          : X P A T H '_' F L O A T ;
-T_XPATH_INT            : X P A T H '_' I N T ;
-T_XPATH_LONG           : X P A T H '_' L O N G ;
-T_XPATH_NUMBER         : X P A T H '_' N U M B E R ;
-T_XPATH_SHORT          : X P A T H '_' S H O R T ;
-T_XPATH_STRING         : X P A T H '_' S T R I N G ;
-T_YEAR            : Y E A R ;
-T_YES             : Y E S ; 
-
-// Functions with specific syntax
-T_ACTIVITY_COUNT       : A C T I V I T Y '_' C O U N T ;
-T_CUME_DIST            : C U M E '_' D I S T ; 
-T_CURRENT_DATE         : C U R R E N T '_' D A T E ;
-T_CURRENT_TIMESTAMP    : C U R R E N T '_' T I M E S T A M P ;
-T_CURRENT_USER         : C U R R E N T '_' U S E R ;
-T_DENSE_RANK           : D E N S E '_' R A N K ;
-T_FIRST_VALUE          : F I R S T '_' V A L U E; 
-T_LAG                  : L A G ;
-T_LAST_VALUE           : L A S T '_' V A L U E; 
-T_LEAD                 : L E A D ; 
-T_MAX_PART_STRING      : M A X '_' P A R T '_' S T R I N G ;
-T_MIN_PART_STRING      : M I N '_' P A R T '_' S T R I N G ;
-T_MAX_PART_INT         : M A X '_' P A R T '_' I N T ;
-T_MIN_PART_INT         : M I N '_' P A R T '_' I N T ;
-T_MAX_PART_DATE        : M A X '_' P A R T '_' D A T E ;
-T_MIN_PART_DATE        : M I N '_' P A R T '_' D A T E ;
-T_PART_COUNT           : P A R T '_' C O U N T ; 
-T_PART_LOC             : P A R T '_' L O C ;
-T_RANK                 : R A N K ;
-T_ROW_NUMBER           : R O W '_' N U M B E R;
-T_STDEV                : S T D E V ;
-T_SYSDATE              : S Y S D A T E ;
-T_VARIANCE             : V A R I A N C E ; 
-T_VAR_POP              : V A R '_' P O P ;
-T_VAR_SAMP             : V A R '_' S A M P ;
-T_USER                 : U S E R ; 
+T_ALL : A L L;
+T_ALTER : A L T E R;
+T_AND : A N D;
+T_ARRAY : A R R A Y;
+T_AS : A S;
+T_AUTHORIZATION : A U T H O R I Z A T I O N;
+T_BETWEEN : B E T W E E N;
+T_BIGINT : B I G I N T;
+T_BINARY : B I N A R Y;
+T_BOOLEAN : B O O L E A N;
+T_BOTH : B O T H;
+T_BY : B Y;
+T_CASE : C A S E;
+T_CAST : C A S T;
+T_CHAR : C H A R;
+T_COLUMN : C O L U M N;
+T_CONF : C O N F;
+T_CREATE : C R E A T E;
+T_CROSS : C R O S S;
+T_CUBE : C U B E;
+T_CURRENT : C U R R E N T;
+T_CURRENT_DATE : C U R R E N T '_' D A T E;
+T_CURRENT_TIMESTAMP : C U R R E N T '_' T I M E S T A M P;
+T_CURSOR : C U R S O R;
+T_DATABASE : D A T A B A S E;
+T_DATE : D A T E;
+T_DECIMAL : D E C I M A L;
+T_DELETE : D E L E T E;
+T_DESCRIBE : D E S C R I B E;
+T_DISTINCT : D I S T I N C T;
+T_DOUBLE : D O U B L E;
+T_DROP : D R O P;
+T_ELSE : E L S E;
+T_END : E N D;
+T_EXCHANGE : E X C H A N G E;
+T_EXISTS : E X I S T S;
+T_EXTENDED : E X T E N D E D;
+T_EXTERNAL : E X T E R N A L;
+T_FALSE : F A L S E;
+T_FETCH : F E T C H;
+T_FLOAT : F L O A T;
+T_FOLLOWING : F O L L O W I N G;
+T_FOR : F O R;
+T_FROM : F R O M;
+T_FULL : F U L L;
+T_FUNCTION : F U N C T I O N;
+T_GRANT : G R A N T;
+T_GROUP : G R O U P;
+T_GROUPING : G R O U P I N G;
+T_HAVING : H A V I N G;
+T_IF : I F;
+T_IMPORT : I M P O R T;
+T_IN : I N;
+T_INNER : I N N E R;
+T_INSERT : I N S E R T;
+T_INT : I N T;
+T_INTERSECT : I N T E R S E C T;
+T_INTERVAL : I N T E R V A L;
+T_INTO : I N T O;
+T_IS : I S;
+T_JOIN : J O I N;
+T_LATERAL : L A T E R A L;
+T_LEFT : L E F T;
+T_LESS_W : L E S S;
+T_LIKE : L I K E;
+T_LOCAL : L O C A L;
+T_MACRO : M A C R O;
+T_MAP : M A P;
+T_MORE : M O R E;
+T_NONE : N O N E;
+T_NOT : N O T;
+T_NULL : N U L L;
+T_OF : O F;
+T_ON : O N;
+T_OR : O R;
+T_ORDER : O R D E R;
+T_OUT : O U T;
+T_OUTER : O U T E R;
+T_OVER : O V E R;
+T_PARTIALSCAN : P A R T I A L S C A N;
+T_PARTITION : P A R T I T I O N;
+T_PERCENT : P E R C E N T;
+T_PRECEDING : P R E C E D I N G;
+T_PRESERVE : P R E S E R V E;
+T_PROCEDURE : P R O C E D U R E;
+T_RANGE : R A N G E;
+T_READS : R E A D S;
+T_REDUCE : R E D U C E;
+T_REVOKE : R E V O K E;
+T_RIGHT : R I G H T;
+T_ROLLUP : R O L L U P;
+T_ROW : R O W;
+T_ROWS : R O W S;
+T_SELECT : S E L E C T;
+T_SET : S E T;
+T_SMALLINT : S M A L L I N T;
+T_TABLE : T A B L E;
+T_TABLESAMPLE : T A B L E S A M P L E;
+T_THEN : T H E N;
+T_TIMESTAMP : T I M E S T A M P;
+T_TO : T O;
+T_TRANSFORM : T R A N S F O R M;
+T_TRIGGER : T R I G G E R;
+T_TRUE : T R U E;
+T_TRUNCATE : T R U N C A T E;
+T_UNBOUNDED : U N B O U N D E D;
+T_UNION : U N I O N;
+T_UNIQUEJOIN : U N I Q U E J O I N;
+T_UPDATE : U P D A T E;
+T_USER : U S E R;
+T_USING : U S I N G;
+T_UTC_TMESTAMP : U T C '_' T M E S T A M P;
+T_VALUES : V A L U E S;
+T_VARCHAR : V A R C H A R;
+T_WHEN : W H E N;
+T_WHERE : W H E R E;
+T_WINDOW : W I N D O W;
+T_WITH : W I T H;
+T_COMMIT : C O M M I T;
+T_ONLY : O N L Y;
+T_REGEXP : R E G E X P;
+T_RLIKE : R L I K E;
+T_ROLLBACK : R O L L B A C K;
+T_START : S T A R T;
+T_CACHE : C A C H E;
+T_CONSTRAINT : C O N S T R A I N T;
+T_FOREIGN : F O R E I G N;
+T_PRIMARY : P R I M A R Y;
+T_REFERENCES : R E F E R E N C E S;
+T_DAYOFWEEK : D A Y O F W E E K;
+T_EXTRACT : E X T R A C T;
+T_FLOOR : F L O O R;
+T_INTEGER : I N T E G E R;
+T_PRECISION : P R E C I S I O N;
+T_VIEWS : V I E W S;
+T_TIME : T I M E;
+T_NUMERIC : N U M E R I C;
+T_SYNC : S Y N C;
+T_ADD_W : A D D;
+T_ADMIN : A D M I N;
+T_AFTER : A F T E R;
+T_ANALYZE : A N A L Y Z E;
+T_ARCHIVE : A R C H I V E;
+T_ASC : A S C;
+T_AUTOCOMMIT : A U T O C O M M I T;
+T_BEFORE : B E F O R E;
+T_BUCKET : B U C K E T;
+T_BUCKETS : B U C K E T S;
+T_CASCADE : C A S C A D E;
+T_CHANGE : C H A N G E;
+T_CLUSTER : C L U S T E R;
+T_CLUSTERED : C L U S T E R E D;
+T_CLUSTERSTATUS : C L U S T E R S T A T U S;
+T_COLLECTION : C O L L E C T I O N;
+T_COLUMNS : C O L U M N S;
+T_COMMENT : C O M M E N T;
+T_COMPACT : C O M P A C T;
+T_COMPACTIONS : C O M P A C T I O N S;
+T_COMPUTE : C O M P U T E;
+T_CONCATENATE : C O N C A T E N A T E;
+T_CONTINUE : C O N T I N U E;
+T_DATA : D A T A;
+T_DATABASES : D A T A B A S E S;
+T_DATETIME : D A T E T I M E;
+T_DAY : D A Y;
+T_DBPROPERTIES : D B P R O P E R T I E S;
+T_DEFERRED : D E F E R R E D;
+T_DEFINED : D E F I N E D;
+T_DELIMITED : D E L I M I T E D;
+T_DEPENDENCY : D E P E N D E N C Y;
+T_DESC : D E S C;
+T_DIRECTORIES : D I R E C T O R I E S;
+T_DIRECTORY : D I R E C T O R Y;
+T_DISABLE : D I S A B L E;
+T_DISTRIBUTE : D I S T R I B U T E;
+T_ELEM_TYPE : E L E M '_' T Y P E;
+T_ENABLE : E N A B L E;
+T_ESCAPED : E S C A P E D;
+T_EXCLUSIVE : E X C L U S I V E;
+T_EXPLAIN : E X P L A I N;
+T_EXPORT : E X P O R T;
+T_FIELDS : F I E L D S;
+T_FILE : F I L E;
+T_FILEFORMAT : F I L E F O R M A T;
+T_FIRST : F I R S T;
+T_FORMAT : F O R M A T;
+T_FORMATTED : F O R M A T T E D;
+T_FUNCTIONS : F U N C T I O N S;
+T_HOLD_DDLTIME : H O L D '_' D D L T I M E;
+T_HOUR : H O U R;
+T_IDXPROPERTIES : I D X P R O P E R T I E S;
+T_IGNORE : I G N O R E;
+T_INDEX : I N D E X;
+T_INDEXES : I N D E X E S;
+T_INPATH : I N P A T H;
+T_INPUTDRIVER : I N P U T D R I V E R;
+T_INPUTFORMAT : I N P U T F O R M A T;
+T_ITEMS : I T E M S;
+T_JAR : J A R;
+T_KEYS : K E Y S;
+T_KEY_TYPE : K E Y '_' T Y P E;
+T_LIMIT : L I M I T;
+T_LINES : L I N E S;
+T_LOAD : L O A D;
+T_LOCATION : L O C A T I O N;
+T_LOCK : L O C K;
+T_LOCKS : L O C K S;
+T_LOGICAL : L O G I C A L;
+T_LONG : L O N G;
+T_MAPJOIN : M A P J O I N;
+T_MATERIALIZED : M A T E R I A L I Z E D;
+T_METADATA : M E T A D A T A;
+T_MINUS : M I N U S;
+T_MINUTE : M I N U T E;
+T_MONTH : M O N T H;
+T_MSCK : M S C K;
+T_NOSCAN : N O S C A N;
+T_NO_DROP : N O '_' D R O P;
+T_OFFLINE : O F F L I N E;
+T_OPTION : O P T I O N;
+T_OUTPUTDRIVER : O U T P U T D R I V E R;
+T_OUTPUTFORMAT : O U T P U T F O R M A T;
+T_OVERWRITE : O V E R W R I T E;
+T_OWNER : O W N E R;
+T_PARTITIONED : P A R T I T I O N E D;
+T_PARTITIONS : P A R T I T I O N S;
+T_PLUS : P L U S;
+T_PRETTY : P R E T T Y;
+T_PRINCIPALS : P R I N C I P A L S;
+T_PROTECTION : P R O T E C T I O N;
+T_PURGE : P U R G E;
+T_READ : R E A D;
+T_READONLY : R E A D O N L Y;
+T_REBUILD : R E B U I L D;
+T_RECORDREADER : R E C O R D R E A D E R;
+T_RECORDWRITER : R E C O R D W R I T E R;
+T_RELOAD : R E L O A D;
+T_RENAME : R E N A M E;
+T_REPAIR : R E P A I R;
+T_REPLACE : R E P L A C E;
+T_REPLICATION : R E P L I C A T I O N;
+T_RESTRICT : R E S T R I C T;
+T_REWRITE : R E W R I T E;
+T_ROLE : R O L E;
+T_ROLES : R O L E S;
+T_SCHEMA : S C H E M A;
+T_SCHEMAS : S C H E M A S;
+T_SECOND : S E C O N D;
+T_SEMI : S E M I;
+T_SERDE : S E R D E;
+T_SERDEPROPERTIES : S E R D E P R O P E R T I E S;
+T_SERVER : S E R V E R;
+T_SETS : S E T S;
+T_SHARED : S H A R E D;
+T_SHOW : S H O W;
+T_SHOW_DATABASE : S H O W '_' D A T A B A S E;
+T_SKEWED : S K E W E D;
+T_SORT : S O R T;
+T_SORTED : S O R T E D;
+T_SSL : S S L;
+T_STATISTICS : S T A T I S T I C S;
+T_STORED : S T O R E D;
+T_STREAMTABLE : S T R E A M T A B L E;
+T_STRING : S T R I N G;
+T_STRUCT : S T R U C T;
+T_TABLES : T A B L E S;
+T_TBLPROPERTIES : T B L P R O P E R T I E S;
+T_TEMPORARY : T E M P O R A R Y;
+T_TERMINATED : T E R M I N A T E D;
+T_TINYINT : T I N Y I N T;
+T_TOUCH : T O U C H;
+T_TRANSACTIONS : T R A N S A C T I O N S;
+T_UNARCHIVE : U N A R C H I V E;
+T_UNDO : U N D O;
+T_UNIONTYPE : U N I O N T Y P E;
+T_UNLOCK : U N L O C K;
+T_UNSET : U N S E T;
+T_UNSIGNED : U N S I G N E D;
+T_URI : U R I;
+T_USE : U S E;
+T_UTC : U T C;
+T_UTCTIMESTAMP : U T C T I M E S T A M P;
+T_VALUE_TYPE : V A L U E '_' T Y P E;
+T_VIEW : V I E W;
+T_WHILE : W H I L E;
+T_YEAR : Y E A R;
+T_ISOLATION : I S O L A T I O N;
+T_LEVEL : L E V E L;
+T_OFFSET : O F F S E T;
+T_SNAPSHOT : S N A P S H O T;
+T_TRANSACTION : T R A N S A C T I O N;
+T_WORK : W O R K;
+T_WRITE : W R I T E;
+T_ABORT : A B O R T;
+T_KEY : K E Y;
+T_LAST : L A S T;
+T_NORELY : N O R E L Y;
+T_NOVALIDATE : N O V A L I D A T E;
+T_NULLS : N U L L S;
+T_RELY : R E L Y;
+T_VALIDATE : V A L I D A T E;
+T_DETAIL : D E T A I L;
+T_DOW : D O W;
+T_EXPRESSION : E X P R E S S I O N;
+T_OPERATOR : O P E R A T O R;
+T_QUARTER : Q U A R T E R;
+T_SUMMARY : S U M M A R Y;
+T_VECTORIZATION : V E C T O R I Z A T I O N;
+T_WEEK : W E E K;
+T_YEARS : Y E A R S;
+T_MONTHS : M O N T H S;
+T_WEEKS : W E E K S;
+T_DAYS : D A Y S;
+T_HOURS : H O U R S;
+T_MINUTES : M I N U T E S;
+T_SECONDS : S E C O N D S;
+T_TIMESTAMPTZ : T I M E S T A M P T Z;
+T_ZONE : Z O N E;
+T_COVAR_POP: C O V A R '_' P O P;
+T_BROUND: B R O U N D;
+T_CURRENT_USER: C U R R E N T '_' U S E R;
+T_LPAD: L P A D;
+T_UNHEX: U N H E X;
+T_PI: P I;
+T_STAR: S T A R;
+T_REGEXP_REPLACE: R E G E X P '_' R E P L A C E;
+T_ASCII: A S C I I;
+T_GET_JSON_OBJECT: G E T '_' J S O N '_' O B J E C T;
+T_COS: C O S;
+T_REGR_SXX: R E G R '_' S X X;
+T_WIDTH_BUCKET: W I D T H '_' B U C K E T;
+T_REPEAT: R E P E A T;
+T_ASIN: A S I N;
+T_NULLIF: N U L L I F;
+T_CONTEXT_NGRAMS: C O N T E X T '_' N G R A M S;
+T_MASK_HASH: M A S K '_' H A S H;
+T_PARENT: P A R E N T;
+T_STR_TO_MAP: S T R '_' T O '_' M A P;
+T_SIN: S I N;
+T_UNBASE64: U N B A S E '6' '4';
+T_COUNT: C O U N T;
+T_IN_FILE: I N '_' F I L E;
+T_CONV: C O N V;
+T_SIGN: S I G N;
+T_REGR_COUNT: R E G R '_' C O U N T;
+T_SQRT: S Q R T;
+T_REGR_INTERCEPT: R E G R '_' I N T E R C E P T;
+T_UNIX_TIMESTAMP: U N I X '_' T I M E S T A M P;
+T_MASK_LAST_N: M A S K '_' L A S T '_' N;
+T_AES_ENCRYPT: A E S '_' E N C R Y P T;
+T_MASK_FIRST_N: M A S K '_' F I R S T '_' N;
+T_REVERSE: R E V E R S E;
+T_NEXT_DAY: N E X T '_' D A Y;
+T_HISTOGRAM_NUMERIC: H I S T O G R A M '_' N U M E R I C;
+T_TRUNC: T R U N C;
+T_SHIFTRIGHT: S H I F T R I G H T;
+T_ADD_MONTHS: A D D '_' M O N T H S;
+T_MAX: M A X;
+T_DATE_SUB: D A T E '_' S U B;
+T_UNARY: U N A R Y;
+T_LN: L N;
+T_OCTET_LENGTH: O C T E T '_' L E N G T H;
+T_EXP: E X P;
+T_FIELD: F I E L D;
+T_NTILE: N T I L E;
+T_COLLECT_LIST: C O L L E C T '_' L I S T;
+T_RTRIM: R T R I M;
+T_LTRIM: L T R I M;
+T_REFLECT: R E F L E C T;
+T_SHA2: S H A '2';
+T_PRINTF: P R I N T F;
+T_CEIL: C E I L;
+T_CEILING : C E I L I N G ;
+T_CONCAT: C O N C A T;
+T_NVL: N V L;
+T_MD5: M D '5';
+T_ISNULL: I S N U L L;
+T_ISNOTNULL : I S N O T N U L L ;
+T_PARSE_URL: P A R S E '_' U R L;
+T_CBRT: C B R T;
+T_VARIANCE: V A R I A N C E;
+T_VAR_POP: V A R '_' P O P ;
+T_DEGREES: D E G R E E S;
+T_RADIANS: R A D I A N S;
+T_LEAST: L E A S T;
+T_BUILDVERSION: B U I L D V E R S I O N;
+T_SUBSTR: S U B S T R;
+T_SUBSTRING: S U B S T R I N G;
+T_SIZE: S I Z E;
+T_POSITIVE: P O S I T I V E;
+T_FROM_UNIXTIME: F R O M '_' U N I X T I M E;
+T_CHR: C H R;
+T_PERCENTILE_APPROX: P E R C E N T I L E '_' A P P R O X;
+T_ASSERT_TRUE: A S S E R T '_' T R U E;
+T_MONTHS_BETWEEN: M O N T H S '_' B E T W E E N;
+T_INITCAP: I N I T C A P;
+T_ACOS: A C O S;
+T_WEEKOFYEAR: W E E K O F Y E A R;
+T_LAST_DAY: L A S T '_' D A Y;
+T_CHARACTER_LENGTH: C H A R A C T E R '_' L E N G T H;
+T_SUBSTRING_INDEX: S U B S T R I N G '_' I N D E X;
+T_TRANSLATE: T R A N S L A T E;
+T_LEVENSHTEIN: L E V E N S H T E I N;
+T_COVAR_SAMP: C O V A R '_' S A M P;
+T_DATEDIFF: D A T E D I F F;
+T_LOG: L O G;
+T_NGRAMS: N G R A M S;
+T_LENGTH: L E N G T H;
+T_REGR_AVGX: R E G R '_' A V G X;
+T_FIND_IN_SET: F I N D '_' I N '_' S E T;
+T_XOR: X O R;
+T_NEGATIVE: N E G A T I V E;
+T_DATE_ADD: D A T E '_' A D D;
+T_PARSE_URL_TUPLE: P A R S E '_' U R L '_' T U P L E;
+T_CONCAT_WS: C O N C A T '_' W S;
+T_ELT: E L T;
+T_LOGGED_IN_USER: L O G G E D '_' I N '_' U S E R;
+T_MAP_VALUES: M A P '_' V A L U E S;
+T_JAVA_METHOD: J A V A '_' M E T H O D;
+T_MAP_KEYS: M A P '_' K E Y S;
+T_CORR: C O R R;
+T_SORT_ARRAY: S O R T '_' A R R A Y;
+T_SHIFTRIGHTUNSIGNED: S H I F T R I G H T U N S I G N E D;
+T_AES_DECRYPT: A E S '_' D E C R Y P T;
+T_SHA1: S H A '1';
+T_SHA: S H A ;
+T_AVG: A V G;
+T_CURRENT_DATABASE: C U R R E N T '_' D A T A B A S E;
+T_ARRAY_CONTAINS: A R R A Y '_' C O N T A I N S;
+T_FROM_UTC_TIMESTAMP: F R O M '_' U T C '_' T I M E S T A M P;
+T_DECODE: D E C O D E;
+T_ABS: A B S;
+T_EXPLODE: E X P L O D E;
+T_E: E;
+T_SUM: S U M;
+T_COALESCE: C O A L E S C E;
+T_LOWER: L O W E R;
+T_LCASE: L C A S E ;
+T_ENCODE: E N C O D E;
+T_VAR_SAMP: V A R '_' S A M P;
+T_INLINE: I N L I N E;
+T_SPACE: S P A C E;
+T_HASH: H A S H;
+T_ROUND: R O U N D;
+T_SPLIT: S P L I T;
+T_BASE64: B A S E '6' '4';
+T_TO_UTC_TIMESTAMP: T O '_' U T C '_' T I M E S T A M P;
+T_REGEXP_EXTRACT: R E G E X P '_' E X T R A C T;
+T_CRC32: C R C '3' '2';
+T_HEX: H E X;
+T_REGR_SYY: R E G R '_' S Y Y;
+T_UPPER: U P P E R;
+T_UCASE: U C A S E ;
+T_STDDEV_POP: S T D D E V '_' P O P;
+T_DATE_FORMAT: D A T E '_' F O R M A T;
+T_REGR_R2: R E G R '_' R '2';
+T_ATAN: A T A N;
+T_MIN: M I N;
+T_POSEXPLODE: P O S E X P L O D E;
+T_BRACKET_OP: B R A C K E T '_' O P;
+T_PMOD: P M O D;
+T_POW: P O W;
+T_POWER: P O W E R ;
+T_SENTENCES: S E N T E N C E S;
+T_MASK_SHOW_FIRST_N: M A S K '_' S H O W '_' F I R S T '_' N;
+T_SOUNDEX: S O U N D E X;
+T_SURROGATE_KEY: S U R R O G A T E '_' K E Y;
+T_SHIFTLEFT: S H I F T L E F T;
+T_PERCENTILE: P E R C E N T I L E;
+T_TO_DATE: T O '_' D A T E;
+T_REGR_AVGY: R E G R '_' A V G Y;
+T_RPAD: R P A D;
+T_FACTORIAL: F A C T O R I A L;
+T_COLLECT_SET: C O L L E C T '_' S E T;
+T_EQUAL_W: E Q U A L;
+T_BEGINNING: B E G I N N I N G;
+T_VERSION: V E R S I O N;
+T_STACK: S T A C K;
+T_BIN: B I N;
+T_TAN: T A N;
+T_TRIM: T R I M;
+T_REGR_SLOPE: R E G R '_' S L O P E;
+T_MASK: M A S K;
+T_MASK_SHOW_LAST_N: M A S K '_' S H O W '_' L A S T '_' N;
+T_INSTR: I N S T R;
+T_GREATEST: G R E A T E S T;
+T_REGR_SXY: R E G R '_' S X Y;
+T_FORMAT_NUMBER: F O R M A T '_' N U M B E R;
+T_LOCATE: L O C A T E;
+T_STDDEV_SAMP: S T D D E V '_' S A M P;
+T_RAND: R A N D;
+T_LOG2: L O G '2';
+T_LOG10: L O G '1' '0';
+T_JSON_TUPLE: J S O N '_' T U P L E;
+T_QUOTE: Q U O T E;
+T_SYSDATE: S Y S D A T E;
+T_XPATH: X P A T H ;
+T_XPATH_BOOLEAN: X P A T H '_' B O O L E A N ;
+T_XPATH_DOUBLE: X P A T H '_' D O U B L E;
+T_XPATH_FLOAT: X P A T H '_' F L O A T;
+T_XPATH_INT: X P A T H '_' I N T;
+T_XPATH_LONG: X P A T H '_' L O N G;
+T_XPATH_NUMBER: X P A T H '_' N U M B E R;
+T_XPATH_SHORT: X P A T H '_' S H O R T;
+T_XPATH_STRING: X P A T H '_' S T R I N G;
+T_FIELD_IN_SET : F I E L D '_' I N '_' S E T ;
+T_GET_JSON_OBJECTS : G E T '_' J S O N '_' O B J E C T S;
+T_IN_STR : I N '_' S T R ;
+T_NAMED_STRUCT : N A M E D '_' S T R U C T ;
+T_RANK : R A N K;
+T_DENSE_RANK : D E N S E '_' R A N K ;
+T_ROW_NUMBER : R O W '_' N U M B E R ;
+T_CUME_DIST : C U M E '_' D I S T ;
+T_PERCENT_RANK : P E R C E N T '_' R A N K ;
+T_UNIQUE : U N I Q U E ;
+T_CHECK : C H E C K ;
+T_DEFAULT : D E F A U L T;
+T_SEQUENCEFILE : S E Q U E N C E F I L E ;
+T_TEXTFILE : T E X T F I L E ;
+T_RCFILE : R C F I L E ;
+T_ORC : O R C ;
+T_PARQUET : P A R Q U E T ;
+T_AVRO : A V R O ;
+T_JSONFILE : J S O N F I L E ;
+T_HIVECONF : H I V E C O N F ;
+T_HIVEVAR : H I V E V A R ;
+T_BYTE : B Y T E ;
 
 
 T_ADD          : '+' ;
@@ -2090,6 +2354,11 @@ T_SUB          : '-' ;
 IDENTIFIER
     : '`' (~'`' | '``')* '`'
     | [a-zA-Z_] [a-zA-Z_0-9]*
+    ;
+
+NIDENTIFIER
+    : '`' (~'`' | '``')* '`'
+    | [a-zA-Z_] [a-zA-Z_0-9-]*
     ;
 
 INT_LITERAL

@@ -29,4 +29,4 @@ def parse(str_in):
     except Exception as ex:
         print(ex)
         return dict()
-#python3 setup.py sdist bdist_wheel
+#python setup.py sdist bdist_wheel
