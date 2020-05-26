@@ -204,6 +204,7 @@ opt_var_use_type returns [string res]
 
 var_name returns [string res]
     : name_identifier { $res = $name_identifier.res; }
+    | reserved_words { $res = $reserved_words.res; }
     ;
 
 droptable_stmt returns [json res]

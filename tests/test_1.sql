@@ -1,3 +1,5 @@
+SET hive.resultset.use.unique.column.names=false;
+SET hive.exec.dynamic.partition = true;
 SET hivevar:DAT_RFRC = 202001;
 SET mapred.ouput.compression.type = BLOCK;
 SET io.seqfile.compression.type = BLOCK;

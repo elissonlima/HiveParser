@@ -1,4 +1,4 @@
 
 import hiveparser
 
-print(hiveparser.parse("./test_1.sql"))
+print(hiveparser.parse("test_1.sql"))
