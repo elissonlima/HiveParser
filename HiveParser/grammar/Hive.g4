@@ -36,18 +36,32 @@ grammar Hive;
         }
     }
 
+    json create_empty_var(string var_name, string var_type)
+    {
+        json j;
+        j["type"] = "VAR_SET";
+        j["var_type"] = var_type;
+        j["var_name"] = var_name;
+        j["value"] = "";
+        return j;
+    }
+
     json get_value(string var_name, string var_type)
     {
+        
         if(var_type == "HIVECONF")
         {
-            json tmp = hiveconf_context_variables.find(var_name)->second;
-
-            return tmp;
+            if(hiveconf_context_variables.find(var_name) == hiveconf_context_variables.end())
+                return create_empty_var(var_name, var_type);
+            else
+                return hiveconf_context_variables.find(var_name)->second;
         }
         else if(var_type == "HIVEVAR")
         {
-            json tmp =  hivevar_context_variables.find(var_name)->second;
-            return tmp;
+            if(hivevar_context_variables.find(var_name) == hivevar_context_variables.end())
+                return create_empty_var(var_name, var_type);
+            else
+                return hivevar_context_variables.find(var_name)->second;
         }
 
         return NULL;
@@ -167,10 +181,11 @@ variable_substitution returns [json res]
     ;
 
 set_var_value returns [json res]
-    : NIDENTIFIER { $res = hql_var_name_value(remove_backquotes($NIDENTIFIER.text)); }
+    : IDENTIFIER { $res = hql_var_name_value(remove_backquotes($IDENTIFIER.text)); }
     | non_reserved_words { $res = hql_var_name_value($non_reserved_words.res); }
     | unary_operator { $res = hql_var_name_value($unary_operator.text); }
     | reserved_words { $res = hql_var_name_value($reserved_words.res); }
+    | unary_operator {  $res = hql_var_name_value($unary_operator.text); }
     | expr { $res = $expr.res; }
     ;
 
@@ -1173,14 +1188,13 @@ ident returns [json res]
     ;
 
 tab_ident returns [json res]
-    :  database=name_identifier '.' tablename=name_identifier { $res = hql_type_table_identifier($database.res, $tablename.res); }
-    |  tablename=name_identifier { $res = hql_type_table_identifier(database_now, $tablename.res); }
-    |  database_var=complex_name '.' tablename_var=complex_name { $res = hql_type_table_identifier($database_var.res, $tablename_var.res); }
-    |  tablename_var=complex_name { $res = hql_type_table_identifier(database_now, $tablename_var.res); }
+    :  database=complex_name '.' tablename=complex_name { $res = hql_type_table_identifier($database.res, $tablename.res); }
+    |  tablename=complex_name { $res = hql_type_table_identifier(database_now, $tablename.res); }
     ;
 
 complex_name returns [string res]
-    : {vector<Complex_atom_nameContext*> name_list; } ( name_list+=complex_atom_name)* use_var {
+    : complex_atom_name { $res = $complex_atom_name.res; }
+    | {vector<Complex_atom_nameContext*> name_list; } ( name_list+=complex_atom_name)* use_var {
         string result = "";
         for(Complex_atom_nameContext* name_ctxt:$name_list)
             result+=name_ctxt->res;
@@ -2351,15 +2365,9 @@ T_CLOSE_SB     : ']' ;
 T_SEMICOLON    : ';' ;
 T_SUB          : '-' ;
 
-
 IDENTIFIER
     : '`' (~'`' | '``')* '`'
     | [a-zA-Z_] [a-zA-Z_0-9]*
-    ;
-
-NIDENTIFIER
-    : '`' (~'`' | '``')* '`'
-    | [a-zA-Z_] [a-zA-Z_0-9-]*
     ;
 
 INT_LITERAL

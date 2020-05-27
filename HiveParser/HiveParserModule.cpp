@@ -8,6 +8,9 @@ std::string parse(std::string in)
 	CommonTokenStream tokens(&lexer);
 	HiveParser parser(&tokens);
 
+	lexer.removeErrorListeners();
+
+
 	HiveParser::ProgramContext* tree = parser.program();
 	return tree->res.dump();
 }
