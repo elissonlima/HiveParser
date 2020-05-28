@@ -206,3 +206,14 @@ json hql_insert_select_stmt(string insert_type, json table_name, vector<json> pa
 	j["select_stmt"] = select_stmt;
 	return j;
 }
+
+json hql_analyze_stmt(json tab_ident, vector<json> partition_list, bool for_columns, bool noscan)
+{
+	json j;
+	j["type"] = "ANALYZE_STMT";
+	j["table"] = tab_ident;
+	j["partition_list"] = partition_list;
+	j["for_columns_flag"] = for_columns;
+	j["noscan_flag"] = noscan;
+	return j;
+}

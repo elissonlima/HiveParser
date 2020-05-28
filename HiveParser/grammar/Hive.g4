@@ -134,7 +134,22 @@ stmt returns [json res]
     : full_select_stmt { $res = $full_select_stmt.res; }
     | ddl_stmt { $res = $ddl_stmt.res; }
     | variable_substitution { $res = $variable_substitution.res; }
+    | analyze_stmt { $res = $analyze_stmt.res; }
     | T_EXIT
+    ;
+
+analyze_stmt returns [json res]
+    : T_ANALYZE T_TABLE tab_ident opt_insert_partitions T_COMPUTE T_STATISTICS opt_for_columns opt_noscan { $res = hql_analyze_stmt($tab_ident.res, $opt_insert_partitions.res, $opt_for_columns.res, $opt_noscan.res); }
+    ;
+
+opt_for_columns returns [bool res]
+    : { $res = false; }
+    | T_FOR T_COLUMNS { $res = true; }
+    ;
+
+opt_noscan returns [bool res]
+    : { $res = false; }
+    | T_NOSCAN { $res = true; }
     ;
 
 ddl_stmt returns [json res]

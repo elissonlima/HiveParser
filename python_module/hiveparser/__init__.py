@@ -62,7 +62,11 @@ def parse(str_in, replace=None):
             import re
             for r_val in replace:
                 str_in = re.sub(r_val[0],r_val[1],str_in)
-        import json
+        try:
+            import ujson as json
+        except:
+            import json
+
         result = json.loads(hiveparser_c.parse(str_in))
         if (type(result) == dict and
             'stmt_list' in result):
