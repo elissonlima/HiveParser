@@ -183,9 +183,7 @@ variable_substitution returns [json res]
 set_var_value returns [json res]
     : IDENTIFIER { $res = hql_var_name_value(remove_backquotes($IDENTIFIER.text)); }
     | non_reserved_words { $res = hql_var_name_value($non_reserved_words.res); }
-    | unary_operator { $res = hql_var_name_value($unary_operator.text); }
     | reserved_words { $res = hql_var_name_value($reserved_words.res); }
-    | unary_operator {  $res = hql_var_name_value($unary_operator.text); }
     | expr { $res = $expr.res; }
     ;
 
@@ -797,8 +795,8 @@ expr returns [json res]
     | eval_expr=expr T_BETWEEN start_interval=expr T_AND end_interval=expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, false); }
     | eval_expr=expr T_NOT T_BETWEEN start_interval=expr T_AND end_interval=expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, true); }
     | eval_expr=expr set_operators_in expr_list { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $expr_list.res);  }
-    | eval_expr=expr set_operators_in T_OPEN_P select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $select_stmt.res); }
-    | eval_expr=expr set_operators_exists T_OPEN_P select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_exists.res, $eval_expr.res, $select_stmt.res); }
+    | eval_expr=expr set_operators_in T_OPEN_P full_select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $full_select_stmt.res); }
+    | eval_expr=expr set_operators_exists T_OPEN_P full_select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_exists.res, $eval_expr.res, $full_select_stmt.res); }
     | eval_expr=expr set_operators_like r_expr=expr { $res = hql_bool_operator($set_operators_like.res, $eval_expr.res, $r_expr.res); }
     | literal_values { $res = $literal_values.res; } 
     | ident { $res =  $ident.res; }
@@ -2341,7 +2339,7 @@ T_HIVEVAR : H I V E V A R ;
 T_BYTE : B Y T E ;
 
 
-T_ADD          : '+' ;
+// T_ADD          : '+' ;
 T_COLON        : ':' ;
 T_COMMA        : ',' ;
 T_PIPE         : '||' ;
@@ -2363,7 +2361,7 @@ T_CLOSE_B      : '}' ;
 T_CLOSE_P      : ')' ;
 T_CLOSE_SB     : ']' ;
 T_SEMICOLON    : ';' ;
-T_SUB          : '-' ;
+// T_SUB          : '-' ;
 
 IDENTIFIER
     : '`' (~'`' | '``')* '`'
@@ -2371,11 +2369,11 @@ IDENTIFIER
     ;
 
 INT_LITERAL
-    :('-' | '+')? L_INT
+    : L_INT
     ;
 
 DECIMAL_LITERAL 
-    : ('-' | '+')? L_DEC 
+    : L_DEC 
     ;
 
 STRING_LITERAL  
