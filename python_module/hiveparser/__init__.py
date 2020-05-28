@@ -64,7 +64,7 @@ def parse(str_in, replace=None):
                 str_in = re.sub(r_val[0],r_val[1],str_in)
         try:
             import ujson as json
-        except:
+        except ImportError:
             import json
 
         result = json.loads(hiveparser_c.parse(str_in))
