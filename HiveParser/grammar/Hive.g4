@@ -134,6 +134,7 @@ stmt returns [json res]
     : full_select_stmt { $res = $full_select_stmt.res; }
     | ddl_stmt { $res = $ddl_stmt.res; }
     | variable_substitution { $res = $variable_substitution.res; }
+    | T_EXIT
     ;
 
 ddl_stmt returns [json res]
@@ -631,7 +632,7 @@ opt_having_expr returns [json res]
     | T_HAVING expr { $res = $expr.res; }
     ;
 
-opt_order_by_list returns [json res]
+opt_order_by_list returns [vector<json> res]
     : { $res = vector<json>(); }
     | { vector<IdentContext*> order_by_ident_list; vector<Opt_order_by_modeContext*> order_mode_list; } T_ORDER T_BY order_by_ident_list+=ident order_mode_list+=opt_order_by_mode ( ',' order_by_ident_list+=ident order_mode_list+=opt_order_by_mode )* {
         vector<json> expr_json_list;
@@ -731,33 +732,19 @@ select_expr returns [json res]
     ;
 
 over_clause returns [json res]
-    : { vector<IdentContext*> ident_cntxt_list; } over_func T_OVER T_OPEN_P T_PARTITION T_BY ident_cntxt_list+=ident ( ',' ident_cntxt_list+=ident)* T_CLOSE_P {
+    :  over_func T_OVER T_OPEN_P opt_partitions_by_list opt_order_by_list T_CLOSE_P { $res = hql_over_clause_partition_order($over_func.res, $opt_partitions_by_list.res, $opt_order_by_list.res);
+    }
+    ;
+
+opt_partitions_by_list returns [vector<json> res]
+    : { $res = vector<json>(); }
+    | { vector<IdentContext*> ident_cntxt_list; } T_PARTITION T_BY ident_cntxt_list+=ident ( ',' ident_cntxt_list+=ident)*{
         vector<json> ident_json_list;
         for(IdentContext* ident_context:$ident_cntxt_list)
         {
             ident_json_list.push_back(ident_context->res);
         }
-        $res = hql_over_clause_partition($over_func.res, ident_json_list);
-    }
-    | { vector<IdentContext*> ident_cntxt_list; } over_func T_OVER T_OPEN_P T_ORDER T_BY ident_cntxt_list+=ident ( ',' ident_cntxt_list+=ident)* T_CLOSE_P {
-        vector<json> ident_json_list;
-        for(IdentContext* ident_context:$ident_cntxt_list)
-        {
-            ident_json_list.push_back(ident_context->res);
-        }
-        $res = hql_over_clause_order($over_func.res, ident_json_list);
-    }
-    | { vector<IdentContext*> partition_cntxt_list; vector<IdentContext*> order_cntxt_list; } over_func T_OVER T_OPEN_P T_PARTITION T_BY partition_cntxt_list+=ident ( ',' partition_cntxt_list+=ident)* T_ORDER T_BY order_cntxt_list+=ident ( ',' order_cntxt_list+=ident)* T_CLOSE_P {
-        vector<json> partition_json_list; vector<json> order_json_list;
-        for(IdentContext* ident_context:$partition_cntxt_list)
-        {
-            partition_json_list.push_back(ident_context->res);
-        }
-        for(IdentContext* ident_context:$order_cntxt_list)
-        {
-            order_json_list.push_back(ident_context->res);
-        }
-        $res = hql_over_clause_partition_order($over_func.res, partition_json_list, order_json_list);
+        $res = ident_json_list;
     }
     ;
 
@@ -1398,6 +1385,7 @@ reserved_words returns [string res]
 // Tokens that are not reserved words and can be used as identifiers
 non_reserved_words returns [string res]
     : function_names { $res = $function_names.res; }
+    | T_EXIT { $res = $T_EXIT.text; }
     | T_ADD_W { $res = $T_ADD_W.text; }
     | T_ADMIN { $res = $T_ADMIN.text; }
     | T_AFTER { $res = $T_AFTER.text; }
@@ -2350,6 +2338,7 @@ T_JSONFILE : J S O N F I L E ;
 T_HIVECONF : H I V E C O N F ;
 T_HIVEVAR : H I V E V A R ;
 T_BYTE : B Y T E ;
+T_EXIT : E X I T ;
 
 
 // T_ADD          : '+' ;

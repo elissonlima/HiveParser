@@ -7,5 +7,5 @@
 SELECT 
     E.abc,
     COALESCE(E.abc, 1029),
-    LAG(a,b,c,d,e) OVER(PARTITION BY abc ORDER BY dce)
+    LAG(a,b,c,d,e) OVER()
 FROM teste ;
