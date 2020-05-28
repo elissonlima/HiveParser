@@ -32,4 +32,4 @@ json hql_drop_table_stmt(bool opt_if_exists, json table_ident, bool opt_purge);
 json hql_set_variable(string var_type, string var_name, json expr);
 json hql_use_variable(string var_type, string var_name);
 json hql_var_name_value(string var_value);
-json hql_insert_select_stmt(json table_name, vector<json> partitions, bool opt_if_not_exists, json select_stmt);
+json hql_insert_select_stmt(string insert_type, json table_name, vector<json> partitions, bool opt_if_not_exists, json select_stmt);

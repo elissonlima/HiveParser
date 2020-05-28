@@ -144,7 +144,7 @@ ddl_stmt returns [json res]
     ;
 
 insert_stmt returns [json res]
-    : T_INSERT T_INTO T_TABLE tab_ident opt_insert_partitions opt_if_not_exists_flag full_select_stmt { $res = hql_insert_select_stmt($tab_ident.res, $opt_insert_partitions.res, $opt_if_not_exists_flag.res, $full_select_stmt.res); }
+    : T_INSERT insert_type=(T_OVERWRITE | T_INTO) T_TABLE tab_ident opt_insert_partitions opt_if_not_exists_flag full_select_stmt { $res = hql_insert_select_stmt($insert_type.text, $tab_ident.res, $opt_insert_partitions.res, $opt_if_not_exists_flag.res, $full_select_stmt.res); }
     ;
 
 opt_insert_partitions returns [vector<json> res]
@@ -764,6 +764,7 @@ over_clause returns [json res]
 over_func returns [json res]
     : basic_aggr_func { $res = $basic_aggr_func.res; }
     | analytic_func { $res = $analytic_func.res; }
+    | f_name=(T_LAG|T_LEAD) expr_list { $res = hql_list_param_func($f_name.text, "column_list", $expr_list.res); }
     ;
 
 analytic_func returns [json res]
@@ -1017,7 +1018,7 @@ cond_func returns [json res]
     | T_ISNULL T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("ISNULL", "expr", $expr.res); }
     | T_ISNOTNULL T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("ISNOTNULL", "expr", $expr.res); }
     | T_NVL T_OPEN_P expr_val=expr ',' default_val=expr T_CLOSE_P { $res = hql_double_param_func("NVL", "expr_val", $expr_val.res, "default_val", $default_val.res); }
-    | { vector<ExprContext*> exprs; } T_COALESCE T_OPEN_P (exprs+=expr) (',' exprs+=expr) (',' exprs+=expr)* T_CLOSE_P { 
+    | { vector<ExprContext*> exprs; } T_COALESCE T_OPEN_P exprs+=expr (',' exprs+=expr)+ T_CLOSE_P { 
         vector<json> expr_list_json;
         for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
         $res = hql_list_param_func("COALESCE","expr_list",expr_list_json);
@@ -1163,8 +1164,8 @@ math_func returns [json res]
     | T_POSITIVE T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("POSITIVE", "expr", $expr.res); }
     | T_NEGATIVE T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("NEGATIVE", "expr", $expr.res); }
     | T_SIGN T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("SIGN", "expr", $expr.res); }
-    | 'E' T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("EULER_CONST"); }
-    | 'PI' T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("PI_CONST"); }
+    | T_E T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("EULER_CONST"); }
+    | T_PI T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("PI_CONST"); }
     | T_FACTORIAL T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("FACTORIAL", "expr", $expr.res); }
     | T_CBRT T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("CUBE_ROOT", "expr", $expr.res); }
     ;
@@ -1806,6 +1807,8 @@ function_names returns [string res]
     | T_ROW_NUMBER { $res = $T_ROW_NUMBER.text; }
     | T_CUME_DIST { $res = $T_CUME_DIST.text; }
     | T_PERCENT_RANK { $res = $T_PERCENT_RANK.text; }
+    | T_LAG { $res = $T_LAG.text; }
+    | T_LEAD { $res = $T_LEAD.text; }
     ;
 
 
@@ -2280,6 +2283,8 @@ T_POSEXPLODE: P O S E X P L O D E;
 T_BRACKET_OP: B R A C K E T '_' O P;
 T_PMOD: P M O D;
 T_POW: P O W;
+T_LAG : L A G ;
+T_LEAD : L E A D ;
 T_POWER: P O W E R ;
 T_SENTENCES: S E N T E N C E S;
 T_MASK_SHOW_FIRST_N: M A S K '_' S H O W '_' F I R S T '_' N;
@@ -2397,7 +2402,7 @@ L_DEC
     ;
 
 L_M_COMMENT : '/*' .*? '*/' -> channel(HIDDEN) ;                       // Multiline comment
-L_S_COMMENT : ('--' | '//')  .*? '\r'? '\n' -> channel(HIDDEN) ;       // Single line comment
+L_S_COMMENT : ('--' | '//') ~('\r' | '\n')* -> channel(HIDDEN) ;       // Single line comment
 
 SPACES
  : [ \u000B\t\r\n] -> channel(HIDDEN)
