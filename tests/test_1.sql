@@ -5,5 +5,5 @@
 -- SET hivevar:DAT_RFRC = XX_DTREF-A-rt2_ai6_utmm2rc1_ut_rems_oran0110_001-MAX-1-_XX;
 
 SELECT 
-    1+anomes+10
+    ITAU.PRANK(a,b,c)
 FROM teste;

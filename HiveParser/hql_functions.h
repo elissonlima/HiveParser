@@ -30,3 +30,4 @@ json hql_double_param_list_func(string func_name,
 	string list_name, vector<json> expr_list);
 std::string remove_quotes(std::string in);
 std::string remove_backquotes(std::string in);
+json hql_generic_function(string database, string function_name, vector<json> param_list);

@@ -170,3 +170,13 @@ std::string remove_backquotes(std::string in)
 	in.erase(std::remove(in.begin(), in.end(), '`'), in.end());
 	return in;
 }
+
+json hql_generic_function(string database, string function_name, vector<json> param_list)
+{
+	json j;
+	j["type"] = "USER_DEFINED_FUNCTION";
+	j["name"] = function_name;
+	j["database"] = database;
+	j["param_list"] = param_list;
+	return j;
+}

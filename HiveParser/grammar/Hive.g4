@@ -810,6 +810,7 @@ expr returns [json res]
     | expr_concat { $res = $expr_concat.res; } //LEMBRAR DE ADICIONAR TODA EXPRESSÃO DE FUNÇÃO NESSE NÃO-TERMINAL
     | misc_func { $res = $misc_func.res; }
     | aggr_func { $res = $aggr_func.res; }
+    | generic_function { $res = $generic_function.res; }
     | complex_types { $res = $complex_types.res; }
     | use_var { $res = $use_var.res; }
     ;
@@ -859,6 +860,7 @@ struct_def returns [json res]
         $res = hql_complx_typ_struct(col_exprs_json, val_exprs_json);
     }
     ;
+
 
 named_struct_def returns [json res]
     : { vector<ExprContext*> col_exprs; vector<ExprContext*> val_exprs; } T_NAMED_STRUCT T_OPEN_P col_exprs+=expr ',' val_exprs+=expr ( ',' col_exprs+=expr ',' val_exprs+=expr )* T_CLOSE_P {
@@ -1007,6 +1009,7 @@ expr_concat_item returns [json res]
     | misc_func { $res = $misc_func.res; }
     | aggr_func { $res = $aggr_func.res; }
     | use_var { $res = $use_var.res; }
+    | generic_function { $res = $generic_function.res; }
     ;
 
 cond_func returns [json res]
@@ -1164,6 +1167,11 @@ math_func returns [json res]
     | 'PI' T_OPEN_P T_CLOSE_P { $res = hql_fixed_func("PI_CONST"); }
     | T_FACTORIAL T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("FACTORIAL", "expr", $expr.res); }
     | T_CBRT T_OPEN_P expr T_CLOSE_P { $res = hql_single_param_func("CUBE_ROOT", "expr", $expr.res); }
+    ;
+
+generic_function returns [json res]
+    : database_name=complex_atom_name '.' function_name=complex_atom_name expr_list { $res = hql_generic_function($database_name.res, $function_name.res, $expr_list.res); }
+    | function_name=complex_atom_name expr_list { $res = hql_generic_function(database_now, $function_name.res, $expr_list.res); }
     ;
 
 // https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
@@ -2373,7 +2381,7 @@ INT_LITERAL
     ;
 
 DECIMAL_LITERAL 
-    : L_DEC 
+    : L_DEC
     ;
 
 STRING_LITERAL  
