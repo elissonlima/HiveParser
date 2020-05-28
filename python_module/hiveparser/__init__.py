@@ -46,8 +46,10 @@ def check_types(f):
             kwargs['replace'] = [(kwargs['replace'][0],kwargs['replace'][1])]
         
         import os.path
-        if(os.path.isfile(args[0])):
-            with open(args[0]) as arq_open:
+        if type(args[0]) == TextIOWrapper:
+            args = (args[0].read(),)
+        elif(os.path.isfile(args[0])):
+            with open(args[0], encoding="utf-8", errors='ignore') as arq_open:
                 args = (arq_open.read(),)
         return f(*args, **kwargs)
     new_f.__name__ = f.__name__
