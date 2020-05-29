@@ -65,7 +65,10 @@ def parse(str_in, replace=None):
         try:
             import ujson as json
         except ImportError:
-            import json
+            try:
+                import simplejson as json
+            except ImportError:
+                import json
 
         result = json.loads(hiveparser_c.parse(str_in))
         if (type(result) == dict and
