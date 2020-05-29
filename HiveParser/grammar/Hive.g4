@@ -200,6 +200,7 @@ set_var_value returns [json res]
     : IDENTIFIER { $res = hql_var_name_value(remove_backquotes($IDENTIFIER.text)); }
     | non_reserved_words { $res = hql_var_name_value($non_reserved_words.res); }
     | reserved_words { $res = hql_var_name_value($reserved_words.res); }
+    | complex_name { $res = $complex_name.res; }
     | expr { $res = $expr.res; }
     ;
 
