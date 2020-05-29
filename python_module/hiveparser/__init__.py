@@ -16,11 +16,13 @@ def check_types(f):
                     .format(f.__name__))
 
         if ( 'replace' in kwargs and 
+            kwargs['replace'] is not None and
             type(kwargs['replace']) != list
             and type(kwargs['replace']) != tuple):
             raise TypeError("{}: replace value should be list or tuple"
                     .format(f.__name__))
         elif ( 'replace' in kwargs and 
+                kwargs['replace'] is not None and
                 len(kwargs['replace']) > 0 and
                 type(kwargs['replace'][0]) != tuple and
                 type(kwargs['replace'][0]) != list and
@@ -28,12 +30,14 @@ def check_types(f):
             raise TypeError("{}: replace value should be {} or {}"
                     .format(f.__name__,"list(tuple)","tuple(string,string)"))
         elif ( 'replace' in kwargs and 
+                kwargs['replace'] is not None and
                 len(kwargs['replace']) > 0 and
                 type(kwargs['replace'][0]) == str 
                 and len(kwargs['replace']) < 2 ):
             raise TypeError("{}: replace value should be {} or {}"
                     .format(f.__name__,"list(string,string)","tuple(string,string)"))
         elif ( 'replace' in kwargs and 
+                kwargs['replace'] is not None and
                 len(kwargs['replace']) > 0 and
                 type(kwargs['replace'][0]) != str 
                 and len(kwargs['replace'][0]) < 2 ):
@@ -41,6 +45,7 @@ def check_types(f):
                     .format(f.__name__,"list(list(string,string))","list(tuple(string,string))"))
 
         if ( 'replace' in kwargs and 
+            kwargs['replace'] is not None and
             len(kwargs['replace']) > 0 and 
             type(kwargs['replace'][0]) == str  ):
             kwargs['replace'] = [(kwargs['replace'][0],kwargs['replace'][1])]
@@ -56,12 +61,19 @@ def check_types(f):
     return new_f
 
 @check_types
-def parse(str_in, replace=None):
+def parse_raw(str_in, replace=None):
     try:
         if replace is not None:
             import re
             for r_val in replace:
                 str_in = re.sub(r_val[0],r_val[1],str_in)
+        return hiveparser_c.parse(str_in)
+    except:
+        return ""
+
+@check_types
+def parse(str_in, replace=None):
+    try:
         try:
             import ujson as json
         except ImportError:
@@ -69,14 +81,15 @@ def parse(str_in, replace=None):
                 import simplejson as json
             except ImportError:
                 import json
-
-        result = json.loads(hiveparser_c.parse(str_in))
-        if (type(result) == dict and
-            'stmt_list' in result):
+        
+        result = json.loads(parse_raw(str_in,replace=replace))
+        if (type(result) == dict and 'stmt_list' in result):
             return result['stmt_list']
         else:
             return []
-    except Exception as ex:
-        print(ex)
+    except Exception as e:
+        raise e
         return []
+
+
 #python setup.py sdist bdist_wheel
