@@ -741,8 +741,8 @@ select_expr returns [json res]
     | expr { $res = hql_select_expr($expr.res); }
     | expr T_AS? name_identifier { $res = hql_select_expr($expr.res, $name_identifier.res); }
     | expr { $res = hql_select_expr($expr.res); }
-    | '*' { $res = hql_select_all_expr(); } 
-    | name_identifier '.' '*' { $res = hql_select_all_expr($name_identifier.res); }
+    | T_MULT_S { $res = hql_select_all_expr(); } 
+    | name_identifier '.' T_MULT_S { $res = hql_select_all_expr($name_identifier.res); }
     | over_clause { $res = hql_select_expr($over_clause.res, "DEFAULT"); }
     | over_clause T_AS? name_identifier { $res = hql_select_expr($over_clause.res, $name_identifier.res); }
     ;
@@ -787,13 +787,7 @@ expr_list returns [vector<json> res]
     ;
 
 expr returns [json res]
-    : l_expr=expr op=( '*' | '/' | '%' ) r_expr=expr { $res = hql_math_operator($op.text, $l_expr.res, $r_expr.res); }
-    | l_expr=expr op=( '+' | '-' ) r_expr=expr { $res = hql_math_operator($op.text, $l_expr.res, $r_expr.res); }
-    | l_expr=expr op=( '<<' | '>>' | '&' | '|' ) r_expr=expr { $res = hql_bool_operator($op.text, $l_expr.res, $r_expr.res); } 
-    | l_expr=expr op=( '<' | '<=' | '>' | '>=' ) r_expr=expr { $res = hql_bool_operator($op.text, $l_expr.res, $r_expr.res); } 
-    | l_expr=expr op=( '=' | '==' | '!=' | '<>' | '<=>' ) r_expr=expr { $res = hql_bool_operator($op.text, $l_expr.res, $r_expr.res); }
-    | l_expr=expr op=T_AND r_expr=expr { $res = hql_bool_operator($op.text, $l_expr.res, $r_expr.res); }
-    | l_expr=expr op=T_OR r_expr=expr { $res = hql_bool_operator($op.text, $l_expr.res, $r_expr.res); }
+    : bool_expr { $res = $bool_expr.res; }
     | l_expr=expr set_operators_is BOOL_LITERAL { $res = hql_bool_operator($set_operators_is.res, $l_expr.res, hql_boolean_type($BOOL_LITERAL.text)); }
     | l_expr=expr set_operators_is NULL_CONST { $res = hql_bool_operator($set_operators_is.res, $l_expr.res, hql_null_constant()); }
     | eval_expr=expr T_BETWEEN start_interval=expr T_AND end_interval=expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, false); }
@@ -802,10 +796,104 @@ expr returns [json res]
     | eval_expr=expr set_operators_in T_OPEN_P full_select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $full_select_stmt.res); }
     | eval_expr=expr set_operators_exists T_OPEN_P full_select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_exists.res, $eval_expr.res, $full_select_stmt.res); }
     | eval_expr=expr set_operators_like r_expr=expr { $res = hql_bool_operator($set_operators_like.res, $eval_expr.res, $r_expr.res); }
-    | literal_values { $res = $literal_values.res; } 
+    | T_OPEN_P expr T_CLOSE_P { $res = $expr.res; }
+    ;
+
+multi_expr returns [json res]
+    : base_expr { $res = $base_expr.res; }
+    | left_op=multi_expr op=( T_MULT_S | T_DIV_S | T_MOD_S ) right_op=base_expr { $res = hql_math_operator($op.text, $left_op.res, $right_op.res); }
+    ;
+
+add_expr returns [json res]
+    : {vector<Multi_exprContext*> multi_expr_list; vector<Add_op_exprContext*> operators; } left_op=multi_expr (operators+=add_op_expr multi_expr_list+=multi_expr)* { 
+        if($multi_expr_list.size() == 0)
+            $res = $left_op.res;
+        else
+        {
+            json result = hql_math_operator($operators[0]->res, $left_op.res, $multi_expr_list[0]->res);
+            for(int i = 1 ; i < $multi_expr_list.size(); i++)
+               result = hql_math_operator($operators[i]->res, result, $multi_expr_list[i]->res);
+            $res = result;
+        }
+     }
+    ;
+
+add_op_expr returns [string res]
+    : T_ADD_S { $res = $T_ADD_S.text; }
+    | T_SUB_S { $res = $T_SUB_S.text; }
+    ;
+
+shift_expr returns [json res]
+    : {vector<Add_exprContext*> add_expr_list; vector<Shift_op_exprContext*> operators; } left_expr=add_expr (operators+=shift_op_expr add_expr_list+=add_expr)* { 
+        if($add_expr_list.size() == 0)
+            $res = $left_expr.res;
+        else
+        {
+            json result = hql_bool_operator($operators[0]->res, $left_expr.res, $add_expr_list[0]->res);
+            for(int i = 1 ; i < $add_expr_list.size(); i++)
+               result = hql_bool_operator($operators[i]->res, result, $add_expr_list[i]->res);
+            $res = result;
+        }
+     }
+    ;
+
+shift_op_expr returns [string res]
+    : T_SHIFT_LEFT { $res = $T_SHIFT_LEFT.text; }
+    | T_SHIFT_RIGHT  { $res = $T_SHIFT_RIGHT.text; }
+    | T_BIT_AND  { $res = $T_BIT_AND.text; }
+    | T_BIT_OR  { $res = $T_BIT_OR.text; }
+    ;
+
+comp_expr returns [json res]
+    : {vector<Shift_exprContext*> shift_expr_list; vector<Comp_op_exprContext*> operators; } left_expr=shift_expr (operators+=comp_op_expr shift_expr_list+=shift_expr)* { 
+        if($shift_expr_list.size() == 0)
+            $res = $left_expr.res;
+        else
+        {
+            json result = hql_bool_operator($operators[0]->res, $left_expr.res, $shift_expr_list[0]->res);
+            for(int i = 1 ; i < $shift_expr_list.size(); i++)
+               result = hql_bool_operator($operators[i]->res, result, $shift_expr_list[i]->res);
+            $res = result;
+        }
+     }
+    ; 
+
+comp_op_expr returns [string res]
+    : T_LESS { $res = $T_LESS.text; }
+    | T_LESSEQUAL { $res = $T_LESSEQUAL.text; }
+    | T_GREATER { $res = $T_GREATER.text; }
+    | T_GREATEREQUAL { $res = $T_GREATEREQUAL.text; }
+    | T_EQUAL2 { $res = $T_EQUAL2.text; }
+    | T_EQUAL { $res = $T_EQUAL.text; }
+    | T_NOTEQUAL { $res = $T_NOTEQUAL.text; }
+    | T_NOTEQUAL2 { $res = $T_NOTEQUAL2.text; }
+    ;
+
+bool_expr returns [json res]
+    : {vector<Comp_exprContext*> comp_expr_list; vector<Bool_op_exprContext*> operators; } left_expr=comp_expr ( operators+=bool_op_expr comp_expr_list+=comp_expr)* { 
+        if($comp_expr_list.size() == 0)
+            $res = $left_expr.res;
+        else
+        {
+            json result = hql_bool_operator($operators[0]->res, $left_expr.res, $comp_expr_list[0]->res);
+            for(int i = 1 ; i < $comp_expr_list.size(); i++)
+               result = hql_bool_operator($operators[i]->res, result, $comp_expr_list[i]->res);
+            $res = result;
+        }
+     }
+    ;
+
+bool_op_expr  returns [string res]
+    : T_AND { $res = "AND"; }
+    | T_OR  { $res = "OR"; }
+    | set_operators_like { $res = $set_operators_like.res; }
+    ;
+
+base_expr returns [json res]
+    : literal_values { $res = $literal_values.res; } 
     | ident { $res =  $ident.res; }
-    | unary_operator expr { $res = hql_unary_operator($unary_operator.text, $expr.res); }
-    | '(' expr ')' { $res = $expr.res; }  
+    | unary_operator base_expr { $res = hql_unary_operator($unary_operator.text, $base_expr.res); }
+    | '(' base_expr ')' { $res = $base_expr.res; }  
     | dat_convrt_func { $res = $dat_convrt_func.res; }
     | math_func { $res = $math_func.res; }
     | date_func { $res = $date_func.res; }
@@ -818,7 +906,6 @@ expr returns [json res]
     | complex_types { $res = $complex_types.res; }
     | use_var { $res = $use_var.res; }
     ;
-
 
 
 complex_types returns [json res]
@@ -1109,7 +1196,7 @@ basic_aggr_func returns [json res]
         for (ExprContext* exp_contxt : $exprs){ expr_list_json.push_back(exp_contxt->res); }
         $res = hql_single_param_list_func("COUNT", "flag_distinct", true, "expr_list", expr_list_json);
     }
-    | T_COUNT T_OPEN_P '*' T_CLOSE_P { $res = hql_count_all_func(); }
+    | T_COUNT T_OPEN_P T_MULT_S T_CLOSE_P { $res = hql_count_all_func(); }
     | T_SUM T_OPEN_P expr T_CLOSE_P { $res = hql_double_param_func("SUM", "flag_distinct", false, "col", $expr.res); }
     | T_SUM T_OPEN_P T_DISTINCT expr T_CLOSE_P { $res = hql_double_param_func("SUM", "flag_distinct", true, "col", $expr.res); }
     | T_AVG T_OPEN_P expr T_CLOSE_P { $res = hql_double_param_func("AVG", "flag_distinct", false, "col", $expr.res); }
@@ -2357,11 +2444,16 @@ T_BYTE : B Y T E ;
 T_EXIT : E X I T ;
 
 
-// T_ADD          : '+' ;
+T_ADD_S        : '+' ;
+T_SUB_S        : '-' ;
+T_MULT_S       : '*' ;
+T_DIV_S        : '/' ;
+T_MOD_S        : '%' ;
+
 T_COLON        : ':' ;
 T_COMMA        : ',' ;
 T_PIPE         : '||' ;
-T_DIV          : '/' ;
+// T_DIV          : '/' ;
 T_DOT2         : '..' ;
 T_EQUAL        : '=' ;
 T_EQUAL2       : '==' ;
@@ -2371,7 +2463,7 @@ T_GREATER      : '>' ;
 T_GREATEREQUAL : '>=' ;
 T_LESS         : '<' ;
 T_LESSEQUAL    : '<=' ;
-T_MUL          : '*' ;
+// T_MUL          : '*' ;
 T_OPEN_B       : '{' ;
 T_OPEN_P       : '(' ;
 T_OPEN_SB      : '[' ;
@@ -2379,7 +2471,10 @@ T_CLOSE_B      : '}' ;
 T_CLOSE_P      : ')' ;
 T_CLOSE_SB     : ']' ;
 T_SEMICOLON    : ';' ;
-// T_SUB          : '-' ;
+T_SHIFT_LEFT   : '<<';
+T_SHIFT_RIGHT  : '>>';
+T_BIT_AND      : '&' ;
+T_BIT_OR       : '|' ;
 
 IDENTIFIER
     : '`' (~'`' | '``')* '`'

@@ -1,13 +1,17 @@
--- SET hive.resultset.use.unique.column.names.
--- SET hivevar:DAT_RFRC = 202001;
--- SET mapred.ouput.compression.type = BLOCK;
--- SET io.seqfile.compression.type = BLOCK;
--- SET hivevar:DAT_RFRC = XX_DTREF-A-rt2_ai6_utmm2rc1_ut_rems_oran0110_001-MAX-1-_XX;
+SET hivevar:DAT_RFRC = 202001;
+SET mapred.ouput.compression.type = BLOCK;
+SET io.seqfile.compression.type = BLOCK;
+SET hivevar:DAT_RFRC = XX_DTREF-A-rt2_ai6_utmm2rc1_ut_rems_oran0110_001-MAX-1-_XX;
 
 SET mapred.job.name = TRANBRU_NADA_A_VER_${DAT_RFRC};
 
-SELECT 
-    E.abc,
-    COALESCE(E.abc, 1029),
-    LAG(a,b,c,d,e) OVER()
+SELECT
+    CAST(TRIM(IDCPFCNP) AS BIGINT) AS CPF_CNPJ,
+    CAST(TRIM(CDMODOPE) AS INT) AS CDMODOPE,
+    TRIM(UPPER(IDORIRSC)) AS IDORIRSC,
+    10 * 10 / 20 + 2,
+    CAST(TRIM(VLAV0030) AS DOUBLE) / 100 + CAST(TRIM(VLAV0060) AS DOUBLE) / 100 + CAST(TRIM(VLAV0090) AS DOUBLE) / 100 +
+    CAST(TRIM(VLAV0180) AS DOUBLE) / 100 + CAST(TRIM(VLAV0360) AS DOUBLE) / 100 + CAST(TRIM(VLAV0720) AS DOUBLE) / 100 +
+    CAST(TRIM(VLAV1080) AS DOUBLE) / 100 + CAST(TRIM(VLAV1440) AS DOUBLE) / 100 + CAST(TRIM(VLAV1800) AS DOUBLE) / 100 +
+    CAST(TRIM(VLAV5400) AS DOUBLE) / 100 + CAST(TRIM(VLAV5499) AS DOUBLE) / 100 + CAST(TRIM(VLAV9999) AS DOUBLE) / 100  AS VAL_VENCER
 FROM teste ;
