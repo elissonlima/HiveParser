@@ -201,6 +201,7 @@ set_var_value returns [json res]
     | non_reserved_words { $res = hql_var_name_value($non_reserved_words.res); }
     | reserved_words { $res = hql_var_name_value($reserved_words.res); }
     | complex_name { $res = $complex_name.res; }
+    | base_expr { $res = $base_expr.res; }
     | expr { $res = $expr.res; }
     ;
 
@@ -788,14 +789,6 @@ expr_list returns [vector<json> res]
 
 expr returns [json res]
     : bool_expr { $res = $bool_expr.res; }
-    | l_expr=expr set_operators_is BOOL_LITERAL { $res = hql_bool_operator($set_operators_is.res, $l_expr.res, hql_boolean_type($BOOL_LITERAL.text)); }
-    | l_expr=expr set_operators_is NULL_CONST { $res = hql_bool_operator($set_operators_is.res, $l_expr.res, hql_null_constant()); }
-    | eval_expr=expr T_BETWEEN start_interval=expr T_AND end_interval=expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, false); }
-    | eval_expr=expr T_NOT T_BETWEEN start_interval=expr T_AND end_interval=expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, true); }
-    | eval_expr=expr set_operators_in expr_list { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $expr_list.res);  }
-    | eval_expr=expr set_operators_in T_OPEN_P full_select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $full_select_stmt.res); }
-    | eval_expr=expr set_operators_exists T_OPEN_P full_select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_exists.res, $eval_expr.res, $full_select_stmt.res); }
-    | eval_expr=expr set_operators_like r_expr=expr { $res = hql_bool_operator($set_operators_like.res, $eval_expr.res, $r_expr.res); }
     | T_OPEN_P expr T_CLOSE_P { $res = $expr.res; }
     ;
 
@@ -856,6 +849,14 @@ comp_expr returns [json res]
             $res = result;
         }
      }
+    | l_expr=shift_expr set_operators_is BOOL_LITERAL { $res = hql_bool_operator($set_operators_is.res, $l_expr.res, hql_boolean_type($BOOL_LITERAL.text)); }
+    | l_expr=shift_expr set_operators_is NULL_CONST { $res = hql_bool_operator($set_operators_is.res, $l_expr.res, hql_null_constant()); }
+    | eval_expr=shift_expr T_BETWEEN start_interval=shift_expr T_AND end_interval=shift_expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, false); }
+    | eval_expr=shift_expr T_NOT T_BETWEEN start_interval=shift_expr T_AND end_interval=shift_expr { $res = hql_between_expr($eval_expr.res, $start_interval.res, $end_interval.res, true); }
+    | eval_expr=shift_expr set_operators_in expr_list { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $expr_list.res);  }
+    | eval_expr=shift_expr set_operators_in T_OPEN_P full_select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_in.res, $eval_expr.res, $full_select_stmt.res); }
+    | eval_expr=shift_expr set_operators_exists T_OPEN_P full_select_stmt T_CLOSE_P { $res = hql_set_operators_in($set_operators_exists.res, $eval_expr.res, $full_select_stmt.res); }
+    | eval_expr=shift_expr set_operators_like r_expr=shift_expr { $res = hql_bool_operator($set_operators_like.res, $eval_expr.res, $r_expr.res); }
     ; 
 
 comp_op_expr returns [string res]
