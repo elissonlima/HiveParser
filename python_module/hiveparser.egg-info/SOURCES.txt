@@ -4,6 +4,7 @@ setup.py
 hiveparser/__init__.py
 hiveparser/hiveparser_c.cp37-win32.pyd
 hiveparser/hiveparser_c.cp37-win_amd64.pyd
+hiveparser/hiveparser_c.cp38-win_amd64.pyd
 hiveparser.egg-info/PKG-INFO
 hiveparser.egg-info/SOURCES.txt
 hiveparser.egg-info/dependency_links.txt

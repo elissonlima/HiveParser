@@ -738,14 +738,19 @@ select_expr_list returns [vector<json> res]
     ;
 
 select_expr returns [json res]
-    : expr T_AS? name_identifier { $res = hql_select_expr($expr.res, $name_identifier.res); }
+    : expr T_AS? column_name_identifier { $res = hql_select_expr($expr.res, $column_name_identifier.res); }
     | expr { $res = hql_select_expr($expr.res); }
-    | expr T_AS? name_identifier { $res = hql_select_expr($expr.res, $name_identifier.res); }
+    | expr T_AS? column_name_identifier { $res = hql_select_expr($expr.res, $column_name_identifier.res); }
     | expr { $res = hql_select_expr($expr.res); }
     | T_MULT_S { $res = hql_select_all_expr(); } 
-    | name_identifier '.' T_MULT_S { $res = hql_select_all_expr($name_identifier.res); }
+    | column_name_identifier '.' T_MULT_S { $res = hql_select_all_expr($column_name_identifier.res); }
     | over_clause { $res = hql_select_expr($over_clause.res, "DEFAULT"); }
-    | over_clause T_AS? name_identifier { $res = hql_select_expr($over_clause.res, $name_identifier.res); }
+    | over_clause T_AS? column_name_identifier { $res = hql_select_expr($over_clause.res, $column_name_identifier.res); }
+    ;
+
+column_name_identifier returns [string res]
+    : name_identifier { $res = $name_identifier.res; }
+    | reserved_words { $res = $reserved_words.res; }
     ;
 
 over_clause returns [json res]

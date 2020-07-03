@@ -56,7 +56,7 @@ add_executable(hiveparser main.cpp hql_types.cpp hql_exprs.cpp hql_stmts.cpp hql
 
 target_link_libraries(hiveparser antlr4_shared nlohmann_json::nlohmann_json)
 
-# target_link_libraries(hiveparser antlr4_shared)
+#target_link_libraries(hiveparser antlr4_shared)
 add_custom_command(TARGET hiveparser
                    POST_BUILD
                    COMMAND ${CMAKE_COMMAND}
@@ -75,5 +75,6 @@ add_custom_command(OUTPUT ${OUTPUT}
                    DEPENDS antlr4_static)
 
 add_custom_target(target ALL DEPENDS ${OUTPUT})
+
 
 install(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} install)")

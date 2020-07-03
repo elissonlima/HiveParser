@@ -8,6 +8,13 @@ import hiveparser_c
 del pathlib
 del sys
 
+class ParserError(Exception):
+    def __init__(self, message):
+
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
 def check_types(f):
     def new_f(*args, **kwargs):
         if ( type(args[0]) != str and 
@@ -62,34 +69,35 @@ def check_types(f):
 
 @check_types
 def parse_raw(str_in, replace=None):
-    try:
-        if replace is not None:
-            import re
-            for r_val in replace:
-                str_in = re.sub(r_val[0],r_val[1],str_in)
-        return hiveparser_c.parse(str_in)
-    except:
-        return ""
+    
+    if replace is not None:
+        import re
+        for r_val in replace:
+            str_in = re.sub(r_val[0],r_val[1],str_in)
+    
+    parser_result = hiveparser_c.parse(str_in)
+    if parser_result.startswith("PARSER_ERROR"):
+        raise ParserError(parser_result)
+    else:
+        return parser_result
 
 @check_types
 def parse(str_in, replace=None):
     try:
+        import ujson as json
+    except ImportError:
         try:
-            import ujson as json
+            import simplejson as json
         except ImportError:
-            try:
-                import simplejson as json
-            except ImportError:
-                import json
-        
-        result = json.loads(parse_raw(str_in,replace=replace))
-        if (type(result) == dict and 'stmt_list' in result):
-            return result['stmt_list']
-        else:
-            return []
-    except Exception as e:
-        raise e
+            import json
+
+    result = json.loads(parse_raw(str_in,replace=replace))
+
+    if (type(result) == dict and 'stmt_list' in result):
+        return result['stmt_list']
+    else:
         return []
+
 
 
 #python setup.py sdist bdist_wheel

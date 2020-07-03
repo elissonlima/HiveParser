@@ -1,5 +1,6 @@
 #include <Python.h>
 #include <string>
+#include <exception>
 #include "HiveParserModule.h"
 
 PyObject* py_parse(PyObject* self, PyObject* args)
@@ -7,9 +8,15 @@ PyObject* py_parse(PyObject* self, PyObject* args)
     char * input = PyBytes_AsString(PyUnicode_AsUTF8String(args));
 
     std::string in(input);
-    std::string result = parse(in);
-
-    return PyUnicode_FromString(result.c_str());
+    try
+    {
+        std::string result = parse(in);
+        return PyUnicode_FromString(result.c_str());
+    }
+    catch (exception& e)
+    {
+        return PyUnicode_FromString(e.what());
+    }
 }
 
 static PyMethodDef ModuleMethods[] = {
